@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "ratat_app",
+  "project_id": "53ff239e-1054-4b4c-a77d-bc64ecd06262"
+}
