@@ -70,12 +70,9 @@ function MediaFrame({ media, alt }: { media: Media; alt: string }) {
 
 function ArtworkPage() {
   const { post, moreBy } = Route.useLoaderData();
-  // A Bluesky post has no title field, so the first line becomes one and the
-  // rest becomes the description — never both.
-  const [firstLine = "", ...rest] = (post.text ?? "").split("\n");
-  const title = firstLine.trim() || `Untitled — @${post.author.handle}`;
   const artistName = post.author.displayName?.trim() || post.author.handle;
-  const description = rest.join("\n").trim() || undefined;
+  const description = (post.text ?? "").trim() || undefined;
+  const mediaAlt = `Artwork by @${post.author.handle}`;
 
   return (
     <>
@@ -84,14 +81,13 @@ function ArtworkPage() {
           <div className="feed">
             {post.media.map((media, index) => (
               <div key={index} className={index === 0 ? "" : "mt-[0.4rem]"}>
-                <MediaFrame media={media} alt={title} />
+                <MediaFrame media={media} alt={mediaAlt} />
               </div>
             ))}
 
             <div className="mt-[24px] flex items-start gap-[16px]">
               <div className="min-w-0 flex-auto">
-                <h1 className="text-[20px] font-[600]">{title}</h1>
-                <div className="mt-[6px] flex items-center gap-[10px]">
+                <div className="flex items-center gap-[10px]">
                   <Link
                     to="/profile/$handle"
                     params={{ handle: post.author.handle }}
