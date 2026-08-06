@@ -17,5 +17,12 @@ export const postNotFound = (actor: string, rkey: string): XRPCError =>
     message: `no artwork at ${rkey} for ${actor}`,
   });
 
+export const invalidCursor = (): XRPCError =>
+  new XRPCError({
+    status: 400,
+    error: "InvalidRequest",
+    message: "that cursor did not come from here",
+  });
+
 export const upstreamFailure = (message: string): XRPCError =>
   new XRPCError({ status: 502, error: "UpstreamFailure", message });

@@ -4,12 +4,13 @@ import type {
   ArtRatatFeedDefs,
   ArtRatatFeedGetAuthorFeed,
   ArtRatatFeedGetPost,
+  ArtRatatFeedGetTimeline,
 } from "@ratat/lexicon";
 import { Effect } from "effect";
 
 import { actorRequestFailed, appviewUnreachable, Appview } from "../appview.ts";
 import { nearestCursor, rememberCursor } from "../cursor-cache.ts";
-import { postNotFound } from "../errors.ts";
+import { postNotFound, upstreamFailure } from "../errors.ts";
 import type { RouteEffect } from "../handler.ts";
 import { noteInterestInBackground } from "../interest.ts";
 import {
@@ -21,8 +22,10 @@ import {
   indexedFeedAfter,
   indexedFeedPage,
   indexedPost,
+  timelinePage,
 } from "../store.ts";
 import { artworkView, postView, rowPostView } from "../views.ts";
+import { resolveViewer } from "../viewer.ts";
 
 const DEFAULT_LIMIT = 30;
 
@@ -181,6 +184,36 @@ export const feedGetAuthorFeed = (
     }
 
     return json(yield* liveAuthorFeed(actor, limit, page, cursor, ctx.signal));
+  });
+
+// -------------------------------------------------------------------- timeline
+
+/**
+ * The home gallery. Unlike an author feed this has no live fallback: a
+ * timeline is a join over the Ratat graph, and only the index holds one. An
+ * artist the viewer follows who has not been backfilled yet simply contributes
+ * nothing until the worker reaches them.
+ */
+export const feedGetTimeline = (
+  ctx: QueryContext<ArtRatatFeedGetTimeline.mainSchema>,
+): RouteEffect<Response> =>
+  Effect.gen(function* () {
+    const { limit } = ctx.params;
+    const page = ctx.params.page ?? 1;
+
+    const viewer = yield* resolveViewer(ctx.params.viewer, ctx.signal);
+    const result = yield* timelinePage(viewer.did, limit ?? DEFAULT_LIMIT, page).pipe(
+      Effect.mapError(() => upstreamFailure("the local index is unavailable")),
+    );
+
+    const output: ArtRatatFeedGetTimeline.$output = {
+      feed: result.items
+        .map((item) => rowPostView(item.post, item.author))
+        .filter((view): view is ArtRatatFeedDefs.PostView => view !== undefined),
+      page: result.page,
+      total: result.total,
+    };
+    return json(output);
   });
 
 // ----------------------------------------------------------------- single post

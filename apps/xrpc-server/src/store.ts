@@ -7,11 +7,18 @@
  */
 
 import { Database, type DbError } from "@ratat/db/effect";
-import { actor, post, type ActorRow, type PostRow } from "@ratat/db/schema";
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import {
+  actor,
+  post,
+  ratatFollow,
+  type ActorRow,
+  type PostRow,
+  type RatatFollowRow,
+} from "@ratat/db/schema";
+import { and, count, desc, eq, lt, or, sql } from "drizzle-orm";
 import { Effect } from "effect";
 
-export type { ActorRow, PostRow };
+export type { ActorRow, PostRow, RatatFollowRow };
 
 export interface ActorSnapshot {
   readonly did: string;
@@ -172,6 +179,112 @@ export const indexedPost = (uri: string): Effect.Effect<PostRow | undefined, DbE
     return rows[0];
   });
 
+// ----------------------------------------------------------------- the graph
+
+/**
+ * Stamps an actor as one whose own Ratat follows somebody wants to read, which
+ * is what queues the ingester's one-off walk of their repo. Only ever set once:
+ * after the walk, jetstream keeps the graph current.
+ */
+export const wantFollowsBackfill = (did: string): Effect.Effect<void, DbError, Database> =>
+  Effect.gen(function* () {
+    const database = yield* Database;
+    yield* database.run("wantFollowsBackfill", (db) =>
+      db
+        .update(actor)
+        .set({ followsWantedAt: new Date() })
+        .where(and(eq(actor.did, did), sql`${actor.followsWantedAt} is null`)),
+    );
+  });
+
+export interface FollowsPage {
+  readonly rows: RatatFollowRow[];
+  readonly hasMore: boolean;
+}
+
+/** One page of an actor's Ratat follows, newest first. */
+export const followsPage = (
+  did: string,
+  limit: number,
+  after: FeedCursor | undefined,
+): Effect.Effect<FollowsPage, DbError, Database> =>
+  Effect.gen(function* () {
+    const database = yield* Database;
+    const rows = yield* database.run("followsPage", (db) =>
+      db
+        .select()
+        .from(ratatFollow)
+        .where(
+          after === undefined
+            ? eq(ratatFollow.did, did)
+            : and(
+                eq(ratatFollow.did, did),
+                or(
+                  lt(ratatFollow.createdAt, after.createdAt),
+                  and(eq(ratatFollow.createdAt, after.createdAt), lt(ratatFollow.uri, after.uri)),
+                ),
+              ),
+        )
+        .orderBy(desc(ratatFollow.createdAt), desc(ratatFollow.uri))
+        .limit(limit + 1),
+    );
+
+    const hasMore = rows.length > limit;
+    return { rows: hasMore ? rows.slice(0, limit) : rows, hasMore };
+  });
+
+// --------------------------------------------------------------- the timeline
+
+export interface TimelineItem {
+  readonly post: PostRow;
+  readonly author: ActorRow;
+}
+
+export interface TimelinePage {
+  readonly items: TimelineItem[];
+  /** The page actually served, clamped to the last page that holds artworks. */
+  readonly page: number;
+  readonly total: number;
+}
+
+/** Restricts posts to their authors being Ratat-followed by the viewer. */
+const byFollowedAuthor = (viewer: string) =>
+  sql`${post.did} in (select ${ratatFollow.subject} from ${ratatFollow} where ${ratatFollow.did} = ${viewer})`;
+
+/**
+ * One page of the home gallery: every indexed artwork by somebody the viewer
+ * follows, newest first. Pages are offsets over an ordered index, so a deep
+ * page costs what a shallow one does.
+ */
+export const timelinePage = (
+  viewer: string,
+  limit: number,
+  page: number,
+): Effect.Effect<TimelinePage, DbError, Database> =>
+  Effect.gen(function* () {
+    const database = yield* Database;
+    const totals = yield* database.run("timelineCount", (db) =>
+      db.select({ total: count() }).from(post).where(byFollowedAuthor(viewer)),
+    );
+    const total = totals[0]?.total ?? 0;
+
+    const lastPage = Math.max(1, Math.ceil(total / limit));
+    const served = Math.min(page, lastPage);
+
+    const items = yield* database.run("timelinePage", (db) =>
+      db
+        .select({ post, author: actor })
+        .from(post)
+        .innerJoin(actor, eq(actor.did, post.did))
+        .where(byFollowedAuthor(viewer))
+        .orderBy(desc(post.createdAt), desc(post.uri))
+        .limit(limit)
+        .offset((served - 1) * limit),
+    );
+
+    return { items, page: served, total };
+  });
+
 export interface FeedCursor {
   readonly createdAt: Date;
   readonly uri: string;
@@ -181,7 +294,7 @@ export interface FeedCursor {
  * The keyset the next page starts after. Encoded rather than exposed so the
  * shape stays ours — the lexicon promises callers nothing but an opaque string.
  */
-export const encodeFeedCursor = (row: PostRow): string =>
+export const encodeFeedCursor = (row: FeedCursor): string =>
   Buffer.from(`${row.createdAt.getTime()}|${row.uri}`, "utf8").toString("base64url");
 
 /**
