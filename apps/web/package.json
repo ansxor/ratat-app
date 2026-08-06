@@ -11,6 +11,7 @@
     "generate-routes": "tsr generate",
     "lint:colors": "bun scripts/check-color-literals.ts",
     "build": "vite build",
+    "start": "bun scripts/serve.ts",
     "preview": "vite preview",
     "typecheck": "tsr generate && tsc --noEmit",
     "test": "bun test"
