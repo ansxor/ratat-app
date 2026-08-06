@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [
+    "**/node_modules/**",
+    ".beads/**",
+    ".claude/**",
+    ".hermes/**",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "**/dist/**",
+    "**/.output/**",
+    "**/.tanstack/**",
+    "**/routeTree.gen.ts",
+    "packages/db/drizzle/**"
+  ]
+}

@@ -40,18 +40,32 @@ Do NOT push to remote unless explicitly asked.
 
 ## Build & Test
 
-_Add your build and test commands here_
+Bun workspace. `just` wraps the root scripts.
 
 ```bash
-# Example:
-# npm install
-# npm test
+bun install
+just up          # Postgres via docker compose
+just migrate     # apply packages/db migrations
+just dev         # all workspace dev servers
+just check       # lint + format-check + typecheck
 ```
 
 ## Architecture Overview
 
-_Add a brief overview of your project architecture_
+Ratat is a read-mostly art appview over `app.bsky.*` data. See
+`.hermes/plans/2026-08-05_ratat-lens-migration.md` for the full plan.
+
+```
+apps/web           TanStack Start (React) — XRPC client + OAuth. No Effect.
+apps/xrpc-server   Effect — read API serving art.ratat.* query lexicons.
+apps/ingester      Effect — jetstream tail + lazy per-DID backfill.
+packages/db        Drizzle + Postgres schema and migration runner.
+packages/lexicon   art.ratat.graph.follow record + art.ratat.* query lexicons.
+packages/common    Shared ATProto helpers.
+```
 
 ## Conventions & Patterns
 
-_Add your project-specific conventions here_
+- Backend services use Effect. The frontend does not.
+- Lint/format via oxlint + oxfmt from the repo root; per-package `typecheck`
+  scripts run `tsc --noEmit` against `tsconfig.base.json`.
