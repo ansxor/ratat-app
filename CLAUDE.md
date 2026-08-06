@@ -69,6 +69,11 @@ packages/common    Shared ATProto helpers.
 - Backend services use Effect. The frontend does not.
 - Lint/format via oxlint + oxfmt from the repo root; per-package `typecheck`
   scripts run `tsc --noEmit` against `tsconfig.base.json`.
+- Page and component designs are PORTED from the old app at
+  `/home/answer/Workspace/ratat/apps/frontend` — copy its layout, JSX structure,
+  classes, and CSS one-for-one; never invent a new design. Buttons, inputs, and
+  dialogs are square-cornered like the old app. When no old-app equivalent
+  exists, stay consistent with its visual language.
 - Colours in `apps/web` come from the `light-dark()` tokens in
   `apps/web/src/styles.css`. `bun run lint:colors` rejects hex, `rgb()`/`hsl()`,
   and Tailwind palette classes anywhere in `apps/web/src`; a colour that must
