@@ -10,33 +10,71 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OauthCallbackRouteImport } from './routes/oauth/callback'
+import { Route as OauthClientMetadataDotjsonRouteImport } from './routes/oauth/client-metadata[.]json'
+import { Route as ProfileHandleRouteImport } from './routes/profile.$handle'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OauthCallbackRoute = OauthCallbackRouteImport.update({
+  id: '/oauth/callback',
+  path: '/oauth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OauthClientMetadataDotjsonRoute =
+  OauthClientMetadataDotjsonRouteImport.update({
+    id: '/oauth/client-metadata.json',
+    path: '/oauth/client-metadata.json',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ProfileHandleRoute = ProfileHandleRouteImport.update({
+  id: '/profile/$handle',
+  path: '/profile/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/oauth/callback': typeof OauthCallbackRoute
+  '/oauth/client-metadata.json': typeof OauthClientMetadataDotjsonRoute
+  '/profile/$handle': typeof ProfileHandleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/oauth/callback': typeof OauthCallbackRoute
+  '/oauth/client-metadata.json': typeof OauthClientMetadataDotjsonRoute
+  '/profile/$handle': typeof ProfileHandleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/oauth/callback': typeof OauthCallbackRoute
+  '/oauth/client-metadata.json': typeof OauthClientMetadataDotjsonRoute
+  '/profile/$handle': typeof ProfileHandleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/oauth/callback' | '/oauth/client-metadata.json' | '/profile/$handle'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    '/' | '/oauth/callback' | '/oauth/client-metadata.json' | '/profile/$handle'
+  id:
+    | '__root__'
+    | '/'
+    | '/oauth/callback'
+    | '/oauth/client-metadata.json'
+    | '/profile/$handle'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  OauthCallbackRoute: typeof OauthCallbackRoute
+  OauthClientMetadataDotjsonRoute: typeof OauthClientMetadataDotjsonRoute
+  ProfileHandleRoute: typeof ProfileHandleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,12 +86,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/oauth/callback': {
+      id: '/oauth/callback'
+      path: '/oauth/callback'
+      fullPath: '/oauth/callback'
+      preLoaderRoute: typeof OauthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oauth/client-metadata.json': {
+      id: '/oauth/client-metadata.json'
+      path: '/oauth/client-metadata.json'
+      fullPath: '/oauth/client-metadata.json'
+      preLoaderRoute: typeof OauthClientMetadataDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/$handle': {
+      id: '/profile/$handle'
+      path: '/profile/$handle'
+      fullPath: '/profile/$handle'
+      preLoaderRoute: typeof ProfileHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  OauthCallbackRoute: OauthCallbackRoute,
+  OauthClientMetadataDotjsonRoute: OauthClientMetadataDotjsonRoute,
+  ProfileHandleRoute: ProfileHandleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

@@ -1,5 +1,7 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 
+import { Masthead } from "#/components/Masthead.tsx";
+import { SessionProvider } from "#/lib/session.tsx";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -33,7 +35,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <SessionProvider>
+          <Masthead />
+          {children}
+        </SessionProvider>
 
         <Scripts />
       </body>

@@ -11,7 +11,8 @@
     "**/.output/**",
     "**/.tanstack/**",
     "**/routeTree.gen.ts",
-    "packages/db/drizzle/**"
+    "packages/db/drizzle/**",
+    "packages/lexicon/lexicons/**"
   ],
   "rules": {},
   "env": {

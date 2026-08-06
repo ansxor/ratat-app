@@ -8,12 +8,25 @@
     ".": {
       "import": "./src/index.ts",
       "types": "./src/index.ts"
+    },
+    "./collections": {
+      "import": "./src/collections.ts",
+      "types": "./src/collections.ts"
     }
   },
   "scripts": {
+    "generate": "lex-cli generate",
+    "export": "lex-cli export",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@atcute/atproto": "^4.0.4",
+    "@atcute/bluesky": "^4.0.17",
+    "@atcute/lexicons": "^2.0.3"
+  },
   "devDependencies": {
+    "@atcute/lex-cli": "^3.2.1",
+    "@atcute/lexicon-doc": "^3.0.2",
     "@types/bun": "latest",
     "typescript": "^5.9.3"
   }
