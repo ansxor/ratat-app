@@ -18,7 +18,8 @@
     "lint:colors": "bun --filter '@ratat/web' lint:colors",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "typecheck": "bun --filter '*' typecheck"
+    "typecheck": "bun --filter '*' typecheck",
+    "test": "bun --filter '@ratat/web' test"
   },
   "devDependencies": {
     "oxfmt": "0.58.0",

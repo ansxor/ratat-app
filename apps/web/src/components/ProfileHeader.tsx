@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
+import { FollowButton } from "#/components/FollowButton.tsx";
 import { ImageIcon } from "#/components/ui/icons.tsx";
 import { TabNav, type TabNavItem } from "#/components/ui/TabNav.tsx";
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
@@ -90,6 +91,7 @@ export function ProfileHeader({ profile, artCount }: { profile: Profile; artCoun
         <ProfileStats profile={profile} />
 
         <div className="flex items-center gap-[8px] py-[6px]">
+          <FollowButton subject={profile.did} />
           <a
             className="btn btn--ghost"
             href={profile.bskyUrl}

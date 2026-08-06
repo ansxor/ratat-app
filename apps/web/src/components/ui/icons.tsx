@@ -1,10 +1,12 @@
 export {
+  Check as CheckIcon,
   ChevronRight as ChevronRightIcon,
   Heart as HeartIcon,
   Home as HomeIcon,
   ImageIcon,
   LogIn as SignInIcon,
   MessageCircle as ChatIcon,
+  Plus as PlusIcon,
   Repeat as BoostIcon,
   Search as SearchIcon,
   Settings as SettingsIcon,

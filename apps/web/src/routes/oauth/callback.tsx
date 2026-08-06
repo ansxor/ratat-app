@@ -12,7 +12,9 @@ function OAuthCallback() {
     (async () => {
       try {
         await completeSignIn();
-        window.location.replace("/");
+        // Onboarding sends anyone who already has a Ratat graph — or who has
+        // turned the offer down once — straight on to the home feed.
+        window.location.replace("/onboarding");
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "Sign-in failed.");
       }

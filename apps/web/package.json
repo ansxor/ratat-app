@@ -12,7 +12,8 @@
     "lint:colors": "bun scripts/check-color-literals.ts",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsr generate && tsc --noEmit"
+    "typecheck": "tsr generate && tsc --noEmit",
+    "test": "bun test"
   },
   "dependencies": {
     "@atcute/atproto": "^4.0.4",

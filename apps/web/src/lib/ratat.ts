@@ -57,6 +57,66 @@ export async function getAuthorFeed(
   };
 }
 
+export interface Timeline {
+  posts: Post[];
+  /** The page the index served, which is the last one when the timeline is shorter. */
+  page: number;
+  total: number;
+}
+
+export async function getTimeline(
+  viewer: string,
+  options: { page?: number; limit?: number; signal?: AbortSignal } = {},
+): Promise<Timeline> {
+  const res = await client.get("art.ratat.feed.getTimeline", {
+    params: {
+      viewer: viewer as Profile["did"],
+      limit: options.limit ?? 30,
+      ...(options.page && options.page > 1 ? { page: options.page } : {}),
+    },
+    ...(options.signal ? { signal: options.signal } : {}),
+  });
+  if (!res.ok) throw new AppviewError(res.data.error, res.data.message);
+  return { posts: res.data.feed, page: res.data.page, total: res.data.total };
+}
+
+export interface IndexedFollows {
+  follows: Array<{ uri: string; subject: string }>;
+  /** False while the index has yet to walk this repo, so the list may be short. */
+  indexed: boolean;
+}
+
+export async function getRatatFollows(
+  actor: string,
+  signal?: AbortSignal,
+): Promise<IndexedFollows> {
+  const follows: IndexedFollows["follows"] = [];
+  let indexed = false;
+  let cursor: string | undefined;
+
+  for (;;) {
+    const res = await client.get("art.ratat.graph.getFollows", {
+      params: {
+        actor: actor as Profile["did"],
+        limit: 100,
+        ...(cursor ? { cursor } : {}),
+      },
+      ...(signal ? { signal } : {}),
+    });
+    if (!res.ok) throw new AppviewError(res.data.error, res.data.message);
+
+    indexed = res.data.indexed;
+    for (const follow of res.data.follows) {
+      follows.push({ uri: follow.uri, subject: follow.subject });
+    }
+
+    cursor = res.data.cursor;
+    if (cursor === undefined) break;
+  }
+
+  return { follows, indexed };
+}
+
 export async function getPost(actor: string, rkey: string, signal?: AbortSignal): Promise<Post> {
   const res = await client.get("art.ratat.feed.getPost", {
     params: { actor: actor as Profile["did"], rkey },

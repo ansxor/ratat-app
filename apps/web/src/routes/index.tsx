@@ -1,92 +1,129 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
+import { ArtworkGrid } from "#/components/ArtworkGrid.tsx";
 import { Footer } from "#/components/Footer.tsx";
-import { SearchIcon } from "#/components/ui/icons.tsx";
+import { LoginPanel } from "#/components/LoginPanel.tsx";
+import { Pager } from "#/components/Pager.tsx";
+import { useFollows } from "#/lib/follows.tsx";
+import { pagerLinks, type PagerPagination } from "#/lib/pagination.ts";
+import { getTimeline, type Timeline } from "#/lib/ratat.ts";
 import { useSession } from "#/lib/session.tsx";
 
-export const Route = createFileRoute("/")({ component: Home });
+const PAGE_SIZE = 30;
+
+export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>): { page?: number } => {
+    const page = Math.trunc(Number(search.page));
+    return Number.isFinite(page) && page > 1 ? { page } : {};
+  },
+  component: Home,
+});
 
 /**
- * The old app's home is a discover feed. Until a discover query exists, the
- * page keeps the gallery shell and offers the one route we can serve: an
- * artist's portfolio.
+ * Home is the following feed. Signed out there is nothing to follow with, so
+ * the page is the sign-in card and nothing else.
  */
 function Home() {
   const { session, restored } = useSession();
-  const navigate = useNavigate();
-  const [handle, setHandle] = useState("");
+  const { page = 1 } = Route.useSearch();
 
-  const visit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmed = handle.trim().replace(/^@/, "");
-    if (!trimmed) return;
-    void navigate({ to: "/profile/$handle", params: { handle: trimmed } });
-  };
+  if (!restored) return <FeedShell />;
+  if (!session) return <LoginPanel />;
+  return <HomeFeed did={session.did} page={page} />;
+}
 
+function FeedShell({ children }: { children?: React.ReactNode }) {
   return (
     <>
       <main className="gallery">
         <div className="wrap layout">
-          <div className="feed">
-            <section className="w-[520px] max-w-full border border-line bg-ink-raised shadow-[0_24px_48px_-32px_var(--shadow-drop)]">
-              <h1 className="flex items-center m-0 bg-ink-hi border-b border-line px-[16px] py-[9px] text-[13px] font-[700] tracking-[0.01em] text-paper">
-                Open an artist's portfolio
-              </h1>
-
-              <form onSubmit={visit} className="flex flex-col px-[16px] py-[16px]">
-                <div className="flex items-center flex-nowrap gap-[5px] bg-search-bg border border-search-line py-[5px] pl-3 pr-2 text-faint transition-shadow duration-[180ms] focus-within:shadow-[0_0_0_2px_var(--color-primary)] [&>svg]:w-[15px] [&>svg]:h-[15px] [&>svg]:flex-none">
-                  <SearchIcon />
-                  <input
-                    aria-label="Artist handle"
-                    value={handle}
-                    onChange={(event) => setHandle(event.target.value)}
-                    placeholder="alice.bsky.social"
-                    autoComplete="off"
-                    spellCheck={false}
-                    className="bg-transparent border-none outline-none text-paper font-body text-[13.5px] flex-1 min-w-[40px] w-full placeholder:text-faint"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="btn btn--accent mt-[14px] justify-center py-[10px]"
-                >
-                  Open portfolio
-                </button>
-              </form>
-
-              <p className="m-0 border-t border-line px-[16px] py-[10px] text-[13px] text-mist">
-                {restored && session ? (
-                  session.handle ? (
-                    <>
-                      Signed in as @{session.handle} —{" "}
-                      <Link
-                        to="/profile/$handle"
-                        params={{ handle: session.handle }}
-                        className="text-primary"
-                      >
-                        your own portfolio
-                      </Link>
-                      .
-                    </>
-                  ) : (
-                    "Signed in."
-                  )
-                ) : (
-                  <>
-                    <Link to="/login" className="text-primary">
-                      Sign in
-                    </Link>{" "}
-                    to favourite the work you find.
-                  </>
-                )}
-              </p>
-            </section>
-          </div>
+          <div className="feed">{children}</div>
         </div>
       </main>
       <Footer />
     </>
+  );
+}
+
+function Notice({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mt-[26px] text-center text-[14px] text-mist [&_a]:underline">{children}</div>
+  );
+}
+
+function paginationFor(timeline: Timeline): PagerPagination {
+  return pagerLinks({
+    page: timeline.page,
+    limit: PAGE_SIZE,
+    total: timeline.total,
+    itemCount: timeline.posts.length,
+    link: (target) => ({ to: "/", search: target > 1 ? { page: target } : {} }),
+  });
+}
+
+function HomeFeed({ did, page }: { did: string; page: number }) {
+  const { follows, loaded } = useFollows();
+  const [timeline, setTimeline] = useState<Timeline | undefined>(undefined);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setFailed(false);
+    getTimeline(did, { page, limit: PAGE_SIZE, signal: controller.signal })
+      .then((result) => {
+        if (!controller.signal.aborted) setTimeline(result);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setFailed(true);
+      });
+    return () => controller.abort();
+  }, [did, page]);
+
+  if (failed) {
+    return (
+      <FeedShell>
+        <Notice>Couldn&apos;t load your feed right now.</Notice>
+      </FeedShell>
+    );
+  }
+
+  if (timeline === undefined || !loaded) return <FeedShell />;
+
+  if (follows.size === 0) {
+    return (
+      <FeedShell>
+        <Notice>
+          <p>
+            You don&apos;t follow any artists on Ratat yet.{" "}
+            <Link to="/onboarding">Bring over the ones you follow on Bluesky</Link>, or open an
+            artist&apos;s portfolio and follow them there.
+          </p>
+        </Notice>
+      </FeedShell>
+    );
+  }
+
+  if (timeline.posts.length === 0) {
+    return (
+      <FeedShell>
+        <Notice>
+          <p>
+            Nothing from the artists you follow yet — their work is still being read in. Check back
+            in a minute.
+          </p>
+        </Notice>
+      </FeedShell>
+    );
+  }
+
+  const pagination = paginationFor(timeline);
+
+  return (
+    <FeedShell>
+      <Pager variant="top" pagination={pagination} />
+      <ArtworkGrid posts={timeline.posts} header="pinned" />
+      <Pager variant="bottom" pagination={pagination} />
+    </FeedShell>
   );
 }
