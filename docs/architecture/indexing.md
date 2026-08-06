@@ -18,11 +18,11 @@ A DID becomes interested when:
 
 | Trigger                                                   | Where                                                                     |
 | --------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Somebody opens their profile                              | `art.ratat.actor.getProfile`                                              |
-| Somebody reads their feed, even before we know the handle | `art.ratat.feed.getAuthorFeed`, from the byline of the first post fetched |
-| Somebody opens one of their artworks                      | `art.ratat.feed.getPost`                                                  |
+| Somebody opens their profile                              | `net.ratat.actor.getProfile`                                              |
+| Somebody reads their feed, even before we know the handle | `net.ratat.feed.getAuthorFeed`, from the byline of the first post fetched |
+| Somebody opens one of their artworks                      | `net.ratat.feed.getPost`                                                  |
 | A user logs in                                            | falls out of the above — the masthead reads its own profile               |
-| Somebody Ratat-follows them                               | `art.ratat.graph.follow` ingest — see _The Ratat graph_                   |
+| Somebody Ratat-follows them                               | `net.ratat.graph.follow` ingest — see _The Ratat graph_                   |
 
 Marking is a background write on the read path (`noteInterestInBackground`). It
 cannot fail a request: if Postgres is unreachable, the page still renders live
@@ -61,12 +61,12 @@ Choices worth knowing:
   pathological account; when it fires, it logs that the rest of the portfolio is
   not indexed rather than quietly stopping.
 - **Media is stored in view shape.** The `media` JSONB column holds exactly the
-  `art.ratat.feed.defs#imageView` / `#videoView` objects the lexicon returns, so
+  `net.ratat.feed.defs#imageView` / `#videoView` objects the lexicon returns, so
   a read is a row fetch, not a re-render of blob refs.
 
 ## The Ratat graph
 
-`art.ratat.graph.follow` is the one record Ratat writes, and it lives in the
+`net.ratat.graph.follow` is the one record Ratat writes, and it lives in the
 follower's repo. The index mirrors it into `ratat_follow` because the home feed
 is a join over it, and because being followed is what makes an artist worth
 indexing at all.
@@ -75,7 +75,7 @@ Two ways a follow arrives:
 
 - **The tail** (below) sees everything written from now on.
 - **A one-off graph walk** covers what was written before. A repo is walked when
-  somebody asks what it follows — `art.ratat.graph.getFollows` stamps
+  somebody asks what it follows — `net.ratat.graph.getFollows` stamps
   `follows_wanted_at`, which is the queue the worker reads, and stamps
   `follows_backfilled_at` when done. The appview does not carry the collection,
   so the walk reads `com.atproto.repo.listRecords` from the actor's own PDS,
@@ -133,7 +133,7 @@ backfilled values.
 
 **`jetstream:follows`** is unscoped for the same reason as the like tail — a
 follow lives in the follower's repo — but costs nothing, because only Ratat
-writes `art.ratat.graph.follow` and jetstream filters the collection upstream.
+writes `net.ratat.graph.follow` and jetstream filters the collection upstream.
 A create writes the row and marks the subject interested; a delete carries no
 record, but the DID and rkey in the event name the row on their own.
 
@@ -171,7 +171,7 @@ Cursors handed out by the indexed path are a base64url keyset
 The indexed path recognises the difference and refuses a cursor it did not mint,
 falling back to live rather than paging from nonsense.
 
-The home feed (`art.ratat.feed.getTimeline`) is the one read with **no live
+The home feed (`net.ratat.feed.getTimeline`) is the one read with **no live
 fallback**: it is a join over a graph only we hold, so an unreachable index is
 an error rather than a slower answer. It is paged the same way — offsets over
 `post_timeline_idx (created_at desc, uri desc)` — and returns the total, so the

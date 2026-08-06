@@ -2,7 +2,7 @@
  * The Ratat graph.
  *
  * Two ways a follow reaches the index. The tail sees every
- * `art.ratat.graph.follow` written from now on (see `tail.ts`); this file
+ * `net.ratat.graph.follow` written from now on (see `tail.ts`); this file
  * covers the other one — a repo that already held follows before we watched
  * for them, walked once when its owner first asks for their home feed.
  *
@@ -23,7 +23,7 @@ import {
 import type { ActorIdentifier, Did } from "@atcute/lexicons/syntax";
 import { parseAtUri } from "@ratat/common";
 import type { Database } from "@ratat/db/effect";
-import { ArtRatatCollection } from "@ratat/lexicon/collections";
+import { NetRatatCollection } from "@ratat/lexicon/collections";
 import { Duration, Effect } from "effect";
 
 import { IngesterSettings } from "./config.ts";
@@ -36,7 +36,7 @@ import {
   upsertRatatFollow,
 } from "./store.ts";
 
-export const FOLLOW_COLLECTION = ArtRatatCollection.graphFollow;
+export const FOLLOW_COLLECTION = NetRatatCollection.graphFollow;
 
 class GraphError extends Error {
   override readonly name = "GraphError";
@@ -138,7 +138,7 @@ const resolver = (settings: { appviewUrl: string; plcDirectoryUrl: string }) =>
 
 /**
  * Walks one repo's follow records straight from its PDS. The appview does not
- * carry `art.ratat.graph.follow`, so this is the only place the records can be
+ * carry `net.ratat.graph.follow`, so this is the only place the records can be
  * read from in bulk.
  */
 const walkFollows = (did: string): Effect.Effect<number, GraphError, IngesterSettings | Database> =>

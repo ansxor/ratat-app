@@ -10,7 +10,7 @@ import {
 } from "@atcute/lexicon-doc/builder";
 
 export default document({
-  id: "art.ratat.feed.defs",
+  id: "net.ratat.feed.defs",
   defs: {
     imageView: object({
       description: "CDN URLs served by Bluesky; dimensions are the appview's, not the record's.",
@@ -35,7 +35,7 @@ export default document({
       properties: {
         uri: required(string({ format: "at-uri" })),
         cid: required(string({ format: "cid" })),
-        author: required(ref({ ref: "art.ratat.actor.defs#profileViewBasic" })),
+        author: required(ref({ ref: "net.ratat.actor.defs#profileViewBasic" })),
         text: string({ maxLength: 3000, maxGraphemes: 300 }),
         media: required(
           array({

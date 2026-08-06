@@ -5,7 +5,7 @@ import type {} from '@atcute/lexicons/ambient';
 const _mainSchema = /*#__PURE__*/ v.record(
 	/*#__PURE__*/ v.tidString(),
 	/*#__PURE__*/ v.object({
-		"$type": /*#__PURE__*/ v.literal("art.ratat.graph.follow"),
+		"$type": /*#__PURE__*/ v.literal("net.ratat.graph.follow"),
 		"createdAt": /*#__PURE__*/ v.datetimeString(),
 		"subject": /*#__PURE__*/ v.didString(),
 	})
@@ -18,6 +18,6 @@ export const mainSchema = _mainSchema as mainSchema;
 export interface Main extends v.InferInput<typeof mainSchema> {}
 declare module '@atcute/lexicons/ambient' {
 	interface Records {
-		"art.ratat.graph.follow": mainSchema;
+		"net.ratat.graph.follow": mainSchema;
 	}
 }

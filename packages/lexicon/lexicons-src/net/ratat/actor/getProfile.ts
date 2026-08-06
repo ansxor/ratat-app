@@ -1,7 +1,7 @@
 import { document, params, query, ref, required, string } from "@atcute/lexicon-doc/builder";
 
 export default document({
-  id: "art.ratat.actor.getProfile",
+  id: "net.ratat.actor.getProfile",
   defs: {
     main: query({
       description: "An artist's profile, hydrated live from the public Bluesky appview. [public]",
@@ -12,7 +12,7 @@ export default document({
       }),
       output: {
         encoding: "application/json",
-        schema: ref({ ref: "art.ratat.actor.defs#profileView" }),
+        schema: ref({ ref: "net.ratat.actor.defs#profileView" }),
       },
       errors: [{ name: "ProfileNotFound" }],
     }),

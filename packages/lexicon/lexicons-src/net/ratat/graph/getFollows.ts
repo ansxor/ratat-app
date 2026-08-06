@@ -12,11 +12,11 @@ import {
 } from "@atcute/lexicon-doc/builder";
 
 export default document({
-  id: "art.ratat.graph.getFollows",
+  id: "net.ratat.graph.getFollows",
   defs: {
     main: query({
       description:
-        "The art.ratat.graph.follow records an actor holds, newest first, read from the local index. [public]",
+        "The net.ratat.graph.follow records an actor holds, newest first, read from the local index. [public]",
       parameters: params({
         properties: {
           actor: required(string({ description: "DID or handle.", format: "at-identifier" })),

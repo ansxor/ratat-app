@@ -4,7 +4,7 @@ import type {} from '@atcute/lexicons/ambient';
 
 const _followViewSchema = /*#__PURE__*/ v.object(
 	{
-		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("art.ratat.graph.getFollows#followView")),
+		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("net.ratat.graph.getFollows#followView")),
 		"createdAt": /*#__PURE__*/ v.datetimeString(),
 		/**
 		 * The followed DID.
@@ -17,7 +17,7 @@ const _followViewSchema = /*#__PURE__*/ v.object(
 	}
 );
 const _mainSchema = /*#__PURE__*/ v.query(
-	"art.ratat.graph.getFollows",
+	"net.ratat.graph.getFollows",
 	{
 		"params": /*#__PURE__*/ v.object(
 			{
@@ -79,6 +79,6 @@ export interface $params extends v.InferInput<mainSchema['params']> {}
 export interface $output extends v.InferXRPCBodyInput<mainSchema['output']> {}
 declare module '@atcute/lexicons/ambient' {
 	interface XRPCQueries {
-		"art.ratat.graph.getFollows": mainSchema;
+		"net.ratat.graph.getFollows": mainSchema;
 	}
 }

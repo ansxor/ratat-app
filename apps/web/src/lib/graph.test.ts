@@ -72,8 +72,8 @@ describe("importFollows", () => {
       "com.atproto.repo.applyWrites#create",
     ]);
     expect(writes.map((write) => write.collection)).toEqual([
-      "art.ratat.graph.follow",
-      "art.ratat.graph.follow",
+      "net.ratat.graph.follow",
+      "net.ratat.graph.follow",
     ]);
     expect(writes.map((write) => (write.value as { subject: string }).subject)).toEqual([
       "did:plc:one",

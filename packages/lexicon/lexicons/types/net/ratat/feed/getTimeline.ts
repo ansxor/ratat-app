@@ -1,10 +1,10 @@
 import type {} from '@atcute/lexicons';
 import * as v from '@atcute/lexicons/validations';
 import type {} from '@atcute/lexicons/ambient';
-import * as ArtRatatFeedDefs from "./defs.js";
+import * as NetRatatFeedDefs from "./defs.js";
 
 const _mainSchema = /*#__PURE__*/ v.query(
-	"art.ratat.feed.getTimeline",
+	"net.ratat.feed.getTimeline",
 	{
 		"params": /*#__PURE__*/ v.object(
 			{
@@ -33,7 +33,7 @@ const _mainSchema = /*#__PURE__*/ v.query(
 					1
 				),
 				/**
-				 * DID or handle whose art.ratat.graph.follow records build the timeline.
+				 * DID or handle whose net.ratat.graph.follow records build the timeline.
 				 */
 				"viewer": /*#__PURE__*/ v.actorIdentifierString(),
 			}
@@ -43,7 +43,7 @@ const _mainSchema = /*#__PURE__*/ v.query(
 			"schema": /*#__PURE__*/ v.object(
 				{
 					get "feed"() {
-						return /*#__PURE__*/ v.array(ArtRatatFeedDefs.postViewSchema)
+						return /*#__PURE__*/ v.array(NetRatatFeedDefs.postViewSchema)
 					},
 					/**
 					 * The page this response holds. Lower than the requested `page` when the timeline ended first.
@@ -68,6 +68,6 @@ export interface $params extends v.InferInput<mainSchema['params']> {}
 export interface $output extends v.InferXRPCBodyInput<mainSchema['output']> {}
 declare module '@atcute/lexicons/ambient' {
 	interface XRPCQueries {
-		"art.ratat.feed.getTimeline": mainSchema;
+		"net.ratat.feed.getTimeline": mainSchema;
 	}
 }

@@ -1,10 +1,10 @@
 import type {} from '@atcute/lexicons';
 import * as v from '@atcute/lexicons/validations';
 import type {} from '@atcute/lexicons/ambient';
-import * as ArtRatatFeedDefs from "./defs.js";
+import * as NetRatatFeedDefs from "./defs.js";
 
 const _mainSchema = /*#__PURE__*/ v.query(
-	"art.ratat.feed.getAuthorFeed",
+	"net.ratat.feed.getAuthorFeed",
 	{
 		"params": /*#__PURE__*/ v.object(
 			{
@@ -57,7 +57,7 @@ const _mainSchema = /*#__PURE__*/ v.query(
 					 */
 					"cursor": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.string()),
 					get "feed"() {
-						return /*#__PURE__*/ v.array(ArtRatatFeedDefs.postViewSchema)
+						return /*#__PURE__*/ v.array(NetRatatFeedDefs.postViewSchema)
 					},
 					/**
 					 * The page this response holds. Lower than the requested `page` when the feed ended first. Absent when the request named a `cursor` instead, since a cursor does not say where it sits.
@@ -78,6 +78,6 @@ export interface $params extends v.InferInput<mainSchema['params']> {}
 export interface $output extends v.InferXRPCBodyInput<mainSchema['output']> {}
 declare module '@atcute/lexicons/ambient' {
 	interface XRPCQueries {
-		"art.ratat.feed.getAuthorFeed": mainSchema;
+		"net.ratat.feed.getAuthorFeed": mainSchema;
 	}
 }

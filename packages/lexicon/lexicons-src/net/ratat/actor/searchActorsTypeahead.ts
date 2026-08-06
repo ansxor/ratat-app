@@ -11,7 +11,7 @@ import {
 } from "@atcute/lexicon-doc/builder";
 
 export default document({
-  id: "art.ratat.actor.searchActorsTypeahead",
+  id: "net.ratat.actor.searchActorsTypeahead",
   defs: {
     main: query({
       description:
@@ -27,7 +27,7 @@ export default document({
         schema: object({
           properties: {
             actors: required(
-              array({ items: ref({ ref: "art.ratat.actor.defs#profileViewBasic" }) }),
+              array({ items: ref({ ref: "net.ratat.actor.defs#profileViewBasic" }) }),
             ),
           },
         }),

@@ -3,7 +3,7 @@ import * as v from '@atcute/lexicons/validations';
 
 const _profileViewSchema = /*#__PURE__*/ v.object(
 	{
-		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("art.ratat.actor.defs#profileView")),
+		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("net.ratat.actor.defs#profileView")),
 		"avatar": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.genericUriString()),
 		"banner": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.genericUriString()),
 		/**
@@ -52,7 +52,7 @@ const _profileViewSchema = /*#__PURE__*/ v.object(
 );
 const _profileViewBasicSchema = /*#__PURE__*/ v.object(
 	{
-		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("art.ratat.actor.defs#profileViewBasic")),
+		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("net.ratat.actor.defs#profileViewBasic")),
 		/**
 		 * CDN URL, not a blob ref.
 		 */

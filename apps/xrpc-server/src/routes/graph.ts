@@ -1,5 +1,5 @@
 import { json, type QueryContext } from "@atcute/xrpc-server";
-import type { ArtRatatGraphGetFollows } from "@ratat/lexicon";
+import type { NetRatatGraphGetFollows } from "@ratat/lexicon";
 import { Effect } from "effect";
 
 import { invalidCursor } from "../errors.ts";
@@ -9,7 +9,7 @@ import { resolveViewer } from "../viewer.ts";
 
 const DEFAULT_LIMIT = 100;
 
-type FollowView = ArtRatatGraphGetFollows.FollowView;
+type FollowView = NetRatatGraphGetFollows.FollowView;
 
 const followView = (row: RatatFollowRow): FollowView => ({
   uri: row.uri as FollowView["uri"],
@@ -27,7 +27,7 @@ const followView = (row: RatatFollowRow): FollowView => ({
  * request itself is what queues that walk.
  */
 export const graphGetFollows = (
-  ctx: QueryContext<ArtRatatGraphGetFollows.mainSchema>,
+  ctx: QueryContext<NetRatatGraphGetFollows.mainSchema>,
 ): RouteEffect<Response> =>
   Effect.gen(function* () {
     const { actor, cursor } = ctx.params;
@@ -47,7 +47,7 @@ export const graphGetFollows = (
     );
 
     const last = page.rows[page.rows.length - 1];
-    const output: ArtRatatGraphGetFollows.$output = {
+    const output: NetRatatGraphGetFollows.$output = {
       follows: page.rows.map(followView),
       indexed:
         viewer.row?.followsBackfilledAt !== undefined && viewer.row?.followsBackfilledAt !== null,

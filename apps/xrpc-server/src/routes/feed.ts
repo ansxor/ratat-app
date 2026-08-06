@@ -1,10 +1,10 @@
 import { json, type QueryContext } from "@atcute/xrpc-server";
 import type { Database } from "@ratat/db/effect";
 import type {
-  ArtRatatFeedDefs,
-  ArtRatatFeedGetAuthorFeed,
-  ArtRatatFeedGetPost,
-  ArtRatatFeedGetTimeline,
+  NetRatatFeedDefs,
+  NetRatatFeedGetAuthorFeed,
+  NetRatatFeedGetPost,
+  NetRatatFeedGetTimeline,
 } from "@ratat/lexicon";
 import { Effect } from "effect";
 
@@ -30,8 +30,8 @@ import { resolveViewer } from "../viewer.ts";
 
 const DEFAULT_LIMIT = 30;
 
-type Did = ArtRatatFeedDefs.PostView["author"]["did"];
-type AtUri = ArtRatatFeedDefs.PostView["uri"];
+type Did = NetRatatFeedDefs.PostView["author"]["did"];
+type AtUri = NetRatatFeedDefs.PostView["uri"];
 
 /**
  * The index row for an actor, or undefined when we have never heard of them —
@@ -61,7 +61,7 @@ const indexedAuthorFeed = (
   limit: number,
   page: number,
   cursor: string | undefined,
-): Effect.Effect<ArtRatatFeedGetAuthorFeed.$output | undefined, never, Database> =>
+): Effect.Effect<NetRatatFeedGetAuthorFeed.$output | undefined, never, Database> =>
   Effect.gen(function* () {
     const after = cursor === undefined ? undefined : decodeFeedCursor(cursor);
     // A cursor we did not mint came from the live path; it means nothing here.
@@ -73,7 +73,7 @@ const indexedAuthorFeed = (
 
     const feed = result.rows
       .map((indexed) => rowPostView(indexed, row))
-      .filter((view): view is ArtRatatFeedDefs.PostView => view !== undefined);
+      .filter((view): view is NetRatatFeedDefs.PostView => view !== undefined);
 
     const last = result.rows[result.rows.length - 1];
     return {
@@ -92,12 +92,12 @@ const indexedAuthorFeed = (
 // ------------------------------------------------------------------ live reads
 
 interface FeedPage {
-  feed: ArtRatatFeedDefs.PostView[];
+  feed: NetRatatFeedDefs.PostView[];
   cursor?: string | undefined;
 }
 
 const fetchPage = (
-  actor: ArtRatatFeedGetAuthorFeed.$params["actor"],
+  actor: NetRatatFeedGetAuthorFeed.$params["actor"],
   limit: number | undefined,
   cursor: string | undefined,
   signal: AbortSignal | undefined,
@@ -124,18 +124,18 @@ const fetchPage = (
     return {
       feed: res.data.feed
         .map(postView)
-        .filter((post): post is ArtRatatFeedDefs.PostView => post !== undefined),
+        .filter((post): post is NetRatatFeedDefs.PostView => post !== undefined),
       cursor: res.data.cursor,
     };
   });
 
 const liveAuthorFeed = (
-  actor: ArtRatatFeedGetAuthorFeed.$params["actor"],
+  actor: NetRatatFeedGetAuthorFeed.$params["actor"],
   limit: number | undefined,
   page: number,
   cursor: string | undefined,
   signal: AbortSignal | undefined,
-): RouteEffect<ArtRatatFeedGetAuthorFeed.$output> =>
+): RouteEffect<NetRatatFeedGetAuthorFeed.$output> =>
   Effect.gen(function* () {
     // Upstream pages by cursor only, so a page number is reached by walking
     // from the deepest cursor already known — page 1 when nothing is cached.
@@ -189,11 +189,11 @@ const SAMPLE_POOL_LIMIT = 100;
  * which is as far back as one upstream read can see.
  */
 const sampledAuthorFeed = (
-  actor: ArtRatatFeedGetAuthorFeed.$params["actor"],
+  actor: NetRatatFeedGetAuthorFeed.$params["actor"],
   row: ActorRow | undefined,
   limit: number,
   signal: AbortSignal | undefined,
-): RouteEffect<ArtRatatFeedGetAuthorFeed.$output> =>
+): RouteEffect<NetRatatFeedGetAuthorFeed.$output> =>
   Effect.gen(function* () {
     if (row?.backfilledAt) {
       const rows = yield* indexedFeedSample(row.did, limit).pipe(
@@ -208,7 +208,7 @@ const sampledAuthorFeed = (
         return {
           feed: rows
             .map((indexed) => rowPostView(indexed, row))
-            .filter((view): view is ArtRatatFeedDefs.PostView => view !== undefined),
+            .filter((view): view is NetRatatFeedDefs.PostView => view !== undefined),
         };
       }
     }
@@ -220,7 +220,7 @@ const sampledAuthorFeed = (
   });
 
 export const feedGetAuthorFeed = (
-  ctx: QueryContext<ArtRatatFeedGetAuthorFeed.mainSchema>,
+  ctx: QueryContext<NetRatatFeedGetAuthorFeed.mainSchema>,
 ): RouteEffect<Response> =>
   Effect.gen(function* () {
     const { actor, limit, cursor } = ctx.params;
@@ -252,7 +252,7 @@ export const feedGetAuthorFeed = (
  * nothing until the worker reaches them.
  */
 export const feedGetTimeline = (
-  ctx: QueryContext<ArtRatatFeedGetTimeline.mainSchema>,
+  ctx: QueryContext<NetRatatFeedGetTimeline.mainSchema>,
 ): RouteEffect<Response> =>
   Effect.gen(function* () {
     const { limit } = ctx.params;
@@ -263,10 +263,10 @@ export const feedGetTimeline = (
       Effect.mapError(() => upstreamFailure("the local index is unavailable")),
     );
 
-    const output: ArtRatatFeedGetTimeline.$output = {
+    const output: NetRatatFeedGetTimeline.$output = {
       feed: result.items
         .map((item) => rowPostView(item.post, item.author))
-        .filter((view): view is ArtRatatFeedDefs.PostView => view !== undefined),
+        .filter((view): view is NetRatatFeedDefs.PostView => view !== undefined),
       page: result.page,
       total: result.total,
     };
@@ -277,7 +277,7 @@ export const feedGetTimeline = (
 
 /** `getPosts` only takes at-uris, so a handle has to become a DID first. */
 const resolveDid = (
-  actor: ArtRatatFeedGetPost.$params["actor"],
+  actor: NetRatatFeedGetPost.$params["actor"],
   known: ActorRow | undefined,
   signal: AbortSignal | undefined,
 ): RouteEffect<Did> =>
@@ -299,7 +299,7 @@ const resolveDid = (
   });
 
 export const feedGetPost = (
-  ctx: QueryContext<ArtRatatFeedGetPost.mainSchema>,
+  ctx: QueryContext<NetRatatFeedGetPost.mainSchema>,
 ): RouteEffect<Response> =>
   Effect.gen(function* () {
     const { actor, rkey } = ctx.params;
@@ -314,7 +314,7 @@ export const feedGetPost = (
       const view = row ? rowPostView(row, author) : undefined;
       if (view) {
         yield* Effect.logDebug(`getPost ${uri} served from index`);
-        const indexedOutput: ArtRatatFeedGetPost.$output = { post: view };
+        const indexedOutput: NetRatatFeedGetPost.$output = { post: view };
         return json(indexedOutput);
       }
     }
@@ -336,6 +336,6 @@ export const feedGetPost = (
 
     yield* noteInterestInBackground(post.author);
 
-    const output: ArtRatatFeedGetPost.$output = { post };
+    const output: NetRatatFeedGetPost.$output = { post };
     return json(output);
   });

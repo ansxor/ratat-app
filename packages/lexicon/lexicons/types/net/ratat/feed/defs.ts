@@ -1,11 +1,11 @@
 import type {} from '@atcute/lexicons';
 import * as v from '@atcute/lexicons/validations';
 import * as AppBskyEmbedDefs from "@atcute/bluesky/types/app/embed/defs";
-import * as ArtRatatActorDefs from "../actor/defs.js";
+import * as NetRatatActorDefs from "../actor/defs.js";
 
 const _imageViewSchema = /*#__PURE__*/ v.object(
 	{
-		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("art.ratat.feed.defs#imageView")),
+		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("net.ratat.feed.defs#imageView")),
 		/**
 		 * @maxLength 10000
 		 * @maxGraphemes 1000
@@ -26,9 +26,9 @@ const _imageViewSchema = /*#__PURE__*/ v.object(
 );
 const _postViewSchema = /*#__PURE__*/ v.object(
 	{
-		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("art.ratat.feed.defs#postView")),
+		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("net.ratat.feed.defs#postView")),
 		get "author"() {
-			return ArtRatatActorDefs.profileViewBasicSchema
+			return NetRatatActorDefs.profileViewBasicSchema
 		},
 		/**
 		 * Permalink to the Bluesky post.
@@ -75,7 +75,7 @@ const _postViewSchema = /*#__PURE__*/ v.object(
 );
 const _videoViewSchema = /*#__PURE__*/ v.object(
 	{
-		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("art.ratat.feed.defs#videoView")),
+		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("net.ratat.feed.defs#videoView")),
 		/**
 		 * @maxLength 10000
 		 * @maxGraphemes 1000

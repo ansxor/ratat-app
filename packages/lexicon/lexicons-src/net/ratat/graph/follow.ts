@@ -1,7 +1,7 @@
 import { document, object, record, required, string } from "@atcute/lexicon-doc/builder";
 
 export default document({
-  id: "art.ratat.graph.follow",
+  id: "net.ratat.graph.follow",
   defs: {
     main: record({
       description:

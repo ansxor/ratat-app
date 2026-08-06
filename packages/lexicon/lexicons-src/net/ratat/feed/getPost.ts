@@ -9,7 +9,7 @@ import {
 } from "@atcute/lexicon-doc/builder";
 
 export default document({
-  id: "art.ratat.feed.getPost",
+  id: "net.ratat.feed.getPost",
   defs: {
     main: query({
       description:
@@ -24,7 +24,7 @@ export default document({
         encoding: "application/json",
         schema: object({
           properties: {
-            post: required(ref({ ref: "art.ratat.feed.defs#postView" })),
+            post: required(ref({ ref: "net.ratat.feed.defs#postView" })),
           },
         }),
       },

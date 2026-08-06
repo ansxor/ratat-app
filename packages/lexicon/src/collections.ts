@@ -1,5 +1,5 @@
-export const ArtRatatCollection = {
-  graphFollow: "art.ratat.graph.follow",
+export const NetRatatCollection = {
+  graphFollow: "net.ratat.graph.follow",
 } as const;
 
 export const BskyCollection = {

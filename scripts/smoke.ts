@@ -2,7 +2,7 @@
 /**
  * End-to-end smoke test for the read API.
  *
- * Every art.ratat.* query gets one real request against a running
+ * Every net.ratat.* query gets one real request against a running
  * xrpc-server — which this script starts itself unless one is already
  * listening — and the response is checked for the shape the lexicon promises.
  * Nothing is mocked: the point is to catch a serving path that broke between
@@ -91,7 +91,7 @@ async function run(): Promise<Check[]> {
   expect(health.status === 200, `_health: expected 200, got ${health.status}`);
   done.push({ name: "_health", detail: await health.text() });
 
-  const typeahead = await query("art.ratat.actor.searchActorsTypeahead", { q: QUERY, limit: 8 });
+  const typeahead = await query("net.ratat.actor.searchActorsTypeahead", { q: QUERY, limit: 8 });
   expect(isRecord(typeahead), "searchActorsTypeahead: not an object");
   const actors = (typeahead as Record<string, unknown>)["actors"];
   expect(Array.isArray(actors), "searchActorsTypeahead: actors is not an array");
@@ -100,28 +100,28 @@ async function run(): Promise<Check[]> {
     checkProfileBasic(actor, `searchActorsTypeahead.actors[${index}]`),
   );
   done.push({
-    name: "art.ratat.actor.searchActorsTypeahead",
+    name: "net.ratat.actor.searchActorsTypeahead",
     detail: `${candidates.length} actor(s) for "${QUERY}"`,
   });
 
   const first = candidates[0];
   if (first === undefined) return fail("searchActorsTypeahead: no candidate to follow up on");
 
-  const profile = await query("art.ratat.actor.getProfile", { actor: first.handle });
+  const profile = await query("net.ratat.actor.getProfile", { actor: first.handle });
   const named = checkProfileBasic(profile, "getProfile");
   expect(named.did === first.did, "getProfile: answered about a different DID");
   expect(
     typeof (profile as Record<string, unknown>)["bskyUrl"] === "string",
     "getProfile: missing bskyUrl",
   );
-  done.push({ name: "art.ratat.actor.getProfile", detail: `@${named.handle}` });
+  done.push({ name: "net.ratat.actor.getProfile", detail: `@${named.handle}` });
 
   // The first candidate may post nothing with media, which is a legitimate
   // empty feed rather than a failure — so the post check moves down the list.
   let withArt: { actor: { did: string; handle: string }; uri: string } | undefined;
 
   for (const candidate of candidates.slice(0, 4)) {
-    const feed = await query("art.ratat.feed.getAuthorFeed", { actor: candidate.did, limit: 5 });
+    const feed = await query("net.ratat.feed.getAuthorFeed", { actor: candidate.did, limit: 5 });
     expect(isRecord(feed), "getAuthorFeed: not an object");
     const items = (feed as Record<string, unknown>)["feed"];
     expect(Array.isArray(items), "getAuthorFeed: feed is not an array");
@@ -131,7 +131,7 @@ async function run(): Promise<Check[]> {
     if (withArt === undefined && posts[0]) {
       withArt = { actor: candidate, uri: posts[0].uri };
       done.push({
-        name: "art.ratat.feed.getAuthorFeed",
+        name: "net.ratat.feed.getAuthorFeed",
         detail: `${posts.length} artwork(s) by @${candidate.handle}`,
       });
       break;
@@ -145,16 +145,16 @@ async function run(): Promise<Check[]> {
     );
   }
 
-  const post = await query("art.ratat.feed.getPost", {
+  const post = await query("net.ratat.feed.getPost", {
     actor: withArt.actor.handle,
     rkey: rkeyOf(withArt.uri),
   });
   expect(isRecord(post), "getPost: not an object");
   const view = checkPostView((post as Record<string, unknown>)["post"], "getPost.post");
   expect(view.uri === withArt.uri, `getPost: asked for ${withArt.uri}, got ${view.uri}`);
-  done.push({ name: "art.ratat.feed.getPost", detail: rkeyOf(view.uri) });
+  done.push({ name: "net.ratat.feed.getPost", detail: rkeyOf(view.uri) });
 
-  const follows = await query("art.ratat.graph.getFollows", { actor: withArt.actor.did });
+  const follows = await query("net.ratat.graph.getFollows", { actor: withArt.actor.did });
   expect(isRecord(follows), "getFollows: not an object");
   expect(
     Array.isArray((follows as Record<string, unknown>)["follows"]),
@@ -165,13 +165,13 @@ async function run(): Promise<Check[]> {
     "getFollows: missing indexed",
   );
   done.push({
-    name: "art.ratat.graph.getFollows",
+    name: "net.ratat.graph.getFollows",
     detail: `${((follows as Record<string, unknown>)["follows"] as unknown[]).length} follow(s)`,
   });
 
   // A timeline needs no follows to be well formed; an actor who follows nobody
   // is exactly the empty-but-valid case worth checking.
-  const timeline = await query("art.ratat.feed.getTimeline", {
+  const timeline = await query("net.ratat.feed.getTimeline", {
     viewer: withArt.actor.did,
     limit: 5,
   });
@@ -184,7 +184,7 @@ async function run(): Promise<Check[]> {
     checkPostView(item, `getTimeline.feed[${index}]`),
   );
   done.push({
-    name: "art.ratat.feed.getTimeline",
+    name: "net.ratat.feed.getTimeline",
     detail: `${(line["feed"] as unknown[]).length} of ${String(line["total"])}`,
   });
 

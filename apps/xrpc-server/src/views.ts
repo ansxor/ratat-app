@@ -4,13 +4,13 @@ import type * as AppBskyFeedPost from "@atcute/bluesky/types/app/feed/post";
 import { bskyPostUrl, bskyProfileUrl } from "@ratat/common";
 import { labelValues } from "@ratat/common/labels";
 import { mediaFromEmbedView } from "@ratat/common/media";
-import type { ArtRatatActorDefs, ArtRatatFeedDefs } from "@ratat/lexicon";
+import type { NetRatatActorDefs, NetRatatFeedDefs } from "@ratat/lexicon";
 
 import type { ActorRow, PostRow } from "./store.ts";
 
 export const profileViewBasic = (
   author: AppBskyActorDefs.ProfileViewBasic,
-): ArtRatatActorDefs.ProfileViewBasic => ({
+): NetRatatActorDefs.ProfileViewBasic => ({
   did: author.did,
   handle: author.handle,
   ...(author.displayName ? { displayName: author.displayName } : {}),
@@ -19,7 +19,7 @@ export const profileViewBasic = (
 
 export const profileView = (
   profile: AppBskyActorDefs.ProfileViewDetailed,
-): ArtRatatActorDefs.ProfileView => ({
+): NetRatatActorDefs.ProfileView => ({
   did: profile.did,
   handle: profile.handle,
   ...(profile.displayName ? { displayName: profile.displayName } : {}),
@@ -30,7 +30,7 @@ export const profileView = (
   ...(profile.followsCount === undefined ? {} : { followsCount: profile.followsCount }),
   ...(profile.postsCount === undefined ? {} : { postsCount: profile.postsCount }),
   labels: labelValues(profile.labels),
-  bskyUrl: bskyProfileUrl(profile.handle) as ArtRatatActorDefs.ProfileView["bskyUrl"],
+  bskyUrl: bskyProfileUrl(profile.handle) as NetRatatActorDefs.ProfileView["bskyUrl"],
   ...(profile.indexedAt ? { indexedAt: profile.indexedAt } : {}),
 });
 
@@ -46,7 +46,7 @@ const postRecord = (record: unknown): AppBskyFeedPost.Main | undefined => {
  */
 export const artworkView = (
   post: AppBskyFeedDefs.PostView,
-): ArtRatatFeedDefs.PostView | undefined => {
+): NetRatatFeedDefs.PostView | undefined => {
   const media = mediaFromEmbedView(post.embed);
   if (media.length === 0) return undefined;
 
@@ -60,12 +60,12 @@ export const artworkView = (
     cid: post.cid,
     author: profileViewBasic(post.author),
     ...(record?.text ? { text: record.text } : {}),
-    media: media as ArtRatatFeedDefs.PostView["media"],
+    media: media as NetRatatFeedDefs.PostView["media"],
     labels: labelValues(post.labels),
     ...(post.likeCount === undefined ? {} : { likeCount: post.likeCount }),
     ...(post.replyCount === undefined ? {} : { replyCount: post.replyCount }),
     ...(post.repostCount === undefined ? {} : { repostCount: post.repostCount }),
-    bskyUrl: bskyUrl as ArtRatatFeedDefs.PostView["bskyUrl"],
+    bskyUrl: bskyUrl as NetRatatFeedDefs.PostView["bskyUrl"],
     createdAt,
     indexedAt: post.indexedAt,
   };
@@ -77,19 +77,19 @@ export const artworkView = (
  */
 export const postView = (
   item: AppBskyFeedDefs.FeedViewPost,
-): ArtRatatFeedDefs.PostView | undefined =>
+): NetRatatFeedDefs.PostView | undefined =>
   item.reason?.$type === "app.bsky.feed.defs#reasonRepost" ? undefined : artworkView(item.post);
 
-type Did = ArtRatatActorDefs.ProfileViewBasic["did"];
-type Handle = ArtRatatActorDefs.ProfileViewBasic["handle"];
+type Did = NetRatatActorDefs.ProfileViewBasic["did"];
+type Handle = NetRatatActorDefs.ProfileViewBasic["handle"];
 
 /** The byline of an indexed post, from the actor snapshot the index holds. */
-export const rowProfileViewBasic = (row: ActorRow): ArtRatatActorDefs.ProfileViewBasic => ({
+export const rowProfileViewBasic = (row: ActorRow): NetRatatActorDefs.ProfileViewBasic => ({
   did: row.did as Did,
   handle: row.handle as Handle,
   ...(row.displayName ? { displayName: row.displayName } : {}),
   ...(row.avatar
-    ? { avatar: row.avatar as NonNullable<ArtRatatActorDefs.ProfileView["avatar"]> }
+    ? { avatar: row.avatar as NonNullable<NetRatatActorDefs.ProfileView["avatar"]> }
     : {}),
 });
 
@@ -100,23 +100,23 @@ export const rowProfileViewBasic = (row: ActorRow): ArtRatatActorDefs.ProfileVie
 export const rowPostView = (
   row: PostRow,
   author: ActorRow,
-): ArtRatatFeedDefs.PostView | undefined => {
+): NetRatatFeedDefs.PostView | undefined => {
   if (row.media.length === 0) return undefined;
   const bskyUrl = bskyPostUrl(row.did, row.uri);
   if (!bskyUrl) return undefined;
 
   return {
-    uri: row.uri as ArtRatatFeedDefs.PostView["uri"],
-    cid: row.cid as ArtRatatFeedDefs.PostView["cid"],
+    uri: row.uri as NetRatatFeedDefs.PostView["uri"],
+    cid: row.cid as NetRatatFeedDefs.PostView["cid"],
     author: rowProfileViewBasic(author),
     ...(row.text ? { text: row.text } : {}),
-    media: row.media as ArtRatatFeedDefs.PostView["media"],
+    media: row.media as NetRatatFeedDefs.PostView["media"],
     labels: row.labels,
     likeCount: row.likeCount,
     replyCount: row.replyCount,
     repostCount: row.repostCount,
-    bskyUrl: bskyUrl as ArtRatatFeedDefs.PostView["bskyUrl"],
-    createdAt: row.createdAt.toISOString() as ArtRatatFeedDefs.PostView["createdAt"],
-    indexedAt: row.indexedAt.toISOString() as ArtRatatFeedDefs.PostView["indexedAt"],
+    bskyUrl: bskyUrl as NetRatatFeedDefs.PostView["bskyUrl"],
+    createdAt: row.createdAt.toISOString() as NetRatatFeedDefs.PostView["createdAt"],
+    indexedAt: row.indexedAt.toISOString() as NetRatatFeedDefs.PostView["indexedAt"],
   };
 };

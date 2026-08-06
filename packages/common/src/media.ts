@@ -2,12 +2,12 @@ import type * as AppBskyEmbedImages from "@atcute/bluesky/types/app/embed/images
 import type * as AppBskyEmbedRecordWithMedia from "@atcute/bluesky/types/app/embed/recordWithMedia";
 import type * as AppBskyEmbedVideo from "@atcute/bluesky/types/app/embed/video";
 import type * as AppBskyFeedDefs from "@atcute/bluesky/types/app/feed/defs";
-import type { ArtRatatFeedDefs } from "@ratat/lexicon";
+import type { NetRatatFeedDefs } from "@ratat/lexicon";
 
 import { blobCid, bskyImageUrl, bskyVideoPlaylistUrl, bskyVideoThumbnailUrl } from "./blob.ts";
 
-/** One entry of a `art.ratat.feed.defs#postView`'s media array. */
-export type MediaView = ArtRatatFeedDefs.PostView["media"][number];
+/** One entry of a `net.ratat.feed.defs#postView`'s media array. */
+export type MediaView = NetRatatFeedDefs.PostView["media"][number];
 
 type ImageView = Extract<MediaView, { fullsize: unknown }>;
 type VideoView = Extract<MediaView, { playlist: unknown }>;
@@ -16,7 +16,7 @@ type AspectRatio = NonNullable<MediaView["aspectRatio"]>;
 type EmbedView = NonNullable<AppBskyFeedDefs.PostView["embed"]>;
 
 const imageView = (image: AppBskyEmbedImages.ViewImage): MediaView => ({
-  $type: "art.ratat.feed.defs#imageView",
+  $type: "net.ratat.feed.defs#imageView",
   thumb: image.thumb,
   fullsize: image.fullsize,
   ...(image.alt ? { alt: image.alt } : {}),
@@ -24,7 +24,7 @@ const imageView = (image: AppBskyEmbedImages.ViewImage): MediaView => ({
 });
 
 const videoView = (video: AppBskyEmbedVideo.View): MediaView => ({
-  $type: "art.ratat.feed.defs#videoView",
+  $type: "net.ratat.feed.defs#videoView",
   playlist: video.playlist,
   ...(video.thumbnail ? { thumbnail: video.thumbnail } : {}),
   ...(video.alt ? { alt: video.alt } : {}),
@@ -71,7 +71,7 @@ const imageFromRecord = (did: string, value: unknown): MediaView | undefined => 
   const alt = asString(entry["alt"]);
   const aspectRatio = aspectRatioOf(entry["aspectRatio"]);
   return {
-    $type: "art.ratat.feed.defs#imageView",
+    $type: "net.ratat.feed.defs#imageView",
     thumb: bskyImageUrl(did, cid, "feed_thumbnail") as ImageView["thumb"],
     fullsize: bskyImageUrl(did, cid, "feed_fullsize") as ImageView["fullsize"],
     ...(alt ? { alt } : {}),
@@ -85,7 +85,7 @@ const videoFromRecord = (did: string, embed: Record<string, unknown>): MediaView
   const alt = asString(embed["alt"]);
   const aspectRatio = aspectRatioOf(embed["aspectRatio"]);
   return {
-    $type: "art.ratat.feed.defs#videoView",
+    $type: "net.ratat.feed.defs#videoView",
     playlist: bskyVideoPlaylistUrl(did, cid) as VideoView["playlist"],
     thumbnail: bskyVideoThumbnailUrl(did, cid) as VideoView["thumbnail"],
     ...(alt ? { alt } : {}),

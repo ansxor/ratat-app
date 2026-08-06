@@ -1,10 +1,10 @@
 import type {} from '@atcute/lexicons';
 import * as v from '@atcute/lexicons/validations';
 import type {} from '@atcute/lexicons/ambient';
-import * as ArtRatatActorDefs from "./defs.js";
+import * as NetRatatActorDefs from "./defs.js";
 
 const _mainSchema = /*#__PURE__*/ v.query(
-	"art.ratat.actor.getProfile",
+	"net.ratat.actor.getProfile",
 	{
 		"params": /*#__PURE__*/ v.object(
 			{
@@ -17,7 +17,7 @@ const _mainSchema = /*#__PURE__*/ v.query(
 		"output": {
 			"type": "lex",
 			get "schema"() {
-				return ArtRatatActorDefs.profileViewSchema
+				return NetRatatActorDefs.profileViewSchema
 			},
 		}
 	}
@@ -31,6 +31,6 @@ export interface $params extends v.InferInput<mainSchema['params']> {}
 export type $output = v.InferXRPCBodyInput<mainSchema['output']>;
 declare module '@atcute/lexicons/ambient' {
 	interface XRPCQueries {
-		"art.ratat.actor.getProfile": mainSchema;
+		"net.ratat.actor.getProfile": mainSchema;
 	}
 }

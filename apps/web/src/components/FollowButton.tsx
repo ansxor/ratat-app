@@ -8,7 +8,7 @@ import { cn } from "#/lib/utils.ts";
 /**
  * Ported from the old app's `src/components/FollowButton.tsx`: same markup and
  * classes, with `cva` folded into `cn`. What it writes is different — an
- * `art.ratat.graph.follow` in the viewer's repo rather than a Bluesky follow —
+ * `net.ratat.graph.follow` in the viewer's repo rather than a Bluesky follow —
  * so following an artist here changes nothing on Bluesky.
  */
 const COMPACT =

@@ -1,7 +1,7 @@
 import { array, document, integer, object, required, string } from "@atcute/lexicon-doc/builder";
 
 export default document({
-  id: "art.ratat.actor.defs",
+  id: "net.ratat.actor.defs",
   defs: {
     profileViewBasic: object({
       description: "The byline shape: enough to render an artist next to their work.",

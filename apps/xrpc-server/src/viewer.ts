@@ -6,7 +6,7 @@
  * for the ingester's one-off graph walk.
  */
 
-import type { ArtRatatGraphGetFollows } from "@ratat/lexicon";
+import type { NetRatatGraphGetFollows } from "@ratat/lexicon";
 import { Effect } from "effect";
 
 import { actorRequestFailed, appviewUnreachable, Appview } from "./appview.ts";
@@ -26,7 +26,7 @@ export interface Viewer {
  * built from, since a row cannot exist without a handle.
  */
 export const resolveViewer = (
-  actor: ArtRatatGraphGetFollows.$params["actor"],
+  actor: NetRatatGraphGetFollows.$params["actor"],
   signal: AbortSignal | undefined,
 ): RouteEffect<Viewer> =>
   Effect.gen(function* () {

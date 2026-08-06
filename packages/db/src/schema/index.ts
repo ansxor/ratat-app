@@ -117,7 +117,7 @@ export const postLike = pgTable(
 );
 
 /**
- * One `art.ratat.graph.follow` record: the Ratat graph, and so the home feed.
+ * One `net.ratat.graph.follow` record: the Ratat graph, and so the home feed.
  * The record lives in the follower's repo, which is why a delete arriving from
  * jetstream — did and rkey, no record — is still enough to find the row.
  */

@@ -1,29 +1,37 @@
 import type {} from '@atcute/lexicons';
 import * as v from '@atcute/lexicons/validations';
 import type {} from '@atcute/lexicons/ambient';
-import * as ArtRatatFeedDefs from "./defs.js";
+import * as NetRatatActorDefs from "./defs.js";
 
 const _mainSchema = /*#__PURE__*/ v.query(
-	"art.ratat.feed.getPost",
+	"net.ratat.actor.searchActorsTypeahead",
 	{
 		"params": /*#__PURE__*/ v.object(
 			{
 				/**
-				 * DID or handle.
+				 * @minimum 1
+				 * @maximum 25
+				 * @default 8
 				 */
-				"actor": /*#__PURE__*/ v.actorIdentifierString(),
+				"limit": /*#__PURE__*/ v.optional(
+					/*#__PURE__*/ v.constrain(
+						/*#__PURE__*/ v.integer(),
+						[/*#__PURE__*/ v.integerRange(1, 25)]
+					),
+					8
+				),
 				/**
-				 * Record key of the app.bsky.feed.post.
+				 * Search term, matched against handle and name.
 				 */
-				"rkey": /*#__PURE__*/ v.string(),
+				"q": /*#__PURE__*/ v.string(),
 			}
 		),
 		"output": {
 			"type": "lex",
 			"schema": /*#__PURE__*/ v.object(
 				{
-					get "post"() {
-						return ArtRatatFeedDefs.postViewSchema
+					get "actors"() {
+						return /*#__PURE__*/ v.array(NetRatatActorDefs.profileViewBasicSchema)
 					},
 				}
 			),
@@ -40,6 +48,6 @@ export interface $params extends v.InferInput<mainSchema['params']> {}
 export interface $output extends v.InferXRPCBodyInput<mainSchema['output']> {}
 declare module '@atcute/lexicons/ambient' {
 	interface XRPCQueries {
-		"art.ratat.feed.getPost": mainSchema;
+		"net.ratat.actor.searchActorsTypeahead": mainSchema;
 	}
 }

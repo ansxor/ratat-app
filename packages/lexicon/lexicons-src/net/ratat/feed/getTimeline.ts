@@ -11,7 +11,7 @@ import {
 } from "@atcute/lexicon-doc/builder";
 
 export default document({
-  id: "art.ratat.feed.getTimeline",
+  id: "net.ratat.feed.getTimeline",
   defs: {
     main: query({
       description:
@@ -20,7 +20,7 @@ export default document({
         properties: {
           viewer: required(
             string({
-              description: "DID or handle whose art.ratat.graph.follow records build the timeline.",
+              description: "DID or handle whose net.ratat.graph.follow records build the timeline.",
               format: "at-identifier",
             }),
           ),
@@ -37,7 +37,7 @@ export default document({
         encoding: "application/json",
         schema: object({
           properties: {
-            feed: required(array({ items: ref({ ref: "art.ratat.feed.defs#postView" }) })),
+            feed: required(array({ items: ref({ ref: "net.ratat.feed.defs#postView" }) })),
             page: required(
               integer({
                 description:

@@ -12,7 +12,7 @@ import {
 } from "@atcute/lexicon-doc/builder";
 
 export default document({
-  id: "art.ratat.feed.getAuthorFeed",
+  id: "net.ratat.feed.getAuthorFeed",
   defs: {
     main: query({
       description:
@@ -42,7 +42,7 @@ export default document({
         encoding: "application/json",
         schema: object({
           properties: {
-            feed: required(array({ items: ref({ ref: "art.ratat.feed.defs#postView" }) })),
+            feed: required(array({ items: ref({ ref: "net.ratat.feed.defs#postView" }) })),
             cursor: string({
               description:
                 "Absent when the upstream feed is exhausted. A page may hold fewer than `limit` posts — or none — while a cursor remains, because posts that carry no media are dropped after paging; never infer the end from the array's length.",

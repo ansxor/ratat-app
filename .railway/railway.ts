@@ -19,6 +19,7 @@ export default defineRailway(() => {
     start: "bun apps/xrpc-server/src/main.ts",
     preDeploy: "bun --filter '@ratat/db' migrate",
     replicas: { sfo: 1 },
+    domains: ["appview.ratat.net"],
     env: {
       DATABASE_URL: Postgres.env.DATABASE_URL,
       HOST: "0.0.0.0",
@@ -29,8 +30,9 @@ export default defineRailway(() => {
     build: { builder: "DOCKERFILE", dockerfilePath: "Dockerfile.frontend" },
     start: "bun run --cwd apps/web start",
     replicas: { sfo: 1 },
+    domains: ["ratat.net"],
     env: {
-      VITE_RATAT_APPVIEW_URL: "https://${{xrpc-server.RAILWAY_PUBLIC_DOMAIN}}",
+      VITE_RATAT_APPVIEW_URL: "https://appview.ratat.net",
     },
   });
 

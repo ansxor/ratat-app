@@ -1,10 +1,10 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
-import type { ArtRatatActorDefs, ArtRatatFeedDefs } from "@ratat/lexicon";
+import type { NetRatatActorDefs, NetRatatFeedDefs } from "@ratat/lexicon";
 import type {} from "@ratat/lexicon";
 
-export type Profile = ArtRatatActorDefs.ProfileView;
-export type ProfileBasic = ArtRatatActorDefs.ProfileViewBasic;
-export type Post = ArtRatatFeedDefs.PostView;
+export type Profile = NetRatatActorDefs.ProfileView;
+export type ProfileBasic = NetRatatActorDefs.ProfileViewBasic;
+export type Post = NetRatatFeedDefs.PostView;
 export type Media = Post["media"][number];
 
 export interface Portfolio {
@@ -45,7 +45,7 @@ export function readFailureMessage(cause: unknown, notFound: string): string {
 }
 
 export async function getProfile(actor: string, signal?: AbortSignal): Promise<Profile> {
-  const res = await client.get("art.ratat.actor.getProfile", {
+  const res = await client.get("net.ratat.actor.getProfile", {
     params: { actor: actor as Profile["did"] },
     ...(signal ? { signal } : {}),
   });
@@ -62,7 +62,7 @@ export async function searchActorsTypeahead(
   q: string,
   options: { limit?: number; signal?: AbortSignal } = {},
 ): Promise<ProfileBasic[]> {
-  const res = await client.get("art.ratat.actor.searchActorsTypeahead", {
+  const res = await client.get("net.ratat.actor.searchActorsTypeahead", {
     params: { q, ...(options.limit ? { limit: options.limit } : {}) },
     ...(options.signal ? { signal: options.signal } : {}),
   });
@@ -80,7 +80,7 @@ export async function getAuthorFeed(
     signal?: AbortSignal;
   } = {},
 ): Promise<Portfolio> {
-  const res = await client.get("art.ratat.feed.getAuthorFeed", {
+  const res = await client.get("net.ratat.feed.getAuthorFeed", {
     params: {
       actor: actor as Profile["did"],
       limit: options.limit ?? 30,
@@ -109,7 +109,7 @@ export async function getTimeline(
   viewer: string,
   options: { page?: number; limit?: number; signal?: AbortSignal } = {},
 ): Promise<Timeline> {
-  const res = await client.get("art.ratat.feed.getTimeline", {
+  const res = await client.get("net.ratat.feed.getTimeline", {
     params: {
       viewer: viewer as Profile["did"],
       limit: options.limit ?? 30,
@@ -136,7 +136,7 @@ export async function getRatatFollows(
   let cursor: string | undefined;
 
   for (;;) {
-    const res = await client.get("art.ratat.graph.getFollows", {
+    const res = await client.get("net.ratat.graph.getFollows", {
       params: {
         actor: actor as Profile["did"],
         limit: 100,
@@ -159,7 +159,7 @@ export async function getRatatFollows(
 }
 
 export async function getPost(actor: string, rkey: string, signal?: AbortSignal): Promise<Post> {
-  const res = await client.get("art.ratat.feed.getPost", {
+  const res = await client.get("net.ratat.feed.getPost", {
     params: { actor: actor as Profile["did"], rkey },
     ...(signal ? { signal } : {}),
   });

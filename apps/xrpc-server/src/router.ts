@@ -20,22 +20,22 @@ export const createRouter = ({ runtime, websocket }: CreateRouterOptions): XRPCR
     websocket,
   });
 
-  router.addQuery(lex.ArtRatatActorGetProfile.mainSchema, {
+  router.addQuery(lex.NetRatatActorGetProfile.mainSchema, {
     handler: (ctx) => runHandler(runtime, actorGetProfile(ctx)),
   });
-  router.addQuery(lex.ArtRatatActorSearchActorsTypeahead.mainSchema, {
+  router.addQuery(lex.NetRatatActorSearchActorsTypeahead.mainSchema, {
     handler: (ctx) => runHandler(runtime, actorSearchActorsTypeahead(ctx)),
   });
-  router.addQuery(lex.ArtRatatFeedGetAuthorFeed.mainSchema, {
+  router.addQuery(lex.NetRatatFeedGetAuthorFeed.mainSchema, {
     handler: (ctx) => runHandler(runtime, feedGetAuthorFeed(ctx)),
   });
-  router.addQuery(lex.ArtRatatFeedGetPost.mainSchema, {
+  router.addQuery(lex.NetRatatFeedGetPost.mainSchema, {
     handler: (ctx) => runHandler(runtime, feedGetPost(ctx)),
   });
-  router.addQuery(lex.ArtRatatFeedGetTimeline.mainSchema, {
+  router.addQuery(lex.NetRatatFeedGetTimeline.mainSchema, {
     handler: (ctx) => runHandler(runtime, feedGetTimeline(ctx)),
   });
-  router.addQuery(lex.ArtRatatGraphGetFollows.mainSchema, {
+  router.addQuery(lex.NetRatatGraphGetFollows.mainSchema, {
     handler: (ctx) => runHandler(runtime, graphGetFollows(ctx)),
   });
 

@@ -4,7 +4,7 @@ import type {} from "@atcute/bluesky";
 import type { ActorIdentifier, Did, Nsid } from "@atcute/lexicons";
 import type { OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { parseAtUri } from "@ratat/common";
-import { ArtRatatCollection } from "@ratat/lexicon/collections";
+import { NetRatatCollection } from "@ratat/lexicon/collections";
 
 /**
  * The Ratat graph, written straight to the viewer's own repo. Following an
@@ -13,7 +13,7 @@ import { ArtRatatCollection } from "@ratat/lexicon/collections";
  * except the import, which only reads it.
  */
 
-const FOLLOW_COLLECTION = ArtRatatCollection.graphFollow;
+const FOLLOW_COLLECTION = NetRatatCollection.graphFollow;
 
 /** Batches at the ceiling applyWrites accepts, which is what an import needs. */
 export const APPLY_WRITES_LIMIT = 200;

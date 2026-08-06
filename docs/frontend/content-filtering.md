@@ -14,7 +14,7 @@ because value is the only part the web app reads — the labeler DID, the
 signature and the timestamps would otherwise travel through the index and the
 lexicon for nobody.
 
-`art.ratat.feed.defs#postView` and `art.ratat.actor.defs#profileView` both
+`net.ratat.feed.defs#postView` and `net.ratat.actor.defs#profileView` both
 carry a `labels: string[]`.
 
 The index stores them on the post row. A **hydrated** write — the backfill,

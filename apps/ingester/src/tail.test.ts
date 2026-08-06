@@ -64,7 +64,7 @@ const commit = (
   }) as unknown as JetstreamEvent;
 
 const followRecord = {
-  $type: "art.ratat.graph.follow",
+  $type: "net.ratat.graph.follow",
   subject: "did:plc:artist",
   createdAt: "2026-08-06T00:00:00.000Z",
 };
@@ -79,17 +79,17 @@ const opsFor = async (event: JetstreamEvent): Promise<string[]> => {
 
 describe("handleFollowEvent", () => {
   test("a follow is written, and a subject we do not know is marked interested", async () => {
-    const ops = await opsFor(commit("art.ratat.graph.follow", "create", followRecord));
+    const ops = await opsFor(commit("net.ratat.graph.follow", "create", followRecord));
     expect(ops).toEqual(["upsertRatatFollow", "actorRow", "markInterested"]);
   });
 
   test("an unfollow removes the record it names", async () => {
-    expect(await opsFor(commit("art.ratat.graph.follow", "delete"))).toEqual(["deleteRatatFollow"]);
+    expect(await opsFor(commit("net.ratat.graph.follow", "delete"))).toEqual(["deleteRatatFollow"]);
   });
 
   test("a record without a subject is not a follow and is ignored", async () => {
     const ops = await opsFor(
-      commit("art.ratat.graph.follow", "create", { $type: "art.ratat.graph.follow" }),
+      commit("net.ratat.graph.follow", "create", { $type: "net.ratat.graph.follow" }),
     );
     expect(ops).toEqual([]);
   });

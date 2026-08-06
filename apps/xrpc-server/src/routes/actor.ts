@@ -1,5 +1,5 @@
 import { json, type QueryContext } from "@atcute/xrpc-server";
-import type { ArtRatatActorGetProfile, ArtRatatActorSearchActorsTypeahead } from "@ratat/lexicon";
+import type { NetRatatActorGetProfile, NetRatatActorSearchActorsTypeahead } from "@ratat/lexicon";
 import { Effect } from "effect";
 
 import { actorRequestFailed, appviewUnreachable, Appview } from "../appview.ts";
@@ -15,7 +15,7 @@ import { profileView, profileViewBasic } from "../views.ts";
  * and, since the masthead reads its own avatar this way, how logging in does.
  */
 export const actorGetProfile = (
-  ctx: QueryContext<ArtRatatActorGetProfile.mainSchema>,
+  ctx: QueryContext<NetRatatActorGetProfile.mainSchema>,
 ): RouteEffect<Response> =>
   Effect.gen(function* () {
     const actor = ctx.params.actor;
@@ -28,7 +28,7 @@ export const actorGetProfile = (
     });
     if (!res.ok) return yield* Effect.fail(actorRequestFailed(actor, res.data));
 
-    const output: ArtRatatActorGetProfile.$output = profileView(res.data);
+    const output: NetRatatActorGetProfile.$output = profileView(res.data);
     yield* noteInterestInBackground(output);
 
     return json(output);
@@ -44,12 +44,12 @@ const TYPEAHEAD_LIMIT = 8;
  * interested would queue a backfill per keystroke.
  */
 export const actorSearchActorsTypeahead = (
-  ctx: QueryContext<ArtRatatActorSearchActorsTypeahead.mainSchema>,
+  ctx: QueryContext<NetRatatActorSearchActorsTypeahead.mainSchema>,
 ): RouteEffect<Response> =>
   Effect.gen(function* () {
     const q = ctx.params.q.trim();
     if (q.length === 0) {
-      const empty: ArtRatatActorSearchActorsTypeahead.$output = { actors: [] };
+      const empty: NetRatatActorSearchActorsTypeahead.$output = { actors: [] };
       return json(empty);
     }
 
@@ -66,7 +66,7 @@ export const actorSearchActorsTypeahead = (
       return yield* Effect.fail(upstreamFailure(res.data.message ?? res.data.error));
     }
 
-    const output: ArtRatatActorSearchActorsTypeahead.$output = {
+    const output: NetRatatActorSearchActorsTypeahead.$output = {
       actors: res.data.actors.map(profileViewBasic),
     };
     return json(output);
