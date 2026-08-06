@@ -10,17 +10,19 @@ export function Masthead() {
   return (
     <header className="sticky top-0 z-50 bg-header border-b-2 border-header-edge">
       <div className="wrap flex items-center gap-[18px] h-[42px]">
-        <Link className="brand" to="/" aria-label="Ratat home">
-          <BrandMark className="text-header-fg" />
-        </Link>
+        <div className="flex flex-1 basis-0 items-center gap-[18px] min-w-0">
+          <Link className="brand" to="/" aria-label="Ratat home">
+            <BrandMark className="text-header-fg" />
+          </Link>
 
-        <MastheadNav />
+          <MastheadNav />
+        </div>
 
-        <div className="flex items-center gap-[9px] ml-auto mr-auto max-[520px]:gap-[8px]">
+        <div className="flex items-center gap-[9px] max-[520px]:gap-[8px]">
           <SearchBar />
         </div>
 
-        <div className="flex items-center gap-[9px] ml-auto max-[520px]:gap-[8px]">
+        <div className="flex flex-1 basis-0 items-center justify-end gap-[9px] max-[520px]:gap-[8px]">
           <QuickSettingsMenu />
           <AuthControl />
         </div>
