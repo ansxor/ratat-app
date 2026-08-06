@@ -73,6 +73,16 @@ export const post = pgTable(
     rkey: text("rkey").notNull(),
     text: text("text"),
     media: mediaColumn("media").notNull(),
+    /**
+     * Moderation label values as of the last write. A post indexed from
+     * jetstream carries only the author's self-labels — labeler labels are
+     * applied by the appview, so they arrive when a backfill or a live read
+     * hydrates the post.
+     */
+    labels: text("labels")
+      .array()
+      .notNull()
+      .default(sql`'{}'`),
     /** Mirrored counter: seeded at backfill, maintained by the like tail. */
     likeCount: integer("like_count").notNull().default(0),
     /** Snapshots taken when the post was indexed; not maintained live. */

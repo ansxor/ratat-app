@@ -3,7 +3,7 @@ import { cors } from "@atcute/xrpc-server/middlewares/cors";
 import * as lex from "@ratat/lexicon";
 
 import { runHandler } from "./handler.ts";
-import { actorGetProfile } from "./routes/actor.ts";
+import { actorGetProfile, actorSearchActorsTypeahead } from "./routes/actor.ts";
 import { feedGetAuthorFeed, feedGetPost, feedGetTimeline } from "./routes/feed.ts";
 import { graphGetFollows } from "./routes/graph.ts";
 import type { AppRuntime } from "./runtime.ts";
@@ -22,6 +22,9 @@ export const createRouter = ({ runtime, websocket }: CreateRouterOptions): XRPCR
 
   router.addQuery(lex.ArtRatatActorGetProfile.mainSchema, {
     handler: (ctx) => runHandler(runtime, actorGetProfile(ctx)),
+  });
+  router.addQuery(lex.ArtRatatActorSearchActorsTypeahead.mainSchema, {
+    handler: (ctx) => runHandler(runtime, actorSearchActorsTypeahead(ctx)),
   });
   router.addQuery(lex.ArtRatatFeedGetAuthorFeed.mainSchema, {
     handler: (ctx) => runHandler(runtime, feedGetAuthorFeed(ctx)),

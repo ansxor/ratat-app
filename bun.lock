@@ -86,6 +86,7 @@
       "name": "@ratat/common",
       "version": "0.1.0",
       "dependencies": {
+        "@atcute/atproto": "^4.0.4",
         "@atcute/bluesky": "^4.0.17",
         "@atcute/lexicons": "^2.0.3",
         "@ratat/lexicon": "workspace:*",

@@ -14,6 +14,7 @@ import type * as AppBskyFeedDefs from "@atcute/bluesky/types/app/feed/defs";
 import type * as AppBskyFeedPost from "@atcute/bluesky/types/app/feed/post";
 import type { ActorIdentifier } from "@atcute/lexicons/syntax";
 import { parseAtUri } from "@ratat/common";
+import { labelValues } from "@ratat/common/labels";
 import { mediaFromEmbedView } from "@ratat/common/media";
 import type { Database } from "@ratat/db/effect";
 import { Duration, Effect } from "effect";
@@ -65,6 +66,7 @@ const rowOf = (item: AppBskyFeedDefs.FeedViewPost): PostInsert | undefined => {
     rkey: parsed.rkey,
     ...(record?.text ? { text: record.text } : {}),
     media,
+    labels: labelValues(view.labels),
     likeCount: view.likeCount ?? 0,
     replyCount: view.replyCount ?? 0,
     repostCount: view.repostCount ?? 0,
@@ -103,7 +105,7 @@ const walk = (did: string): Effect.Effect<number, BackfillError, IngesterSetting
       }
 
       const rows = res.data.feed.map(rowOf).filter((row): row is PostInsert => row !== undefined);
-      stored += yield* upsertPosts(rows, { seedCounts: true }).pipe(
+      stored += yield* upsertPosts(rows, { hydrated: true }).pipe(
         Effect.mapError((error) => new BackfillError(`index write failed: ${String(error.cause)}`)),
       );
 

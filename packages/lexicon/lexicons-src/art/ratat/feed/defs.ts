@@ -43,6 +43,11 @@ export default document({
             minLength: 1,
           }),
         ),
+        labels: array({
+          description:
+            "Moderation label values on this post, from the poster's self-labels and from the labelers the Bluesky appview applies. Negations are already resolved away. Clients filter on these device-side.",
+          items: string({ maxLength: 128 }),
+        }),
         likeCount: integer(),
         replyCount: integer(),
         repostCount: integer(),

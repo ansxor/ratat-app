@@ -37,6 +37,13 @@ const _postViewSchema = /*#__PURE__*/ v.object(
 		"cid": /*#__PURE__*/ v.cidString(),
 		"createdAt": /*#__PURE__*/ v.datetimeString(),
 		"indexedAt": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.datetimeString()),
+		/**
+		 * Moderation label values on this post, from the poster's self-labels and from the labelers the Bluesky appview applies. Negations are already resolved away. Clients filter on these device-side.
+		 */
+		"labels": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.array(/*#__PURE__*/ v.constrain(
+			/*#__PURE__*/ v.string(),
+			[/*#__PURE__*/ v.stringLength(0, 128)]
+		))),
 		"likeCount": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.integer()),
 		/**
 		 * @minLength 1

@@ -2,6 +2,7 @@ import type * as AppBskyActorDefs from "@atcute/bluesky/types/app/actor/defs";
 import type * as AppBskyFeedDefs from "@atcute/bluesky/types/app/feed/defs";
 import type * as AppBskyFeedPost from "@atcute/bluesky/types/app/feed/post";
 import { bskyPostUrl, bskyProfileUrl } from "@ratat/common";
+import { labelValues } from "@ratat/common/labels";
 import { mediaFromEmbedView } from "@ratat/common/media";
 import type { ArtRatatActorDefs, ArtRatatFeedDefs } from "@ratat/lexicon";
 
@@ -28,6 +29,7 @@ export const profileView = (
   ...(profile.followersCount === undefined ? {} : { followersCount: profile.followersCount }),
   ...(profile.followsCount === undefined ? {} : { followsCount: profile.followsCount }),
   ...(profile.postsCount === undefined ? {} : { postsCount: profile.postsCount }),
+  labels: labelValues(profile.labels),
   bskyUrl: bskyProfileUrl(profile.handle) as ArtRatatActorDefs.ProfileView["bskyUrl"],
   ...(profile.indexedAt ? { indexedAt: profile.indexedAt } : {}),
 });
@@ -59,6 +61,7 @@ export const artworkView = (
     author: profileViewBasic(post.author),
     ...(record?.text ? { text: record.text } : {}),
     media: media as ArtRatatFeedDefs.PostView["media"],
+    labels: labelValues(post.labels),
     ...(post.likeCount === undefined ? {} : { likeCount: post.likeCount }),
     ...(post.replyCount === undefined ? {} : { replyCount: post.replyCount }),
     ...(post.repostCount === undefined ? {} : { repostCount: post.repostCount }),
@@ -108,6 +111,7 @@ export const rowPostView = (
     author: rowProfileViewBasic(author),
     ...(row.text ? { text: row.text } : {}),
     media: row.media as ArtRatatFeedDefs.PostView["media"],
+    labels: row.labels,
     likeCount: row.likeCount,
     replyCount: row.replyCount,
     repostCount: row.repostCount,

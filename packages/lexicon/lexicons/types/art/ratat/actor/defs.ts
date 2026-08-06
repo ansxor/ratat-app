@@ -38,6 +38,13 @@ const _profileViewSchema = /*#__PURE__*/ v.object(
 		"handle": /*#__PURE__*/ v.handleString(),
 		"indexedAt": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.datetimeString()),
 		/**
+		 * Moderation label values on the account, from its self-labels and from the labelers the Bluesky appview applies. Negations are already resolved away.
+		 */
+		"labels": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.array(/*#__PURE__*/ v.constrain(
+			/*#__PURE__*/ v.string(),
+			[/*#__PURE__*/ v.stringLength(0, 128)]
+		))),
+		/**
 		 * Posts of every kind in the actor's repo, as Bluesky counts them — not the size of this actor's Ratat portfolio, which holds only posts with media.
 		 */
 		"postsCount": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.integer()),

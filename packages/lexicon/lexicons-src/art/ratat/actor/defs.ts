@@ -1,4 +1,4 @@
-import { document, integer, object, required, string } from "@atcute/lexicon-doc/builder";
+import { array, document, integer, object, required, string } from "@atcute/lexicon-doc/builder";
 
 export default document({
   id: "art.ratat.actor.defs",
@@ -26,6 +26,11 @@ export default document({
         postsCount: integer({
           description:
             "Posts of every kind in the actor's repo, as Bluesky counts them — not the size of this actor's Ratat portfolio, which holds only posts with media.",
+        }),
+        labels: array({
+          description:
+            "Moderation label values on the account, from its self-labels and from the labelers the Bluesky appview applies. Negations are already resolved away.",
+          items: string({ maxLength: 128 }),
         }),
         bskyUrl: required(
           string({ description: "Permalink to the Bluesky profile.", format: "uri" }),

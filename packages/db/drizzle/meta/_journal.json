@@ -15,6 +15,13 @@
       "when": 1786041256918,
       "tag": "0001_panoramic_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786044518058,
+      "tag": "0002_bored_brood",
+      "breakpoints": true
     }
   ]
 }

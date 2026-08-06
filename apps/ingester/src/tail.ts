@@ -20,6 +20,7 @@ import { JetstreamSubscription, type JetstreamEvent } from "@atcute/jetstream";
 import { type Did, isDid } from "@atcute/lexicons/syntax";
 import { bskyImageUrl, parseAtUri } from "@ratat/common";
 import { blobCid } from "@ratat/common";
+import { selfLabelValues } from "@ratat/common/labels";
 import { mediaFromPostRecord } from "@ratat/common/media";
 import type { Database } from "@ratat/db/effect";
 import { Duration, Effect, Ref, Schedule, Stream } from "effect";
@@ -128,11 +129,13 @@ const indexPostCommit = (
           rkey,
           ...(asText(post?.["text"]) ? { text: asText(post?.["text"]) } : {}),
           media,
+          labels: selfLabelValues(record),
           createdAt: Number.isNaN(createdAt.getTime()) ? new Date() : createdAt,
         },
       ],
-      // A firehose post has no counts of its own; the like tail owns that column.
-      { seedCounts: false },
+      // A firehose post has no counts of its own and only the author's
+      // self-labels; the like tail owns the one, the appview the other.
+      { hydrated: false },
     ).pipe(
       Effect.tap(() => Effect.logInfo(`indexed ${uri}`)),
       Effect.catchAll((error) =>

@@ -95,20 +95,23 @@ export const failBackfill = (
   });
 
 /**
- * Writes posts, refreshing the ones we already hold. The counts are only
- * overwritten when they carry information: the backfill seeds them from the
- * appview, whereas a post arriving from the firehose has no counts at all and
- * must not reset a counter the like tail has been maintaining.
+ * Writes posts, refreshing the ones we already hold. Counts and labels are
+ * only overwritten by a *hydrated* write — one built from an appview view,
+ * which is the backfill. A post arriving from the firehose has no counts at
+ * all and must not reset a counter the like tail has been maintaining, and
+ * carries only the author's self-labels, which must not erase what a labeler
+ * added.
  */
 export const upsertPosts = (
   rows: PostInsert[],
-  options: { readonly seedCounts: boolean },
+  options: { readonly hydrated: boolean },
 ): Effect.Effect<number, DbError, Database> =>
   Effect.gen(function* () {
     if (rows.length === 0) return 0;
     const database = yield* Database;
-    const counts = options.seedCounts
+    const hydratedColumns = options.hydrated
       ? {
+          labels: sql`excluded.labels`,
           likeCount: sql`excluded.like_count`,
           replyCount: sql`excluded.reply_count`,
           repostCount: sql`excluded.repost_count`,
@@ -127,7 +130,7 @@ export const upsertPosts = (
             media: sql`excluded.media`,
             createdAt: sql`excluded.created_at`,
             updatedAt: new Date(),
-            ...counts,
+            ...hydratedColumns,
           },
         }),
     );

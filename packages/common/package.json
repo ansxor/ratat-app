@@ -12,12 +12,17 @@
     "./media": {
       "import": "./src/media.ts",
       "types": "./src/media.ts"
+    },
+    "./labels": {
+      "import": "./src/labels.ts",
+      "types": "./src/labels.ts"
     }
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@atcute/atproto": "^4.0.4",
     "@atcute/bluesky": "^4.0.17",
     "@atcute/lexicons": "^2.0.3",
     "@ratat/lexicon": "workspace:*"
