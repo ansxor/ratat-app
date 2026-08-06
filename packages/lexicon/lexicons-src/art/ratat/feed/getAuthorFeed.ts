@@ -23,6 +23,13 @@ export default document({
           cursor: string({
             description: "Opaque cursor from a previous page; omit for the first page.",
           }),
+          page: integer({
+            description:
+              "1-based page number, for numbered pagination. The upstream feed is cursor-based, so the server walks cursors to reach the page; a page past the end of the feed yields the last page. Ignored when `cursor` is given.",
+            minimum: 1,
+            maximum: 100,
+            default: 1,
+          }),
         },
       }),
       output: {
@@ -33,6 +40,10 @@ export default document({
             cursor: string({
               description:
                 "Absent when the upstream feed is exhausted. A page may hold fewer than `limit` posts — or none — while a cursor remains, because posts that carry no media are dropped after paging; never infer the end from the array's length.",
+            }),
+            page: integer({
+              description:
+                "The page this response holds. Lower than the requested `page` when the feed ended first. Absent when the request named a `cursor` instead, since a cursor does not say where it sits.",
             }),
           },
         }),

@@ -7,6 +7,7 @@ export {
   MessageCircle as ChatIcon,
   Repeat as BoostIcon,
   Search as SearchIcon,
+  Settings as SettingsIcon,
   Star as StarIcon,
 } from "lucide-react";
 

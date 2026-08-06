@@ -28,6 +28,19 @@ const _mainSchema = /*#__PURE__*/ v.query(
 					),
 					30
 				),
+				/**
+				 * 1-based page number, for numbered pagination. The upstream feed is cursor-based, so the server walks cursors to reach the page; a page past the end of the feed yields the last page. Ignored when `cursor` is given.
+				 * @minimum 1
+				 * @maximum 100
+				 * @default 1
+				 */
+				"page": /*#__PURE__*/ v.optional(
+					/*#__PURE__*/ v.constrain(
+						/*#__PURE__*/ v.integer(),
+						[/*#__PURE__*/ v.integerRange(1, 100)]
+					),
+					1
+				),
 			}
 		),
 		"output": {
@@ -41,6 +54,10 @@ const _mainSchema = /*#__PURE__*/ v.query(
 					get "feed"() {
 						return /*#__PURE__*/ v.array(ArtRatatFeedDefs.postViewSchema)
 					},
+					/**
+					 * The page this response holds. Lower than the requested `page` when the feed ended first. Absent when the request named a `cursor` instead, since a cursor does not say where it sits.
+					 */
+					"page": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.integer()),
 				}
 			),
 		}

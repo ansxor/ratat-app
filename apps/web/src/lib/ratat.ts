@@ -9,6 +9,8 @@ export type Media = Post["media"][number];
 export interface Portfolio {
   posts: Post[];
   cursor?: string;
+  /** The page the appview served, which is the last one when the feed ran out first. */
+  page?: number;
 }
 
 const APPVIEW_URL = import.meta.env.VITE_RATAT_APPVIEW_URL ?? "http://127.0.0.1:3001";
@@ -36,18 +38,23 @@ export async function getProfile(actor: string, signal?: AbortSignal): Promise<P
 
 export async function getAuthorFeed(
   actor: string,
-  options: { cursor?: string; limit?: number; signal?: AbortSignal } = {},
+  options: { cursor?: string; page?: number; limit?: number; signal?: AbortSignal } = {},
 ): Promise<Portfolio> {
   const res = await client.get("art.ratat.feed.getAuthorFeed", {
     params: {
       actor: actor as Profile["did"],
       limit: options.limit ?? 30,
+      ...(options.page && options.page > 1 ? { page: options.page } : {}),
       ...(options.cursor ? { cursor: options.cursor } : {}),
     },
     ...(options.signal ? { signal: options.signal } : {}),
   });
   if (!res.ok) throw new AppviewError(res.data.error, res.data.message);
-  return { posts: res.data.feed, ...(res.data.cursor ? { cursor: res.data.cursor } : {}) };
+  return {
+    posts: res.data.feed,
+    ...(res.data.cursor ? { cursor: res.data.cursor } : {}),
+    ...(res.data.page === undefined ? {} : { page: res.data.page }),
+  };
 }
 
 export async function getPost(actor: string, rkey: string, signal?: AbortSignal): Promise<Post> {

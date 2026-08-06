@@ -631,3 +631,15 @@
     background: var(--ink-hi);
   }
 }
+
+body.show-details .piece__art {
+  border: 1px solid var(--line);
+}
+body.show-details .piece__top,
+body.show-details .piece__bar {
+  position: static;
+  transform: none;
+  opacity: 1;
+  background: var(--ink-raised);
+  backdrop-filter: none;
+}
