@@ -2,8 +2,9 @@ import { Link } from "@tanstack/react-router";
 
 import { AuthControl } from "#/components/AuthControl.tsx";
 import { BrandMark } from "#/components/BrandMark.tsx";
-import { HandleSearch } from "#/components/HandleSearch.tsx";
 import { MastheadNav } from "#/components/MastheadNav.tsx";
+import { QuickSettingsMenu } from "#/components/QuickSettingsMenu.tsx";
+import { SearchBar } from "#/components/search/SearchBar.tsx";
 
 export function Masthead() {
   return (
@@ -16,10 +17,11 @@ export function Masthead() {
         <MastheadNav />
 
         <div className="flex items-center gap-[9px] ml-auto mr-auto max-[520px]:gap-[8px]">
-          <HandleSearch />
+          <SearchBar />
         </div>
 
         <div className="flex items-center gap-[9px] ml-auto max-[520px]:gap-[8px]">
+          <QuickSettingsMenu />
           <AuthControl />
         </div>
       </div>

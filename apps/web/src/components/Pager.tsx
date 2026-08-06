@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 
-import { SettingsIcon } from "#/components/ui/icons.tsx";
 import { formatTotal, type PagerPagination } from "#/lib/pagination.ts";
 import { cn } from "#/lib/utils.ts";
 
@@ -9,7 +8,9 @@ import { cn } from "#/lib/utils.ts";
  * Ported from the old app's `src/components/Pager.tsx`: same markup and
  * classes, with `cva` folded into `cn` and Next's `Link` swapped for the
  * router's. The old app's `captureEvent` call is dropped — no observability
- * library here yet.
+ * library here yet. Its settings cog is dropped too: "always show details"
+ * moved into the masthead's quick settings, where it is reachable from a page
+ * with nothing to page through.
  */
 
 /**
@@ -33,43 +34,14 @@ const pageLink = (
 export function Pager({
   variant = "top",
   leading,
-  settings = variant === "top",
   pagination,
   countNoun = ["work", "works"],
 }: {
   variant?: "top" | "bottom" | "standalone";
   leading?: ReactNode;
-  settings?: boolean;
   pagination?: PagerPagination;
   countNoun?: readonly [string, string];
 }) {
-  const [open, setOpen] = useState(false);
-  const [alwaysShow, setAlwaysShow] = useState(false);
-  const cogRef = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    document.body.classList.toggle("show-details", alwaysShow);
-    return () => document.body.classList.remove("show-details");
-  }, [alwaysShow]);
-
-  useEffect(() => {
-    function onClick(e: MouseEvent) {
-      if (!(e.target instanceof Node)) return;
-      if (
-        open &&
-        menuRef.current &&
-        cogRef.current &&
-        !menuRef.current.contains(e.target) &&
-        !cogRef.current.contains(e.target)
-      ) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
-  }, [open]);
-
   return (
     <div
       className={cn(
@@ -80,41 +52,6 @@ export function Pager({
         variant === "standalone" && "justify-center mt-[1.5rem]",
       )}
     >
-      {variant === "top" && settings && (
-        <div className="relative inline-flex">
-          <button
-            type="button"
-            ref={cogRef}
-            className="inline-flex items-center text-mist p-[3px] transition-colors duration-[140ms] hover:text-paper [&_svg]:size-[18px]"
-            title="Settings"
-            aria-label="Settings"
-            aria-haspopup="true"
-            aria-expanded={open}
-            onClick={(e) => {
-              e.stopPropagation();
-              setOpen((v) => !v);
-            }}
-          >
-            <SettingsIcon />
-          </button>
-          {open && (
-            <div
-              ref={menuRef}
-              className="absolute top-[calc(100%+6px)] left-0 bg-ink-raised border border-line p-[9px_11px] min-w-[206px] z-30 shadow-[0_12px_28px_-12px_var(--shadow-drop)] [&_.toggle+.toggle]:mt-[8px]"
-            >
-              <label className="toggle flex items-center gap-[9px] cursor-pointer text-[13px] font-[600] text-paper">
-                <input
-                  type="checkbox"
-                  checked={alwaysShow}
-                  className="appearance-none flex-none w-[34px] h-[18px] rounded-full relative cursor-pointer bg-ink-hi border border-line transition-[background,border-color] duration-[150ms] after:content-[''] after:absolute after:top-px after:left-px after:size-[14px] after:rounded-full after:bg-ink-raised after:shadow-[0_1px_2px_var(--shadow)] after:transition-transform after:duration-[150ms] checked:bg-primary checked:border-primary checked:after:translate-x-[16px]"
-                  onChange={(e) => setAlwaysShow(e.target.checked)}
-                />
-                <span>Always show details</span>
-              </label>
-            </div>
-          )}
-        </div>
-      )}
       {leading ??
         (pagination?.total !== undefined && (
           <span className="text-[12px] tracking-[0.04em] text-faint whitespace-nowrap">

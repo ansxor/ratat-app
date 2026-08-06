@@ -4,6 +4,8 @@ import { DevLoopbackRedirect } from "#/components/DevLoopbackRedirect.tsx";
 import { Masthead } from "#/components/Masthead.tsx";
 import { FollowsProvider } from "#/lib/follows.tsx";
 import { SessionProvider } from "#/lib/session.tsx";
+import { SettingsProvider } from "#/lib/settings.tsx";
+import { THEME_BOOT_SCRIPT } from "#/lib/theme.ts";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -35,15 +37,18 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body>
-        <SessionProvider>
-          <FollowsProvider>
-            <DevLoopbackRedirect />
-            <Masthead />
-            {children}
-          </FollowsProvider>
-        </SessionProvider>
+        <SettingsProvider>
+          <SessionProvider>
+            <FollowsProvider>
+              <DevLoopbackRedirect />
+              <Masthead />
+              {children}
+            </FollowsProvider>
+          </SessionProvider>
+        </SettingsProvider>
 
         <Scripts />
       </body>

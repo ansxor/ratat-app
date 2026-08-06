@@ -3,6 +3,7 @@ import type { ArtRatatActorDefs, ArtRatatFeedDefs } from "@ratat/lexicon";
 import type {} from "@ratat/lexicon";
 
 export type Profile = ArtRatatActorDefs.ProfileView;
+export type ProfileBasic = ArtRatatActorDefs.ProfileViewBasic;
 export type Post = ArtRatatFeedDefs.PostView;
 export type Media = Post["media"][number];
 
@@ -34,6 +35,23 @@ export async function getProfile(actor: string, signal?: AbortSignal): Promise<P
   });
   if (!res.ok) throw new AppviewError(res.data.error, res.data.message);
   return res.data;
+}
+
+/**
+ * As-you-type suggestions. The appview proxies these to Bluesky, so an artist
+ * Ratat has never indexed is still findable — the first visit to their page is
+ * what puts them in the index.
+ */
+export async function searchActorsTypeahead(
+  q: string,
+  options: { limit?: number; signal?: AbortSignal } = {},
+): Promise<ProfileBasic[]> {
+  const res = await client.get("art.ratat.actor.searchActorsTypeahead", {
+    params: { q, ...(options.limit ? { limit: options.limit } : {}) },
+    ...(options.signal ? { signal: options.signal } : {}),
+  });
+  if (!res.ok) throw new AppviewError(res.data.error, res.data.message);
+  return res.data.actors;
 }
 
 export async function getAuthorFeed(

@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
 
+import { ArtworkVeil, veilFrameClass } from "#/components/content/ArtworkVeil.tsx";
 import { EngagementButton } from "#/components/EngagementButton.tsx";
 import { BoostIcon, ChatIcon } from "#/components/ui/icons.tsx";
 import { artworkParams } from "#/lib/artwork-href.ts";
 import { aspectRatio, isVideo, type Post } from "#/lib/ratat.ts";
+import { useContentVeil } from "#/lib/settings.tsx";
 import { cn } from "#/lib/utils.ts";
 
 export type ArtworkCardHeader = "hover" | "pinned" | "none";
@@ -17,12 +19,16 @@ export function ArtworkCard({
   aspect?: string;
   header?: ArtworkCardHeader;
 }) {
+  const { hidden, veil, peeked, animated, reveal } = useContentVeil(post.labels);
+
   const cover = post.media[0];
   if (!cover) return null;
+  if (hidden) return null;
 
   const params = artworkParams(post);
   const title = post.text || `Artwork by @${post.author.handle}`;
   const imgAspect = aspect ?? aspectRatio(cover);
+  const covered = veil !== null && !peeked;
 
   return (
     <article className={cn("piece", header === "pinned" && "piece--pinned")}>
@@ -50,20 +56,32 @@ export function ArtworkCard({
           </div>
         )}
 
-        <div className="relative" style={{ aspectRatio: imgAspect }}>
+        <div
+          className={cn("relative", veilFrameClass(covered ? veil : null, { animated }))}
+          style={{ aspectRatio: imgAspect }}
+        >
           <Link
             className="piece__open absolute inset-0"
             to="/art/$handle/$rkey"
             params={params}
-            aria-label={title}
+            aria-label={covered ? "Filtered artwork" : title}
           >
             <img
               className="canvas h-full w-full object-cover"
               src={isVideo(cover) ? cover.thumbnail : cover.thumb}
-              alt={cover.alt ?? ""}
+              alt={covered ? "" : (cover.alt ?? "")}
               loading="lazy"
             />
           </Link>
+          {veil && (
+            <ArtworkVeil
+              variant={veil}
+              peeked={peeked}
+              animated={animated}
+              onReveal={reveal}
+              label="Uncensor filtered artwork"
+            />
+          )}
         </div>
 
         <div className="piece__bar">

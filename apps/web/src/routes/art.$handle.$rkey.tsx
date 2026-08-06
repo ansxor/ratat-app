@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 
+import { ArtworkGate } from "#/components/content/ArtworkGate.tsx";
+import { ArtworkVeil, veilFrameClass } from "#/components/content/ArtworkVeil.tsx";
 import { EngagementButton } from "#/components/EngagementButton.tsx";
 import { FollowButton } from "#/components/FollowButton.tsx";
 import { Footer } from "#/components/Footer.tsx";
@@ -16,6 +19,8 @@ import {
   type Media,
   type Post,
 } from "#/lib/ratat.ts";
+import { useContentVeil } from "#/lib/settings.tsx";
+import { cn } from "#/lib/utils.ts";
 
 export const Route = createFileRoute("/art/$handle/$rkey")({
   loader: async ({ params }) => {
@@ -31,7 +36,14 @@ export const Route = createFileRoute("/art/$handle/$rkey")({
   errorComponent: ArtworkError,
 });
 
-function MediaFrame({ media, alt }: { media: Media; alt: string }) {
+interface Veil {
+  variant: "black" | "blur" | null;
+  peeked: boolean;
+  animated: boolean;
+  reveal: () => void;
+}
+
+function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Veil }) {
   const style = {
     position: "relative" as const,
     overflow: "hidden",
@@ -41,9 +53,26 @@ function MediaFrame({ media, alt }: { media: Media; alt: string }) {
     padding: "16px",
   };
 
+  const covered = veil.variant !== null && !veil.peeked;
+  const frame = cn(
+    veilFrameClass(covered ? veil.variant : null, { animated: veil.animated, strength: "page" }),
+  );
+
+  const cover = veil.variant && (
+    <ArtworkVeil
+      variant={veil.variant}
+      peeked={veil.peeked}
+      animated={veil.animated}
+      onReveal={veil.reveal}
+      prominent
+      iconSize={44}
+      label="Uncensor this artwork"
+    />
+  );
+
   if (isVideo(media)) {
     return (
-      <div style={style}>
+      <div style={style} className={frame}>
         <video
           controls
           playsInline
@@ -54,26 +83,42 @@ function MediaFrame({ media, alt }: { media: Media; alt: string }) {
         >
           <track kind="captions" />
         </video>
+        {cover}
       </div>
     );
   }
 
   return (
-    <div style={style}>
+    <div style={style} className={frame}>
       <img
         src={media.fullsize}
-        alt={media.alt ?? alt}
+        alt={covered ? "" : (media.alt ?? alt)}
         className="h-full w-full bg-mat object-contain"
       />
+      {cover}
     </div>
   );
 }
 
 function ArtworkPage() {
   const { post, moreBy } = Route.useLoaderData();
+  const { hidden, veil, peeked, animated, reveal } = useContentVeil(post.labels);
+  const [unhidden, setUnhidden] = useState(false);
   const artistName = post.author.displayName?.trim() || post.author.handle;
   const description = (post.text ?? "").trim() || undefined;
   const mediaAlt = `Artwork by @${post.author.handle}`;
+
+  if (hidden && !unhidden) {
+    return (
+      <ArtworkGate
+        handle={post.author.handle}
+        labels={post.labels}
+        onReveal={() => setUnhidden(true)}
+      />
+    );
+  }
+
+  const frameVeil: Veil = { variant: veil, peeked, animated, reveal };
 
   return (
     <>
@@ -82,7 +127,7 @@ function ArtworkPage() {
           <div className="feed">
             {post.media.map((media, index) => (
               <div key={index} className={index === 0 ? "" : "mt-[0.4rem]"}>
-                <MediaFrame media={media} alt={mediaAlt} />
+                <MediaFrame media={media} alt={mediaAlt} veil={frameVeil} />
               </div>
             ))}
 

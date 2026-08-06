@@ -1,16 +1,23 @@
 export {
   Check as CheckIcon,
   ChevronRight as ChevronRightIcon,
+  Eye as EyeIcon,
+  EyeOff as EyeOffIcon,
+  Grid2x2 as BlurIcon,
   Heart as HeartIcon,
   Home as HomeIcon,
   ImageIcon,
   LogIn as SignInIcon,
   MessageCircle as ChatIcon,
+  Monitor as SystemThemeIcon,
+  Moon as DarkThemeIcon,
   Plus as PlusIcon,
   Repeat as BoostIcon,
   Search as SearchIcon,
   Settings as SettingsIcon,
+  Square as BlackoutIcon,
   Star as StarIcon,
+  Sun as LightThemeIcon,
 } from "lucide-react";
 
 export const BlueskyIcon = ({
