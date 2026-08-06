@@ -10,6 +10,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@atcute/bluesky": "^4.0.17",
+    "@atcute/client": "^5.1.1",
+    "@atcute/jetstream": "^2.0.2",
+    "@atcute/lexicons": "^2.0.3",
+    "@ratat/common": "workspace:*",
+    "@ratat/db": "workspace:*",
+    "@ratat/lexicon": "workspace:*",
+    "drizzle-orm": "^0.44.7",
     "effect": "^3.19.4"
   },
   "devDependencies": {

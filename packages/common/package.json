@@ -8,10 +8,19 @@
     ".": {
       "import": "./src/index.ts",
       "types": "./src/index.ts"
+    },
+    "./media": {
+      "import": "./src/media.ts",
+      "types": "./src/media.ts"
     }
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@atcute/bluesky": "^4.0.17",
+    "@atcute/lexicons": "^2.0.3",
+    "@ratat/lexicon": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",

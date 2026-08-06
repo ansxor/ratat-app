@@ -12,6 +12,10 @@
     "./schema": {
       "import": "./src/schema/index.ts",
       "types": "./src/schema/index.ts"
+    },
+    "./effect": {
+      "import": "./src/effect.ts",
+      "types": "./src/effect.ts"
     }
   },
   "scripts": {
@@ -20,7 +24,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "drizzle-orm": "^0.44.7"
+    "@ratat/common": "workspace:*",
+    "drizzle-orm": "^0.44.7",
+    "effect": "^3.19.4"
   },
   "devDependencies": {
     "@types/bun": "latest",

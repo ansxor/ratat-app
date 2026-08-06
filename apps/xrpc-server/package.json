@@ -17,7 +17,9 @@
     "@atcute/xrpc-server": "^2.0.2",
     "@atcute/xrpc-server-bun": "^2.0.1",
     "@ratat/common": "workspace:*",
+    "@ratat/db": "workspace:*",
     "@ratat/lexicon": "workspace:*",
+    "drizzle-orm": "^0.44.7",
     "effect": "^3.19.4"
   },
   "devDependencies": {

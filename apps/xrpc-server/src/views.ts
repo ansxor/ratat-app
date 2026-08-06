@@ -1,13 +1,11 @@
 import type * as AppBskyActorDefs from "@atcute/bluesky/types/app/actor/defs";
-import type * as AppBskyEmbedImages from "@atcute/bluesky/types/app/embed/images";
-import type * as AppBskyEmbedRecordWithMedia from "@atcute/bluesky/types/app/embed/recordWithMedia";
-import type * as AppBskyEmbedVideo from "@atcute/bluesky/types/app/embed/video";
 import type * as AppBskyFeedDefs from "@atcute/bluesky/types/app/feed/defs";
 import type * as AppBskyFeedPost from "@atcute/bluesky/types/app/feed/post";
 import { bskyPostUrl, bskyProfileUrl } from "@ratat/common";
+import { mediaFromEmbedView } from "@ratat/common/media";
 import type { ArtRatatActorDefs, ArtRatatFeedDefs } from "@ratat/lexicon";
 
-type Media = ArtRatatFeedDefs.PostView["media"][number];
+import type { ActorRow, PostRow } from "./store.ts";
 
 export const profileViewBasic = (
   author: AppBskyActorDefs.ProfileViewBasic,
@@ -34,37 +32,6 @@ export const profileView = (
   ...(profile.indexedAt ? { indexedAt: profile.indexedAt } : {}),
 });
 
-const imageView = (image: AppBskyEmbedImages.ViewImage): Media => ({
-  $type: "art.ratat.feed.defs#imageView",
-  thumb: image.thumb,
-  fullsize: image.fullsize,
-  ...(image.alt ? { alt: image.alt } : {}),
-  ...(image.aspectRatio ? { aspectRatio: image.aspectRatio } : {}),
-});
-
-const videoView = (video: AppBskyEmbedVideo.View): Media => ({
-  $type: "art.ratat.feed.defs#videoView",
-  playlist: video.playlist,
-  ...(video.thumbnail ? { thumbnail: video.thumbnail } : {}),
-  ...(video.alt ? { alt: video.alt } : {}),
-  ...(video.aspectRatio ? { aspectRatio: video.aspectRatio } : {}),
-});
-
-type Embed = NonNullable<AppBskyFeedDefs.PostView["embed"]>;
-
-const mediaOf = (embed: Embed | undefined): Media[] => {
-  switch (embed?.$type) {
-    case "app.bsky.embed.images#view":
-      return (embed as AppBskyEmbedImages.View).images.map(imageView);
-    case "app.bsky.embed.video#view":
-      return [videoView(embed as AppBskyEmbedVideo.View)];
-    case "app.bsky.embed.recordWithMedia#view":
-      return mediaOf((embed as AppBskyEmbedRecordWithMedia.View).media as Embed);
-    default:
-      return [];
-  }
-};
-
 const postRecord = (record: unknown): AppBskyFeedPost.Main | undefined => {
   if (typeof record !== "object" || record === null) return undefined;
   const candidate = record as { $type?: unknown };
@@ -78,7 +45,7 @@ const postRecord = (record: unknown): AppBskyFeedPost.Main | undefined => {
 export const artworkView = (
   post: AppBskyFeedDefs.PostView,
 ): ArtRatatFeedDefs.PostView | undefined => {
-  const media = mediaOf(post.embed);
+  const media = mediaFromEmbedView(post.embed);
   if (media.length === 0) return undefined;
 
   const record = postRecord(post.record);
@@ -109,3 +76,43 @@ export const postView = (
   item: AppBskyFeedDefs.FeedViewPost,
 ): ArtRatatFeedDefs.PostView | undefined =>
   item.reason?.$type === "app.bsky.feed.defs#reasonRepost" ? undefined : artworkView(item.post);
+
+type Did = ArtRatatActorDefs.ProfileViewBasic["did"];
+type Handle = ArtRatatActorDefs.ProfileViewBasic["handle"];
+
+/** The byline of an indexed post, from the actor snapshot the index holds. */
+export const rowProfileViewBasic = (row: ActorRow): ArtRatatActorDefs.ProfileViewBasic => ({
+  did: row.did as Did,
+  handle: row.handle as Handle,
+  ...(row.displayName ? { displayName: row.displayName } : {}),
+  ...(row.avatar
+    ? { avatar: row.avatar as NonNullable<ArtRatatActorDefs.ProfileView["avatar"]> }
+    : {}),
+});
+
+/**
+ * An indexed row as the lexicon's post view. `media` was stored in view shape,
+ * so nothing is rebuilt here; the counts are the mirrored ones.
+ */
+export const rowPostView = (
+  row: PostRow,
+  author: ActorRow,
+): ArtRatatFeedDefs.PostView | undefined => {
+  if (row.media.length === 0) return undefined;
+  const bskyUrl = bskyPostUrl(row.did, row.uri);
+  if (!bskyUrl) return undefined;
+
+  return {
+    uri: row.uri as ArtRatatFeedDefs.PostView["uri"],
+    cid: row.cid as ArtRatatFeedDefs.PostView["cid"],
+    author: rowProfileViewBasic(author),
+    ...(row.text ? { text: row.text } : {}),
+    media: row.media as ArtRatatFeedDefs.PostView["media"],
+    likeCount: row.likeCount,
+    replyCount: row.replyCount,
+    repostCount: row.repostCount,
+    bskyUrl: bskyUrl as ArtRatatFeedDefs.PostView["bskyUrl"],
+    createdAt: row.createdAt.toISOString() as ArtRatatFeedDefs.PostView["createdAt"],
+    indexedAt: row.indexedAt.toISOString() as ArtRatatFeedDefs.PostView["indexedAt"],
+  };
+};
