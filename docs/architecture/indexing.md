@@ -114,13 +114,18 @@ first visit — **any** database failure falls back to live, including a server
 started with no `DATABASE_URL` at all, which logs a warning and behaves exactly
 as it did before this index existed.
 
-What that buys, measured locally against the public appview:
+What that buys, measured on `bsky.app` (168 indexed artworks, `limit=30`) against
+a second server pointed at an unreachable database:
 
-| Read                 | Indexed | Live                                     |
-| -------------------- | ------- | ---------------------------------------- |
-| page 1 (`limit=5`)   | 12 ms   | 183 ms (1 upstream request)              |
-| page 4 (`limit=5`)   | 3.8 ms  | 717 ms (4 upstream requests, cold cache) |
-| one post (`getPost`) | 4 ms    | ~150 ms                                  |
+| Read   | Indexed | Live   |
+| ------ | ------- | ------ |
+| page 1 | 5.9 ms  | 351 ms |
+| page 4 | 5.4 ms  | 560 ms |
+| page 6 | 4.2 ms  | 240 ms |
+
+The live column flatters itself: those requests ran in order against one process,
+so pages 4 and 6 walked from a cursor page 1 had already cached. A cold jump to
+page 4 pays one upstream request per page on the way.
 
 Page numbers are offsets over `post_author_feed_idx (did, created_at desc, uri
 desc)`, so a jump to page 40 costs the same as page 2. The cursor-walking path
