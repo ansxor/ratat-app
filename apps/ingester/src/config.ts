@@ -3,6 +3,8 @@ import { Config as EffectConfig, type ConfigError, Context, Effect, Layer } from
 
 export interface IngesterConfig {
   readonly appviewUrl: string;
+  /** Where DID documents are read from, which is how a repo's PDS is found. */
+  readonly plcDirectoryUrl: string;
   readonly jetstreamUrl: string;
   /** How often the tail re-reads the interested set to re-scope itself. */
   readonly didRefreshSeconds: number;
@@ -33,6 +35,9 @@ export const SettingsLive: Layer.Layer<IngesterSettings, ConfigError.ConfigError
     return IngesterSettings.of({
       appviewUrl: yield* EffectConfig.string("BSKY_APPVIEW_URL").pipe(
         EffectConfig.withDefault(PUBLIC_BSKY_APPVIEW_URL),
+      ),
+      plcDirectoryUrl: yield* EffectConfig.string("PLC_DIRECTORY_URL").pipe(
+        EffectConfig.withDefault("https://plc.directory"),
       ),
       jetstreamUrl: yield* EffectConfig.string("JETSTREAM_URL").pipe(
         EffectConfig.withDefault("wss://jetstream2.us-east.bsky.network"),

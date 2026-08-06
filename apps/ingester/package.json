@@ -10,8 +10,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@atcute/atproto": "^4.0.4",
     "@atcute/bluesky": "^4.0.17",
     "@atcute/client": "^5.1.1",
+    "@atcute/identity-resolver": "^2.0.1",
     "@atcute/jetstream": "^2.0.2",
     "@atcute/lexicons": "^2.0.3",
     "@ratat/common": "workspace:*",

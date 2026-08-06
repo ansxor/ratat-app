@@ -11,6 +11,9 @@
  *   whole like firehose, filtered here down to subjects we index. It is the
  *   expensive half of the ingester and can be switched off with
  *   `JETSTREAM_LIKE_TAIL=false`.
+ * - **ratat follows** are unscoped for the same reason — a follow lives in the
+ *   follower's repo — but cost nothing, because only Ratat writes the
+ *   collection and jetstream filters it upstream.
  */
 
 import { JetstreamSubscription, type JetstreamEvent } from "@atcute/jetstream";
@@ -22,9 +25,11 @@ import type { Database } from "@ratat/db/effect";
 import { Duration, Effect, Ref, Schedule, Stream } from "effect";
 
 import { IngesterSettings } from "./config.ts";
+import { FOLLOW_COLLECTION, indexFollow } from "./follows.ts";
 import {
   applyLike,
   deletePost,
+  deleteRatatFollow,
   interestedDids,
   likedUris,
   readCursor,
@@ -233,6 +238,30 @@ const handleLikeEvent = (
   );
 };
 
+// ---------------------------------------------------------------- follow tail
+
+/**
+ * A Ratat follow, from whoever wrote it. Unlike a like, a follow is worth
+ * having whatever the interested set says — being followed is itself what puts
+ * the subject in that set.
+ */
+const handleFollowEvent = (event: JetstreamEvent): Effect.Effect<void, never, TailServices> => {
+  if (event.kind !== "commit" || event.commit.collection !== FOLLOW_COLLECTION) return Effect.void;
+  const commit = event.commit;
+  const uri = uriOf(event.did, FOLLOW_COLLECTION, commit.rkey);
+
+  if (commit.operation === "delete") {
+    return deleteRatatFollow(uri).pipe(
+      Effect.tap(() => Effect.logInfo(`ratat unfollow ${uri}`)),
+      Effect.catchAll((error) =>
+        Effect.logWarning(`could not remove ${uri}: ${String(error.cause)}`),
+      ),
+    );
+  }
+
+  return indexFollow(event.did, commit.rkey, commit.record);
+};
+
 // ---------------------------------------------------------------- subscription
 
 interface SubscriptionSpec {
@@ -244,7 +273,7 @@ interface SubscriptionSpec {
   readonly handle: (
     event: JetstreamEvent,
     interested: ReadonlySet<string>,
-  ) => Effect.Effect<void, never, Database>;
+  ) => Effect.Effect<void, never, TailServices>;
 }
 
 const runSubscription = (
@@ -330,9 +359,22 @@ export const runTail: Effect.Effect<never, never, TailServices> = Effect.gen(fun
     interested,
   );
 
+  const follows = runSubscription(
+    {
+      source: "jetstream:follows",
+      collections: [FOLLOW_COLLECTION],
+      scoped: false,
+      validateEvents: true,
+      handle: (event) => handleFollowEvent(event),
+    },
+    interested,
+  );
+
   if (!settings.likeTail) {
     yield* Effect.logInfo("like tail disabled; like counts stay at their backfilled values");
-    return yield* posts;
+    return yield* Effect.all([posts, follows], { concurrency: "unbounded" }).pipe(
+      Effect.zipRight(Effect.never),
+    );
   }
 
   const counted = yield* makeCountedLikes;
@@ -349,7 +391,7 @@ export const runTail: Effect.Effect<never, never, TailServices> = Effect.gen(fun
     interested,
   );
 
-  return yield* Effect.all([posts, likes], { concurrency: "unbounded" }).pipe(
+  return yield* Effect.all([posts, follows, likes], { concurrency: "unbounded" }).pipe(
     Effect.zipRight(Effect.never),
   );
 });

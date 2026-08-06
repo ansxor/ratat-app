@@ -3,16 +3,20 @@ import { Effect, Fiber, Layer, Logger, LogLevel } from "effect";
 
 import { runBackfillWorker } from "./backfill.ts";
 import { SettingsLive } from "./config.ts";
+import { runFollowsBackfillWorker } from "./follows.ts";
 import { runTail } from "./tail.ts";
 
 /**
- * Two jobs, one process: catch an interested actor up (backfill) and keep them
- * current (tail). They share the index and nothing else, so they simply run
- * side by side.
+ * Three jobs, one process: catch an interested actor up (backfill), read a
+ * viewer's existing Ratat graph once (graph backfill), and keep both current
+ * (tail). They share the index and nothing else, so they simply run side by
+ * side.
  */
 const main = Effect.gen(function* () {
   yield* Effect.logInfo("ratat ingester starting");
-  yield* Effect.all([runBackfillWorker, runTail], { concurrency: "unbounded" });
+  yield* Effect.all([runBackfillWorker, runFollowsBackfillWorker, runTail], {
+    concurrency: "unbounded",
+  });
 }).pipe(
   Effect.provide(Layer.mergeAll(SettingsLive, DatabaseLive)),
   Logger.withMinimumLogLevel(LogLevel.Info),
