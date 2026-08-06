@@ -19,6 +19,14 @@ migrate:
 dev:
     bun run dev
 
+test:
+    bun run test
+
+# One live request per art.ratat.* query, against a server this starts if one
+# is not already listening. Needs Postgres up (`just up`) and the network.
+smoke:
+    bun run smoke
+
 lint:
     bun run lint
 
@@ -31,4 +39,4 @@ format-check:
 typecheck:
     bun run typecheck
 
-check: lint lint-colors format-check typecheck
+check: lint lint-colors format-check typecheck test

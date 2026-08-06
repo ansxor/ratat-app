@@ -28,6 +28,22 @@ export class AppviewError extends Error {
   }
 }
 
+/**
+ * What to put on the page when a read failed. The appview's own error names
+ * are the only thing worth branching on: everything else — Postgres down, the
+ * appview process gone, a network that dropped — reaches the browser the same
+ * way and deserves the same "try again" rather than a stack trace.
+ */
+export function readFailureMessage(cause: unknown, notFound: string): string {
+  if (cause instanceof AppviewError) {
+    if (cause.kind === "ProfileNotFound" || cause.kind === "PostNotFound") return notFound;
+    if (cause.kind === "UpstreamFailure") {
+      return "Bluesky didn't answer just now. Try again in a moment.";
+    }
+  }
+  return "Ratat couldn't load this. Try again in a moment.";
+}
+
 export async function getProfile(actor: string, signal?: AbortSignal): Promise<Profile> {
   const res = await client.get("art.ratat.actor.getProfile", {
     params: { actor: actor as Profile["did"] },

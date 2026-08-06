@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { ArtworkGrid } from "#/components/ArtworkGrid.tsx";
+import { FeedNotice } from "#/components/FeedNotice.tsx";
 import { Footer } from "#/components/Footer.tsx";
 import { LoginPanel } from "#/components/LoginPanel.tsx";
 import { Pager } from "#/components/Pager.tsx";
@@ -28,7 +29,13 @@ function Home() {
   const { session, restored } = useSession();
   const { page = 1 } = Route.useSearch();
 
-  if (!restored) return <FeedShell />;
+  if (!restored) {
+    return (
+      <FeedShell>
+        <FeedNotice pulse>Loading…</FeedNotice>
+      </FeedShell>
+    );
+  }
   if (!session) return <LoginPanel />;
   return <HomeFeed did={session.did} page={page} />;
 }
@@ -43,12 +50,6 @@ function FeedShell({ children }: { children?: React.ReactNode }) {
       </main>
       <Footer />
     </>
-  );
-}
-
-function Notice({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mt-[26px] text-center text-[14px] text-mist [&_a]:underline">{children}</div>
   );
 }
 
@@ -83,23 +84,27 @@ function HomeFeed({ did, page }: { did: string; page: number }) {
   if (failed) {
     return (
       <FeedShell>
-        <Notice>Couldn&apos;t load your feed right now.</Notice>
+        <FeedNotice>Couldn&apos;t load your feed right now. Try again in a moment.</FeedNotice>
       </FeedShell>
     );
   }
 
-  if (timeline === undefined || !loaded) return <FeedShell />;
+  if (timeline === undefined || !loaded) {
+    return (
+      <FeedShell>
+        <FeedNotice pulse>Loading…</FeedNotice>
+      </FeedShell>
+    );
+  }
 
   if (follows.size === 0) {
     return (
       <FeedShell>
-        <Notice>
-          <p>
-            You don&apos;t follow any artists on Ratat yet.{" "}
-            <Link to="/onboarding">Bring over the ones you follow on Bluesky</Link>, or open an
-            artist&apos;s portfolio and follow them there.
-          </p>
-        </Notice>
+        <FeedNotice>
+          You don&apos;t follow any artists on Ratat yet.{" "}
+          <Link to="/onboarding">Bring over the ones you follow on Bluesky</Link>, or open an
+          artist&apos;s portfolio and follow them there.
+        </FeedNotice>
       </FeedShell>
     );
   }
@@ -107,12 +112,10 @@ function HomeFeed({ did, page }: { did: string; page: number }) {
   if (timeline.posts.length === 0) {
     return (
       <FeedShell>
-        <Notice>
-          <p>
-            Nothing from the artists you follow yet — their work is still being read in. Check back
-            in a minute.
-          </p>
-        </Notice>
+        <FeedNotice>
+          Nothing from the artists you follow yet — their work is still being read in. Check back in
+          a minute.
+        </FeedNotice>
       </FeedShell>
     );
   }

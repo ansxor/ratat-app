@@ -18,10 +18,12 @@
     "lint:colors": "bun --filter '@ratat/web' lint:colors",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "typecheck": "bun --filter '*' typecheck",
-    "test": "bun --filter '*' test"
+    "typecheck": "bun --filter '*' typecheck && tsc --noEmit",
+    "test": "bun --filter '*' test",
+    "smoke": "bun scripts/smoke.ts"
   },
   "devDependencies": {
+    "@types/bun": "latest",
     "oxfmt": "0.58.0",
     "oxlint": "1.73.0",
     "typescript": "^5.9.3"

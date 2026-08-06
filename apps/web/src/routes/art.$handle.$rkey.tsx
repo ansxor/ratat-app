@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArtworkGate } from "#/components/content/ArtworkGate.tsx";
 import { ArtworkVeil, veilFrameClass } from "#/components/content/ArtworkVeil.tsx";
 import { EngagementButton } from "#/components/EngagementButton.tsx";
+import { FeedNotice } from "#/components/FeedNotice.tsx";
 import { FollowButton } from "#/components/FollowButton.tsx";
 import { Footer } from "#/components/Footer.tsx";
 import { Sidebar } from "#/components/Sidebar.tsx";
@@ -11,13 +12,13 @@ import { BlueskyIcon } from "#/components/ui/icons.tsx";
 import { rkeyOf } from "#/lib/artwork-href.ts";
 import { formatDate } from "#/lib/date.ts";
 import {
-  AppviewError,
   aspectRatio,
   getAuthorFeed,
   getPost,
   isVideo,
   type Media,
   type Post,
+  readFailureMessage,
 } from "#/lib/ratat.ts";
 import { useContentVeil } from "#/lib/settings.tsx";
 import { cn } from "#/lib/utils.ts";
@@ -25,14 +26,14 @@ import { cn } from "#/lib/utils.ts";
 export const Route = createFileRoute("/art/$handle/$rkey")({
   loader: async ({ params }) => {
     const post = await getPost(params.handle, params.rkey).catch((cause: unknown) => {
-      if (cause instanceof AppviewError) throw new Error("That artwork isn't on Ratat.");
-      throw cause;
+      throw new Error(readFailureMessage(cause, "That artwork isn't on Ratat."));
     });
     const feed = await getAuthorFeed(post.author.did, { limit: 12 }).catch(() => undefined);
     const moreBy = (feed?.posts ?? []).filter((other) => other.uri !== post.uri).slice(0, 4);
     return { post, moreBy };
   },
   component: ArtworkPage,
+  pendingComponent: ArtworkPending,
   errorComponent: ArtworkError,
 });
 
@@ -261,23 +262,37 @@ function ArtworkMeta({ post, description }: { post: Post; description: string | 
   );
 }
 
-function ArtworkError({ error }: { error: Error }) {
-  const { handle, rkey } = Route.useParams();
+function ArtworkShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="gallery">
       <div className="wrap layout">
-        <div className="feed">
-          <p className="text-mist py-[24px]">{error.message}</p>
-          <Link
-            to="/profile/$handle"
-            params={{ handle }}
-            className="btn btn--ghost"
-            title={rkeyOf(rkey)}
-          >
-            Back to @{handle}
-          </Link>
-        </div>
+        <div className="feed">{children}</div>
       </div>
     </main>
+  );
+}
+
+function ArtworkPending() {
+  return (
+    <ArtworkShell>
+      <FeedNotice pulse>Loading…</FeedNotice>
+    </ArtworkShell>
+  );
+}
+
+function ArtworkError({ error }: { error: Error }) {
+  const { handle, rkey } = Route.useParams();
+  return (
+    <ArtworkShell>
+      <FeedNotice>{error.message}</FeedNotice>
+      <Link
+        to="/profile/$handle"
+        params={{ handle }}
+        className="btn btn--ghost"
+        title={rkeyOf(rkey)}
+      >
+        Back to @{handle}
+      </Link>
+    </ArtworkShell>
   );
 }

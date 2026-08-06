@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
 
+import { ArtworkVeil } from "#/components/content/ArtworkVeil.tsx";
 import { FollowButton } from "#/components/FollowButton.tsx";
 import { ImageIcon } from "#/components/ui/icons.tsx";
 import { TabNav, type TabNavItem } from "#/components/ui/TabNav.tsx";
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
 import type { Profile } from "#/lib/ratat.ts";
+import { useContentVeil } from "#/lib/settings.tsx";
 import { cn } from "#/lib/utils.ts";
 
 const STAT_VALUE = "font-display text-[22px] font-[500] leading-none";
@@ -33,10 +35,21 @@ function ProfileStats({ profile }: { profile: Profile }) {
   );
 }
 
+/**
+ * An account-level label covers the banner and the avatar, which are the only
+ * artwork this header shows. It never takes the page away: somebody who
+ * followed a link to an artist asked for this page, and the works below are
+ * filtered on their own labels anyway.
+ */
 export function ProfileHeader({ profile, artCount }: { profile: Profile; artCount: number }) {
+  const { hidden, veil, peeked, animated, reveal } = useContentVeil(profile.labels);
+  const cover = hidden ? "black" : veil;
+  const covered = cover !== null && !peeked;
+
   const name = profile.displayName?.trim() || profile.handle;
   const bannerBg = profile.banner ? `url(${profile.banner})` : PLACEHOLDER_GRADIENT;
   const avatarBg = profile.avatar ? `url(${profile.avatar})` : PLACEHOLDER_GRADIENT;
+  const blur = covered && cover === "blur" ? "blur(38px)" : undefined;
 
   const tabs: TabNavItem[] = [
     {
@@ -51,22 +64,24 @@ export function ProfileHeader({ profile, artCount }: { profile: Profile; artCoun
     <>
       <header
         className={cn(
-          "relative h-[clamp(220px,32vw,320px)] border border-line",
+          // `isolate` keeps the banner layer's negative z inside this header.
+          "relative isolate overflow-hidden h-[clamp(220px,32vw,320px)] border border-line",
           "shadow-[0_24px_48px_-36px_var(--shadow-drop)]",
           "before:content-[''] before:absolute before:inset-0 before:pointer-events-none",
           // theme-invariant: contrast over arbitrary user artwork.
           "before:bg-[linear-gradient(to_top,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.55)_12%,rgba(0,0,0,0.25)_26%,rgba(0,0,0,0.08)_38%,rgba(0,0,0,0)_50%)]",
         )}
-        style={{
-          backgroundImage: bannerBg,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
       >
+        {/* Its own layer, behind the gradient, so blurring the banner cannot blur the name over it. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-[-1] bg-cover bg-center"
+          style={{ backgroundImage: bannerBg, ...(blur ? { filter: blur } : {}) }}
+        />
         <div className="absolute inset-0 flex flex-col items-start justify-center gap-[12px] p-[20px_24px]">
           <div
             className="w-[clamp(96px,14vw,160px)] h-[clamp(96px,14vw,160px)] flex-none bg-cover bg-center border border-line shadow-[inset_0_0_0_3px_var(--color-ink-raised),0_18px_36px_-24px_var(--shadow-drop)]"
-            style={{ backgroundImage: avatarBg }}
+            style={{ backgroundImage: avatarBg, ...(blur ? { filter: blur } : {}) }}
           />
           <div className="flex flex-col items-start gap-[6px]">
             <h1 className="m-0 font-display text-[clamp(22px,4vw,30px)] font-[500] tracking-[-0.02em] leading-[1.1] text-paper bg-overlay backdrop-blur-[8px] border border-line p-[5px_13px]">
@@ -77,6 +92,15 @@ export function ProfileHeader({ profile, artCount }: { profile: Profile; artCoun
             </span>
           </div>
         </div>
+        {cover && (
+          <ArtworkVeil
+            variant={cover}
+            peeked={peeked}
+            animated={animated}
+            onReveal={reveal}
+            label={`Uncensor @${profile.handle}'s banner`}
+          />
+        )}
       </header>
 
       <div className="flex gap-[24px] items-start flex-wrap mt-[14px]">

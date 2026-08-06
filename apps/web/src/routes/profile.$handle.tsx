@@ -1,16 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { ArtworkGrid } from "#/components/ArtworkGrid.tsx";
+import { FeedNotice } from "#/components/FeedNotice.tsx";
 import { Footer } from "#/components/Footer.tsx";
 import { Pager } from "#/components/Pager.tsx";
 import { ProfileHeader } from "#/components/ProfileHeader.tsx";
 import { pagerLinks, type PagerPagination } from "#/lib/pagination.ts";
 import {
-  AppviewError,
   getAuthorFeed,
   getProfile,
   type Portfolio,
   type Profile,
+  readFailureMessage,
 } from "#/lib/ratat.ts";
 
 const PAGE_SIZE = 30;
@@ -26,15 +27,13 @@ export const Route = createFileRoute("/profile/$handle")({
   loaderDeps: ({ search }) => ({ page: search.page ?? 1 }),
   loader: async ({ params, deps }) => {
     const profile = await getProfile(params.handle).catch((cause: unknown) => {
-      if (cause instanceof AppviewError && cause.kind === "ProfileNotFound") {
-        throw new Error("No such account on Bluesky.");
-      }
-      throw cause;
+      throw new Error(readFailureMessage(cause, "No such account on Bluesky."));
     });
     const portfolio = await getAuthorFeed(profile.did, { page: deps.page, limit: PAGE_SIZE });
     return { profile, portfolio };
   },
   component: ArtistPage,
+  pendingComponent: ArtistPending,
   errorComponent: ArtistError,
 });
 
@@ -93,7 +92,10 @@ function ArtistPage() {
 
             <div className="pt-[18px] pb-[40px]">
               {posts.length === 0 ? (
-                <p className="text-mist py-[24px]">No artworks to show yet.</p>
+                <FeedNotice>
+                  No artworks to show yet — this artist has posted nothing with media, or Ratat is
+                  still reading their work in.
+                </FeedNotice>
               ) : (
                 <>
                   <Pager variant="top" pagination={pagination} />
@@ -110,17 +112,42 @@ function ArtistPage() {
   );
 }
 
-function ArtistError({ error }: { error: Error }) {
+function ArtistShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="gallery">
       <div className="wrap layout">
-        <div className="feed">
-          <p className="text-mist py-[24px]">{error.message}</p>
-          <Link to="/" className="btn btn--ghost">
-            Back to Ratat
-          </Link>
-        </div>
+        <div className="feed">{children}</div>
       </div>
     </main>
+  );
+}
+
+function ArtistPending() {
+  return (
+    <ArtistShell>
+      <FeedNotice pulse>Loading…</FeedNotice>
+    </ArtistShell>
+  );
+}
+
+function ArtistError({ error }: { error: Error }) {
+  const { handle } = Route.useParams();
+  return (
+    <ArtistShell>
+      <FeedNotice>{error.message}</FeedNotice>
+      <div className="flex gap-[8px]">
+        <Link to="/" className="btn btn--ghost">
+          Back to Ratat
+        </Link>
+        <a
+          className="btn btn--ghost"
+          href={`https://bsky.app/profile/${handle}`}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          Look on Bluesky
+        </a>
+      </div>
+    </ArtistShell>
   );
 }
