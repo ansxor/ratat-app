@@ -22,7 +22,7 @@ A DID becomes interested when:
 | Somebody reads their feed, even before we know the handle | `art.ratat.feed.getAuthorFeed`, from the byline of the first post fetched |
 | Somebody opens one of their artworks                      | `art.ratat.feed.getPost`                                                  |
 | A user logs in                                            | falls out of the above — the masthead reads its own profile               |
-| _(Phase 3)_ somebody Ratat-follows them                   | `art.ratat.graph.follow` ingest                                           |
+| Somebody Ratat-follows them                               | `art.ratat.graph.follow` ingest — see _The Ratat graph_                   |
 
 Marking is a background write on the read path (`noteInterestInBackground`). It
 cannot fail a request: if Postgres is unreachable, the page still renders live
@@ -64,9 +64,37 @@ Choices worth knowing:
   `art.ratat.feed.defs#imageView` / `#videoView` objects the lexicon returns, so
   a read is a row fetch, not a re-render of blob refs.
 
+## The Ratat graph
+
+`art.ratat.graph.follow` is the one record Ratat writes, and it lives in the
+follower's repo. The index mirrors it into `ratat_follow` because the home feed
+is a join over it, and because being followed is what makes an artist worth
+indexing at all.
+
+Two ways a follow arrives:
+
+- **The tail** (below) sees everything written from now on.
+- **A one-off graph walk** covers what was written before. A repo is walked when
+  somebody asks what it follows — `art.ratat.graph.getFollows` stamps
+  `follows_wanted_at`, which is the queue the worker reads, and stamps
+  `follows_backfilled_at` when done. The appview does not carry the collection,
+  so the walk reads `com.atproto.repo.listRecords` from the actor's own PDS,
+  found through their DID document.
+
+Either way, indexing a follow marks its **subject** interested. The record
+carries only a DID, so the first sighting of a subject fetches their profile
+from the appview — an actor row needs a handle to render a byline.
+
+`getFollows` reports `indexed: false` until the walk has happened. That is what
+lets the web app fall back to reading the viewer's own repo, which is also the
+only correct answer in the second after a follow is written.
+
+Duplicate follows of the same subject are tolerated rather than constrained: a
+repo may hold several, and the timeline join collapses them.
+
 ## The live tail
 
-Two jetstream subscriptions, for two different reasons.
+Three jetstream subscriptions, for three different reasons.
 
 **`jetstream:posts`** is scoped by DID. Posts and profile edits live in the
 author's own repo, so jetstream filters to the interested set for us
@@ -103,6 +131,12 @@ loaded into memory at boot so a delete can be recognised without a query.
 Set `JETSTREAM_LIKE_TAIL=false` to turn this half off; counts then stay at their
 backfilled values.
 
+**`jetstream:follows`** is unscoped for the same reason as the like tail — a
+follow lives in the follower's repo — but costs nothing, because only Ratat
+writes `art.ratat.graph.follow` and jetstream filters the collection upstream.
+A create writes the row and marks the subject interested; a delete carries no
+record, but the DID and rkey in the event name the row on their own.
+
 Each subscription checkpoints its jetstream cursor to `ingestion_cursor` every
 `JETSTREAM_CHECKPOINT_EVERY` events, and resumes from it on reconnect.
 
@@ -137,6 +171,13 @@ Cursors handed out by the indexed path are a base64url keyset
 The indexed path recognises the difference and refuses a cursor it did not mint,
 falling back to live rather than paging from nonsense.
 
+The home feed (`art.ratat.feed.getTimeline`) is the one read with **no live
+fallback**: it is a join over a graph only we hold, so an unreachable index is
+an error rather than a slower answer. It is paged the same way — offsets over
+`post_timeline_idx (created_at desc, uri desc)` — and returns the total, so the
+pager knows how many pages exist. An artist who is followed but not yet
+backfilled contributes nothing until the worker reaches them.
+
 ### What is not indexed
 
 - **Profiles.** `getProfile` is always live: followers, follows and post counts
@@ -163,6 +204,10 @@ falling back to live rather than paging from nonsense.
 - **A backfill is a point-in-time walk.** Nothing re-walks an actor later, so a
   post that existed before the backfill but was missed (an appview hiccup mid
   walk) stays missing until somebody re-triggers it by hand.
+- **The backfill queue is first-come, first-served.** A newly Ratat-followed
+  artist waits behind everyone already in it, and one prolific account can hold
+  the queue for minutes — a 26,000-artwork walk was measured at over two. A
+  home feed that stays empty after an import is usually this.
 
 ## Configuration
 
@@ -171,6 +216,7 @@ falling back to live rather than paging from nonsense.
 | `DATABASE_URL`                  | —                                       | Postgres. Absent in `xrpc-server` means live-only reads. |
 | `BSKY_APPVIEW_URL`              | `https://public.api.bsky.app`           | Where backfill and live reads go.                        |
 | `JETSTREAM_URL`                 | `wss://jetstream2.us-east.bsky.network` | Jetstream instance.                                      |
+| `PLC_DIRECTORY_URL`             | `https://plc.directory`                 | DID documents, which is how a repo's PDS is found.       |
 | `JETSTREAM_LIKE_TAIL`           | `true`                                  | Tail the global like firehose.                           |
 | `JETSTREAM_DID_REFRESH_SECONDS` | `30`                                    | How often the tail re-scopes to the interested set.      |
 | `JETSTREAM_CHECKPOINT_EVERY`    | `50`                                    | Events between cursor writes.                            |

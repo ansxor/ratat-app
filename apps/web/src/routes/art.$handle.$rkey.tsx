@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { EngagementButton } from "#/components/EngagementButton.tsx";
+import { FollowButton } from "#/components/FollowButton.tsx";
 import { Footer } from "#/components/Footer.tsx";
 import { Sidebar } from "#/components/Sidebar.tsx";
 import { BlueskyIcon } from "#/components/ui/icons.tsx";
@@ -106,6 +107,7 @@ function ArtworkPage() {
                     )}
                     <span>{artistName}</span>
                   </Link>
+                  <FollowButton subject={post.author.did} variant="compact" />
                 </div>
               </div>
 

@@ -19,7 +19,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "typecheck": "bun --filter '*' typecheck",
-    "test": "bun --filter '@ratat/web' test"
+    "test": "bun --filter '*' test"
   },
   "devDependencies": {
     "oxfmt": "0.58.0",

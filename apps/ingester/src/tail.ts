@@ -245,7 +245,9 @@ const handleLikeEvent = (
  * having whatever the interested set says — being followed is itself what puts
  * the subject in that set.
  */
-const handleFollowEvent = (event: JetstreamEvent): Effect.Effect<void, never, TailServices> => {
+export const handleFollowEvent = (
+  event: JetstreamEvent,
+): Effect.Effect<void, never, TailServices> => {
   if (event.kind !== "commit" || event.commit.collection !== FOLLOW_COLLECTION) return Effect.void;
   const commit = event.commit;
   const uri = uriOf(event.did, FOLLOW_COLLECTION, commit.rkey);
