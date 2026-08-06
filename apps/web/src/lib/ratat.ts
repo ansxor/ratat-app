@@ -72,12 +72,19 @@ export async function searchActorsTypeahead(
 
 export async function getAuthorFeed(
   actor: string,
-  options: { cursor?: string; page?: number; limit?: number; signal?: AbortSignal } = {},
+  options: {
+    cursor?: string;
+    page?: number;
+    limit?: number;
+    sample?: boolean;
+    signal?: AbortSignal;
+  } = {},
 ): Promise<Portfolio> {
   const res = await client.get("art.ratat.feed.getAuthorFeed", {
     params: {
       actor: actor as Profile["did"],
       limit: options.limit ?? 30,
+      ...(options.sample ? { sample: true } : {}),
       ...(options.page && options.page > 1 ? { page: options.page } : {}),
       ...(options.cursor ? { cursor: options.cursor } : {}),
     },

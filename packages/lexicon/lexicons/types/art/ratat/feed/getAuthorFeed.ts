@@ -41,6 +41,11 @@ const _mainSchema = /*#__PURE__*/ v.query(
 					),
 					1
 				),
+				/**
+				 * When true, the feed is a random sample of the artist's works rather than a page: `limit` posts drawn without order, no `cursor` or `page` in the response. `cursor` and `page` are ignored.
+				 * @default false
+				 */
+				"sample": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.boolean(), false),
 			}
 		),
 		"output": {

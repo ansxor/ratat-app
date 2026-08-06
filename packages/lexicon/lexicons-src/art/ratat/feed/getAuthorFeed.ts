@@ -1,5 +1,6 @@
 import {
   array,
+  boolean,
   document,
   integer,
   object,
@@ -29,6 +30,11 @@ export default document({
             minimum: 1,
             maximum: 100,
             default: 1,
+          }),
+          sample: boolean({
+            description:
+              "When true, the feed is a random sample of the artist's works rather than a page: `limit` posts drawn without order, no `cursor` or `page` in the response. `cursor` and `page` are ignored.",
+            default: false,
           }),
         },
       }),

@@ -28,8 +28,10 @@ export const Route = createFileRoute("/art/$handle/$rkey")({
     const post = await getPost(params.handle, params.rkey).catch((cause: unknown) => {
       throw new Error(readFailureMessage(cause, "That artwork isn't on Ratat."));
     });
-    const feed = await getAuthorFeed(post.author.did, { limit: 12 }).catch(() => undefined);
-    const moreBy = (feed?.posts ?? []).filter((other) => other.uri !== post.uri).slice(0, 4);
+    const feed = await getAuthorFeed(post.author.did, { sample: true, limit: 9 }).catch(
+      () => undefined,
+    );
+    const moreBy = (feed?.posts ?? []).filter((other) => other.uri !== post.uri).slice(0, 8);
     return { post, moreBy };
   },
   component: ArtworkPage,

@@ -11,7 +11,7 @@ function RailHeading({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * The rail is a fixed two-by-two, so a card that filters itself out would
+ * The rail is a fixed two-column grid, so a card that filters itself out would
  * leave a hole rather than close the gap: this one drops hidden works before
  * laying out instead of after.
  */

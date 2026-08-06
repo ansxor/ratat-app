@@ -170,6 +170,27 @@ export const indexedFeedAfter = (
     return { rows: hasMore ? rows.slice(0, limit) : rows, page: 0, hasMore };
   });
 
+/**
+ * A random sample of an actor's indexed artworks. `order by random()` walks
+ * every row the actor has, which is fine at portfolio scale — thousands of
+ * posts, not millions.
+ */
+export const indexedFeedSample = (
+  did: string,
+  limit: number,
+): Effect.Effect<PostRow[], DbError, Database> =>
+  Effect.gen(function* () {
+    const database = yield* Database;
+    return yield* database.run("indexedFeedSample", (db) =>
+      db
+        .select()
+        .from(post)
+        .where(eq(post.did, did))
+        .orderBy(sql`random()`)
+        .limit(limit),
+    );
+  });
+
 export const indexedPost = (uri: string): Effect.Effect<PostRow | undefined, DbError, Database> =>
   Effect.gen(function* () {
     const database = yield* Database;

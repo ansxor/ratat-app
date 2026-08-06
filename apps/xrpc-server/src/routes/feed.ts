@@ -21,6 +21,7 @@ import {
   encodeFeedCursor,
   indexedFeedAfter,
   indexedFeedPage,
+  indexedFeedSample,
   indexedPost,
   timelinePage,
 } from "../store.ts";
@@ -167,6 +168,57 @@ const liveAuthorFeed = (
     };
   });
 
+// ------------------------------------------------------------- random samples
+
+/** Fisher–Yates; returns a new array without mutating the input. */
+const shuffle = <T>(items: readonly T[]): T[] => {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j] as T, out[i] as T];
+  }
+  return out;
+};
+
+/** How much of a live feed one sample draws from — the first page only. */
+const SAMPLE_POOL_LIMIT = 100;
+
+/**
+ * A random sample of an actor's works. The index samples the whole portfolio;
+ * an actor not backfilled yet is sampled from their newest hundred instead,
+ * which is as far back as one upstream read can see.
+ */
+const sampledAuthorFeed = (
+  actor: ArtRatatFeedGetAuthorFeed.$params["actor"],
+  row: ActorRow | undefined,
+  limit: number,
+  signal: AbortSignal | undefined,
+): RouteEffect<ArtRatatFeedGetAuthorFeed.$output> =>
+  Effect.gen(function* () {
+    if (row?.backfilledAt) {
+      const rows = yield* indexedFeedSample(row.did, limit).pipe(
+        Effect.catchAll((error) =>
+          Effect.logWarning(
+            `indexed sample for ${row.did} failed, serving live: ${String(error.cause)}`,
+          ).pipe(Effect.as(undefined)),
+        ),
+      );
+      if (rows !== undefined) {
+        yield* Effect.logDebug(`getAuthorFeed ${actor} sample served from index`);
+        return {
+          feed: rows
+            .map((indexed) => rowPostView(indexed, row))
+            .filter((view): view is ArtRatatFeedDefs.PostView => view !== undefined),
+        };
+      }
+    }
+
+    const result = yield* fetchPage(actor, SAMPLE_POOL_LIMIT, undefined, signal);
+    const seen = result.feed[0]?.author;
+    if (seen) yield* noteInterestInBackground(seen);
+    return { feed: shuffle(result.feed).slice(0, limit) };
+  });
+
 export const feedGetAuthorFeed = (
   ctx: QueryContext<ArtRatatFeedGetAuthorFeed.mainSchema>,
 ): RouteEffect<Response> =>
@@ -175,6 +227,11 @@ export const feedGetAuthorFeed = (
     const page = ctx.params.page ?? 1;
 
     const row = yield* indexedActor(actor);
+
+    if (ctx.params.sample) {
+      return json(yield* sampledAuthorFeed(actor, row, limit ?? DEFAULT_LIMIT, ctx.signal));
+    }
+
     if (row?.backfilledAt) {
       const indexed = yield* indexedAuthorFeed(row, limit ?? DEFAULT_LIMIT, page, cursor);
       if (indexed !== undefined) {
