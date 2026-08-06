@@ -96,9 +96,11 @@ ratat-app/
 - `post` — uri, cid, did, createdAt, text, facets/tags, embed summary, image
   blobs (cid, alt, aspect), label snapshot, has_images flag. Only posts **with
   media** from interested actors are stored (text-only posts skipped).
-- `like_count` / viewer-like state — either denormalized counters maintained from
-  jetstream, or fetched live from the Bluesky appview per view (start live-fetch
-  via `app.bsky.feed.getPosts` hydration; denormalize later if needed).
+- `like_count` — denormalized counter mirrored in the local index (DECIDED
+  2026-08-06): seeded from appview counts during backfill, then maintained by
+  tailing `app.bsky.feed.like` creates/deletes on jetstream for posts we index.
+  Live per-read hydration from the appview would be too expensive. Viewer-like
+  state stays a live check (or client-side) — no per-liker records stored.
 - `ratat_follow` — indexed from `art.ratat.graph.follow` records (subject did,
   actor did, rkey, createdAt).
 - `label` — per-subject labels from subscribed labelers (or fetch via hydration).
@@ -217,8 +219,9 @@ deliberately (no history graft). Old repo stays as reference until parity.
   top-nav "Following" page/rail is obsolete and is not ported.
 - **Boosts removed entirely.** The old "favourites" concept becomes the Bluesky
   like (`app.bsky.feed.like`) — one synced action, no custom like record.
-- **Likes are count-only.** No "liked by" surfaces; hydrate counts from the
-  public Bluesky appview — no like indexing.
+- **Likes are count-only.** No "liked by" surfaces. Counts are mirrored into
+  the local index (backfill seed + jetstream `app.bsky.feed.like` tail) rather
+  than hydrated live per read — cheaper at scale (decided 2026-08-06).
 - **Onboarding:** replace the old "import posts" step with an **import follows**
   step — offer the user's Bluesky follow graph as initial ratat-follows
   (one-time, initial stage only; no ongoing sync).
