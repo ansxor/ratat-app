@@ -40,11 +40,21 @@ export const actor = pgTable(
     /** When the worker last tried, so a failing DID backs off instead of spinning. */
     backfillAttemptedAt: stamp("backfill_attempted_at"),
     backfillError: text("backfill_error"),
+    /**
+     * Non-null once somebody asked what this DID Ratat-follows — which only
+     * happens for a DID whose own viewer is reading its home feed. Follows
+     * written before we tailed them exist only in the repo, so the graph
+     * worker walks it once; live follows arrive on jetstream from then on.
+     */
+    followsWantedAt: stamp("follows_wanted_at"),
+    followsBackfilledAt: stamp("follows_backfilled_at"),
+    followsBackfillAttemptedAt: stamp("follows_backfill_attempted_at"),
     indexedAt: stamp("indexed_at").notNull().defaultNow(),
   },
   (table) => [
     index("actor_handle_idx").on(table.handle),
     index("actor_backfill_queue_idx").on(table.interestedAt, table.backfillAttemptedAt),
+    index("actor_follows_queue_idx").on(table.followsWantedAt, table.followsBackfillAttemptedAt),
   ],
 );
 
@@ -76,6 +86,8 @@ export const post = pgTable(
     // The author-feed read: newest first, tie-broken by uri so offset paging is
     // stable across two posts sharing a createdAt.
     index("post_author_feed_idx").on(table.did, desc(table.createdAt), desc(table.uri)),
+    // The timeline read, which orders across authors rather than within one.
+    index("post_timeline_idx").on(desc(table.createdAt), desc(table.uri)),
   ],
 );
 
@@ -94,6 +106,29 @@ export const postLike = pgTable(
   (table) => [index("post_like_subject_idx").on(table.subjectUri)],
 );
 
+/**
+ * One `art.ratat.graph.follow` record: the Ratat graph, and so the home feed.
+ * The record lives in the follower's repo, which is why a delete arriving from
+ * jetstream — did and rkey, no record — is still enough to find the row.
+ */
+export const ratatFollow = pgTable(
+  "ratat_follow",
+  {
+    uri: text("uri").primaryKey(),
+    did: text("did").notNull(),
+    rkey: text("rkey").notNull(),
+    subject: text("subject").notNull(),
+    createdAt: stamp("created_at").notNull(),
+    indexedAt: stamp("indexed_at").notNull().defaultNow(),
+  },
+  (table) => [
+    // The timeline read: every subject one follower holds.
+    index("ratat_follow_did_idx").on(table.did, table.subject),
+    // The interested-set trigger: who follows this subject.
+    index("ratat_follow_subject_idx").on(table.subject),
+  ],
+);
+
 /** Resume point per jetstream subscription, in microseconds since the epoch. */
 export const ingestionCursor = pgTable("ingestion_cursor", {
   source: text("source").primaryKey(),
@@ -107,3 +142,5 @@ export type ActorRow = typeof actor.$inferSelect;
 export type ActorInsert = typeof actor.$inferInsert;
 export type PostRow = typeof post.$inferSelect;
 export type PostInsert = typeof post.$inferInsert;
+export type RatatFollowRow = typeof ratatFollow.$inferSelect;
+export type RatatFollowInsert = typeof ratatFollow.$inferInsert;

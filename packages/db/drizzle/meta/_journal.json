@@ -8,6 +8,13 @@
       "when": 1786033183214,
       "tag": "0000_polite_paper_doll",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786041256918,
+      "tag": "0001_panoramic_guardian",
+      "breakpoints": true
     }
   ]
 }
