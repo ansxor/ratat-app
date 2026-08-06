@@ -4,7 +4,7 @@ import * as lex from "@ratat/lexicon";
 
 import { runHandler } from "./handler.ts";
 import { actorGetProfile } from "./routes/actor.ts";
-import { feedGetAuthorFeed } from "./routes/feed.ts";
+import { feedGetAuthorFeed, feedGetPost } from "./routes/feed.ts";
 import type { AppRuntime } from "./runtime.ts";
 
 export interface CreateRouterOptions {
@@ -24,6 +24,9 @@ export const createRouter = ({ runtime, websocket }: CreateRouterOptions): XRPCR
   });
   router.addQuery(lex.ArtRatatFeedGetAuthorFeed.mainSchema, {
     handler: (ctx) => runHandler(runtime, feedGetAuthorFeed(ctx)),
+  });
+  router.addQuery(lex.ArtRatatFeedGetPost.mainSchema, {
+    handler: (ctx) => runHandler(runtime, feedGetPost(ctx)),
   });
 
   return router;

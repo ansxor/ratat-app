@@ -20,20 +20,21 @@ function OAuthCallback() {
   }, []);
 
   return (
-    <main className="mx-auto mt-xxl w-full max-w-md px-xl text-center">
-      {error ? (
-        <>
-          <p className="text-body text-paper">Sign-in didn&apos;t complete: {error}</p>
-          <Link
-            to="/"
-            className="mt-lg inline-block rounded-sm border border-line-2 px-md py-sm text-body-sm text-mist"
-          >
-            Back to Ratat
-          </Link>
-        </>
-      ) : (
-        <p className="text-body text-mist">Finishing sign-in…</p>
-      )}
+    <main className="wrap flex flex-col items-center pt-[64px] pb-[80px] max-[680px]:pt-[32px]">
+      <section className="w-[380px] max-w-full border border-line bg-ink-raised shadow-[0_24px_48px_-32px_var(--shadow-drop)] px-[24px] py-[24px]">
+        {error ? (
+          <>
+            <p className="m-0 text-[13px] leading-[1.5] text-[var(--danger)]" role="alert">
+              Sign-in didn&apos;t complete: {error}
+            </p>
+            <Link to="/login" className="btn btn--ghost mt-[14px] justify-center py-[10px] w-full">
+              Try again
+            </Link>
+          </>
+        ) : (
+          <p className="m-0 text-[13px] text-mist animate-pulse-soft">Finishing sign-in…</p>
+        )}
+      </section>
     </main>
   );
 }

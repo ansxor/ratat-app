@@ -1,122 +1,92 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 
-import { startSignIn } from "#/lib/oauth.ts";
+import { Footer } from "#/components/Footer.tsx";
+import { SearchIcon } from "#/components/ui/icons.tsx";
 import { useSession } from "#/lib/session.tsx";
 
 export const Route = createFileRoute("/")({ component: Home });
 
+/**
+ * The old app's home is a discover feed. Until a discover query exists, the
+ * page keeps the gallery shell and offers the one route we can serve: an
+ * artist's portfolio.
+ */
 function Home() {
   const { session, restored } = useSession();
-
-  useEffect(() => {
-    if (import.meta.env.PROD) return;
-    if (window.location.hostname !== "localhost") return;
-    const url = new URL(window.location.href);
-    url.hostname = "127.0.0.1";
-    window.location.replace(url.toString());
-  }, []);
-
-  if (restored && session) return <SignedIn handle={session.handle} />;
-  return <Login />;
-}
-
-function Login() {
-  const [handle, setHandle] = useState("");
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const identifier = handle.trim().replace(/^@/, "");
-    if (!identifier || pending) return;
-    setPending(true);
-    setError(null);
-    try {
-      await startSignIn(identifier);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Sign-in could not start.");
-      setPending(false);
-    }
-  };
-
-  return (
-    <main className="relative z-1 mx-auto mt-xxl w-full max-w-md px-xl">
-      <h1 className="font-display text-h2 text-paper">Ratat</h1>
-      <p className="mt-md text-body-sm text-mist">
-        A gallery over Bluesky. Sign in with your ATProto handle to continue.
-      </p>
-      <form
-        onSubmit={submit}
-        className="mt-xl flex flex-col gap-sm rounded-md border border-line bg-ink-raised p-xl shadow-sm shadow-shadow"
-      >
-        <label htmlFor="handle" className="text-eyebrow uppercase text-faint">
-          Handle
-        </label>
-        <input
-          id="handle"
-          name="handle"
-          value={handle}
-          onChange={(event) => setHandle(event.target.value)}
-          placeholder="artist.bsky.social"
-          autoComplete="username"
-          className="rounded-sm border border-line-2 bg-search-bg px-md py-sm text-body text-paper placeholder:text-faint"
-        />
-        <button
-          type="submit"
-          disabled={pending}
-          className="mt-sm rounded-sm bg-primary px-md py-sm text-body-sm font-semibold text-primary-foreground disabled:opacity-45"
-        >
-          {pending ? "Redirecting…" : "Sign in"}
-        </button>
-        {error ? <p className="text-body-sm text-destructive">{error}</p> : null}
-      </form>
-    </main>
-  );
-}
-
-function SignedIn({ handle }: { handle: string | undefined }) {
   const navigate = useNavigate();
-  const [target, setTarget] = useState("");
+  const [handle, setHandle] = useState("");
 
-  const visit = (event: React.FormEvent) => {
+  const visit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const trimmed = target.trim().replace(/^@/, "");
+    const trimmed = handle.trim().replace(/^@/, "");
     if (!trimmed) return;
     void navigate({ to: "/profile/$handle", params: { handle: trimmed } });
   };
 
   return (
-    <main className="relative z-1 mx-auto mt-xxl w-full max-w-2xl px-xl">
-      <h1 className="font-display text-h2 text-paper">Welcome back</h1>
-      <p className="mt-md text-body-sm text-mist">
-        The following feed lands in a later phase. For now, open an artist's portfolio.
-      </p>
+    <>
+      <main className="gallery">
+        <div className="wrap layout">
+          <div className="feed">
+            <section className="w-[520px] max-w-full border border-line bg-ink-raised shadow-[0_24px_48px_-32px_var(--shadow-drop)]">
+              <h1 className="flex items-center m-0 bg-ink-hi border-b border-line px-[16px] py-[9px] text-[13px] font-[700] tracking-[0.01em] text-paper">
+                Open an artist's portfolio
+              </h1>
 
-      <form
-        onSubmit={visit}
-        className="mt-xl flex gap-sm rounded-md border border-line bg-ink-raised p-xl shadow-sm shadow-shadow"
-      >
-        <input
-          aria-label="Artist handle"
-          value={target}
-          onChange={(event) => setTarget(event.target.value)}
-          placeholder="artist.bsky.social"
-          className="flex-1 rounded-sm border border-line-2 bg-search-bg px-md py-sm text-body text-paper placeholder:text-faint"
-        />
-        <button
-          type="submit"
-          className="rounded-sm bg-primary px-md py-sm text-body-sm font-semibold text-primary-foreground"
-        >
-          Visit
-        </button>
-      </form>
+              <form onSubmit={visit} className="flex flex-col px-[16px] py-[16px]">
+                <div className="flex items-center flex-nowrap gap-[5px] bg-search-bg border border-search-line py-[5px] pl-3 pr-2 text-faint transition-shadow duration-[180ms] focus-within:shadow-[0_0_0_2px_var(--color-primary)] [&>svg]:w-[15px] [&>svg]:h-[15px] [&>svg]:flex-none">
+                  <SearchIcon />
+                  <input
+                    aria-label="Artist handle"
+                    value={handle}
+                    onChange={(event) => setHandle(event.target.value)}
+                    placeholder="alice.bsky.social"
+                    autoComplete="off"
+                    spellCheck={false}
+                    className="bg-transparent border-none outline-none text-paper font-body text-[13.5px] flex-1 min-w-[40px] w-full placeholder:text-faint"
+                  />
+                </div>
 
-      {handle ? (
-        <p className="mt-md text-body-sm text-faint">
-          Signed in as @{handle} — your own portfolio is at /profile/{handle}.
-        </p>
-      ) : null}
-    </main>
+                <button
+                  type="submit"
+                  className="btn btn--accent mt-[14px] justify-center py-[10px]"
+                >
+                  Open portfolio
+                </button>
+              </form>
+
+              <p className="m-0 border-t border-line px-[16px] py-[10px] text-[13px] text-mist">
+                {restored && session ? (
+                  session.handle ? (
+                    <>
+                      Signed in as @{session.handle} —{" "}
+                      <Link
+                        to="/profile/$handle"
+                        params={{ handle: session.handle }}
+                        className="text-primary"
+                      >
+                        your own portfolio
+                      </Link>
+                      .
+                    </>
+                  ) : (
+                    "Signed in."
+                  )
+                ) : (
+                  <>
+                    <Link to="/login" className="text-primary">
+                      Sign in
+                    </Link>{" "}
+                    to favourite the work you find.
+                  </>
+                )}
+              </p>
+            </section>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 }

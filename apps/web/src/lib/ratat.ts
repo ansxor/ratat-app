@@ -50,6 +50,15 @@ export async function getAuthorFeed(
   return { posts: res.data.feed, ...(res.data.cursor ? { cursor: res.data.cursor } : {}) };
 }
 
+export async function getPost(actor: string, rkey: string, signal?: AbortSignal): Promise<Post> {
+  const res = await client.get("art.ratat.feed.getPost", {
+    params: { actor: actor as Profile["did"], rkey },
+    ...(signal ? { signal } : {}),
+  });
+  if (!res.ok) throw new AppviewError(res.data.error, res.data.message);
+  return res.data.post;
+}
+
 export function isVideo(media: Media): media is Extract<Media, { playlist: string }> {
   return "playlist" in media;
 }

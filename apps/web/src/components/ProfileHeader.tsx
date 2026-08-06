@@ -1,58 +1,107 @@
+import { Link } from "@tanstack/react-router";
+
+import { ImageIcon } from "#/components/ui/icons.tsx";
+import { TabNav, type TabNavItem } from "#/components/ui/TabNav.tsx";
+import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
 import type { Profile } from "#/lib/ratat.ts";
+import { cn } from "#/lib/utils.ts";
 
-export function ProfileHeader({ profile }: { profile: Profile }) {
+const STAT_VALUE = "font-display text-[22px] font-[500] leading-none";
+const STAT_LABEL = "font-mono text-[10.5px] tracking-[0.16em] uppercase text-faint";
+
+function ProfileStats({ profile }: { profile: Profile }) {
   return (
-    <section className="overflow-hidden rounded-lg border border-line bg-ink-raised shadow-sm shadow-shadow">
-      {profile.banner ? (
-        <img src={profile.banner} alt="" className="h-40 w-full bg-mat object-cover" />
-      ) : (
-        <div className="h-20 w-full bg-mat" />
-      )}
-
-      <div className="flex flex-wrap items-end gap-md px-xl pb-xl">
-        <img
-          src={profile.avatar}
-          alt=""
-          width={88}
-          height={88}
-          className="-mt-lg size-[88px] rounded-lg border border-line-2 bg-mat object-cover"
-        />
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate font-display text-h3 text-paper">
-            {profile.displayName ?? profile.handle}
-          </h1>
-          <p className="truncate text-body-sm text-faint">@{profile.handle}</p>
-        </div>
-        <a
-          href={profile.bskyUrl}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="rounded-pill border border-bsky-line bg-bsky-tint px-md py-xs text-body-sm text-bsky hover:bg-bsky-tint-hi"
-        >
-          On Bluesky
-        </a>
-      </div>
-
-      {profile.description ? (
-        <p className="whitespace-pre-wrap px-xl pb-xl text-body-sm text-mist">
-          {profile.description}
-        </p>
-      ) : null}
-
-      <dl className="flex gap-xl border-t border-line-soft px-xl py-md text-body-sm">
-        <Stat label="Followers" value={profile.followersCount} />
-        <Stat label="Following" value={profile.followsCount} />
-        <Stat label="Posts" value={profile.postsCount} />
-      </dl>
-    </section>
+    <div className="flex gap-[26px] py-[6px]">
+      <span className="flex flex-col gap-[2px] items-start text-paper">
+        <b className={STAT_VALUE}>{profile.followersCount ?? 0}</b>
+        <span className={STAT_LABEL}>Followers</span>
+      </span>
+      <span className="flex flex-col gap-[2px] items-start text-paper">
+        <b className={STAT_VALUE}>{profile.followsCount ?? 0}</b>
+        <span className={STAT_LABEL}>Following</span>
+      </span>
+      <Link
+        to="/profile/$handle"
+        params={{ handle: profile.handle }}
+        className="flex flex-col gap-[2px] items-start no-underline text-paper"
+      >
+        <b className={STAT_VALUE}>{profile.postsCount ?? 0}</b>
+        <span className={STAT_LABEL}>Pieces</span>
+      </Link>
+    </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: number | undefined }) {
+export function ProfileHeader({ profile, artCount }: { profile: Profile; artCount: number }) {
+  const name = profile.displayName?.trim() || profile.handle;
+  const bannerBg = profile.banner ? `url(${profile.banner})` : PLACEHOLDER_GRADIENT;
+  const avatarBg = profile.avatar ? `url(${profile.avatar})` : PLACEHOLDER_GRADIENT;
+
+  const tabs: TabNavItem[] = [
+    {
+      key: "art",
+      link: { to: "/profile/$handle", params: { handle: profile.handle } },
+      label: artCount ? `Art · ${artCount}` : "Art",
+      icon: <ImageIcon />,
+    },
+  ];
+
   return (
-    <div className="flex gap-xs">
-      <dt className="text-faint">{label}</dt>
-      <dd className="text-paper">{value ?? 0}</dd>
-    </div>
+    <>
+      <header
+        className={cn(
+          "relative h-[clamp(220px,32vw,320px)] border border-line",
+          "shadow-[0_24px_48px_-36px_var(--shadow-drop)]",
+          "before:content-[''] before:absolute before:inset-0 before:pointer-events-none",
+          // theme-invariant: contrast over arbitrary user artwork.
+          "before:bg-[linear-gradient(to_top,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.55)_12%,rgba(0,0,0,0.25)_26%,rgba(0,0,0,0.08)_38%,rgba(0,0,0,0)_50%)]",
+        )}
+        style={{
+          backgroundImage: bannerBg,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 flex flex-col items-start justify-center gap-[12px] p-[20px_24px]">
+          <div
+            className="w-[clamp(96px,14vw,160px)] h-[clamp(96px,14vw,160px)] flex-none bg-cover bg-center border border-line shadow-[inset_0_0_0_3px_var(--color-ink-raised),0_18px_36px_-24px_var(--shadow-drop)]"
+            style={{ backgroundImage: avatarBg }}
+          />
+          <div className="flex flex-col items-start gap-[6px]">
+            <h1 className="m-0 font-display text-[clamp(22px,4vw,30px)] font-[500] tracking-[-0.02em] leading-[1.1] text-paper bg-overlay backdrop-blur-[8px] border border-line p-[5px_13px]">
+              {name}
+            </h1>
+            <span className="text-[12px] tracking-[0.04em] text-mist bg-overlay backdrop-blur-[8px] border border-line p-[3px_9px]">
+              @{profile.handle}
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex gap-[24px] items-start flex-wrap mt-[14px]">
+        <div className="flex-1 min-w-[280px]">
+          {profile.description && (
+            <p className="m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words">
+              {profile.description}
+            </p>
+          )}
+        </div>
+
+        <ProfileStats profile={profile} />
+
+        <div className="flex items-center gap-[8px] py-[6px]">
+          <a
+            className="btn btn--ghost"
+            href={profile.bskyUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            On Bluesky
+          </a>
+        </div>
+      </div>
+
+      <TabNav items={tabs} activeKey="art" ariaLabel="Profile sections" />
+    </>
   );
 }

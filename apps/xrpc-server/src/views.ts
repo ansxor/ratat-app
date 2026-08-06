@@ -72,16 +72,12 @@ const postRecord = (record: unknown): AppBskyFeedPost.Main | undefined => {
 };
 
 /**
- * Returns undefined for anything that is not a piece of the author's own artwork:
- * a repost, a post whose embed carries no media, or a post we cannot read a
- * creation time from.
+ * Returns undefined for anything that is not a piece of artwork: a post whose
+ * embed carries no media, or a post we cannot build a permalink for.
  */
-export const postView = (
-  item: AppBskyFeedDefs.FeedViewPost,
+export const artworkView = (
+  post: AppBskyFeedDefs.PostView,
 ): ArtRatatFeedDefs.PostView | undefined => {
-  if (item.reason?.$type === "app.bsky.feed.defs#reasonRepost") return undefined;
-
-  const post = item.post;
   const media = mediaOf(post.embed);
   if (media.length === 0) return undefined;
 
@@ -104,3 +100,12 @@ export const postView = (
     indexedAt: post.indexedAt,
   };
 };
+
+/**
+ * Returns undefined for anything that is not a piece of the author's own
+ * artwork: a repost, or anything `artworkView` rejects.
+ */
+export const postView = (
+  item: AppBskyFeedDefs.FeedViewPost,
+): ArtRatatFeedDefs.PostView | undefined =>
+  item.reason?.$type === "app.bsky.feed.defs#reasonRepost" ? undefined : artworkView(item.post);

@@ -1,5 +1,6 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 
+import { DevLoopbackRedirect } from "#/components/DevLoopbackRedirect.tsx";
 import { Masthead } from "#/components/Masthead.tsx";
 import { SessionProvider } from "#/lib/session.tsx";
 import appCss from "../styles.css?url";
@@ -36,6 +37,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <SessionProvider>
+          <DevLoopbackRedirect />
           <Masthead />
           {children}
         </SessionProvider>

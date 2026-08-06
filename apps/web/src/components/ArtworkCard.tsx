@@ -1,42 +1,83 @@
-import { aspectRatio, isVideo, type Post } from "#/lib/ratat.ts";
+import { Link } from "@tanstack/react-router";
 
-export function ArtworkCard({ post, onOpen }: { post: Post; onOpen: () => void }) {
+import { EngagementButton } from "#/components/EngagementButton.tsx";
+import { BoostIcon, ChatIcon } from "#/components/ui/icons.tsx";
+import { artworkParams } from "#/lib/artwork-href.ts";
+import { aspectRatio, isVideo, type Post } from "#/lib/ratat.ts";
+import { cn } from "#/lib/utils.ts";
+
+export type ArtworkCardHeader = "hover" | "pinned" | "none";
+
+export function ArtworkCard({
+  post,
+  aspect,
+  header = "hover",
+}: {
+  post: Post;
+  aspect?: string;
+  header?: ArtworkCardHeader;
+}) {
   const cover = post.media[0];
   if (!cover) return null;
 
-  const extra = post.media.length - 1;
-  const label = cover.alt || post.text || `Artwork by @${post.author.handle}`;
+  const params = artworkParams(post);
+  const title = post.text || `Artwork by @${post.author.handle}`;
+  const imgAspect = aspect ?? aspectRatio(cover);
 
   return (
-    <article className="mb-md break-inside-avoid">
-      <button
-        type="button"
-        onClick={onOpen}
-        aria-label={label}
-        className="group relative block w-full overflow-hidden rounded-md border border-line bg-ink-raised shadow-sm shadow-shadow"
-      >
-        <img
-          src={isVideo(cover) ? cover.thumbnail : cover.thumb}
-          alt={cover.alt ?? ""}
-          loading="lazy"
-          style={{ aspectRatio: aspectRatio(cover) }}
-          className="w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
-        />
-        <span className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between gap-sm bg-scrim-hover px-md py-sm text-body-sm text-scrim-solid-fg opacity-0 transition-opacity group-hover:opacity-100">
-          <span className="truncate">@{post.author.handle}</span>
-          <span className="shrink-0">♥ {post.likeCount ?? 0}</span>
-        </span>
-        {isVideo(cover) ? (
-          <span className="pointer-events-none absolute right-sm top-sm rounded-pill bg-scrim-chip px-sm text-eyebrow uppercase text-scrim-solid-fg">
-            video
+    <article className={cn("piece", header === "pinned" && "piece--pinned")}>
+      <div className="piece__art">
+        {header !== "none" && (
+          <div className="piece__top">
+            {post.author.avatar ? (
+              <img
+                className="piece__av"
+                src={post.author.avatar}
+                alt={post.author.displayName ?? post.author.handle}
+                width={18}
+                height={18}
+              />
+            ) : (
+              <span className="piece__av" />
+            )}
+            <Link
+              className="piece__artist"
+              to="/profile/$handle"
+              params={{ handle: post.author.handle }}
+            >
+              @{post.author.handle}
+            </Link>
+          </div>
+        )}
+
+        <div className="relative" style={{ aspectRatio: imgAspect }}>
+          <Link
+            className="piece__open absolute inset-0"
+            to="/art/$handle/$rkey"
+            params={params}
+            aria-label={title}
+          >
+            <img
+              className="canvas h-full w-full object-cover"
+              src={isVideo(cover) ? cover.thumbnail : cover.thumb}
+              alt={cover.alt ?? ""}
+              loading="lazy"
+            />
+          </Link>
+        </div>
+
+        <div className="piece__bar">
+          <EngagementButton post={post} variant="card" />
+          <span className="act act--boost">
+            <BoostIcon />
+            <span>{post.repostCount ?? 0}</span>
           </span>
-        ) : null}
-        {extra > 0 ? (
-          <span className="pointer-events-none absolute left-sm top-sm rounded-pill bg-scrim-chip px-sm text-eyebrow text-scrim-solid-fg">
-            +{extra}
+          <span className="act act--cm">
+            <ChatIcon />
+            <span>{post.replyCount ?? 0}</span>
           </span>
-        ) : null}
-      </button>
+        </div>
+      </div>
     </article>
   );
 }

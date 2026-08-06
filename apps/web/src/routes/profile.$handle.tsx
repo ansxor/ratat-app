@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { Lightbox } from "#/components/Lightbox.tsx";
-import { PortfolioGrid } from "#/components/PortfolioGrid.tsx";
+import { ArtworkGrid } from "#/components/ArtworkGrid.tsx";
+import { Footer } from "#/components/Footer.tsx";
 import { ProfileHeader } from "#/components/ProfileHeader.tsx";
 import { AppviewError, getAuthorFeed, getProfile, type Post, type Profile } from "#/lib/ratat.ts";
 
@@ -45,7 +45,6 @@ function Portfolio({
   const [posts, setPosts] = useState(initial);
   const [cursor, setCursor] = useState(initialCursor);
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState<number | null>(null);
 
   const loadMore = async () => {
     if (!cursor || loading) return;
@@ -59,57 +58,52 @@ function Portfolio({
     }
   };
 
-  const current = open === null ? undefined : posts[open];
-
   return (
     <>
-      <main className="relative z-1 mx-auto w-full max-w-[var(--maxw)] px-xl py-xl">
-        <ProfileHeader profile={profile} />
+      <main className="gallery">
+        <div className="wrap layout">
+          <div className="feed">
+            <ProfileHeader profile={profile} artCount={profile.postsCount ?? posts.length} />
 
-        <section className="mt-xl">
-          {posts.length === 0 ? (
-            <p className="rounded-md border border-line bg-ink-raised p-xl text-body-sm text-mist">
-              No artwork yet — Ratat shows only posts that carry images or video.
-            </p>
-          ) : (
-            <PortfolioGrid posts={posts} onOpen={setOpen} />
-          )}
+            <div className="pt-[18px] pb-[40px]">
+              {posts.length === 0 ? (
+                <p className="text-mist py-[24px]">No artworks to show yet.</p>
+              ) : (
+                <ArtworkGrid posts={posts} />
+              )}
 
-          {cursor ? (
-            <button
-              type="button"
-              onClick={() => void loadMore()}
-              disabled={loading}
-              className="mx-auto mt-lg block rounded-pill border border-line-2 px-xl py-sm text-body-sm text-mist hover:text-paper disabled:opacity-50"
-            >
-              {loading ? "Loading…" : "Load more"}
-            </button>
-          ) : null}
-        </section>
+              {cursor && (
+                <div className="flex items-center justify-center mt-[1.5rem]">
+                  <button
+                    type="button"
+                    onClick={() => void loadMore()}
+                    disabled={loading}
+                    className="btn btn--ghost"
+                  >
+                    {loading ? "Loading…" : "Load more"}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </main>
-
-      {current ? (
-        <Lightbox
-          post={current}
-          onClose={() => setOpen(null)}
-          {...(open !== null && open > 0 ? { onPrev: () => setOpen(open - 1) } : {})}
-          {...(open !== null && open < posts.length - 1 ? { onNext: () => setOpen(open + 1) } : {})}
-        />
-      ) : null}
+      <Footer />
     </>
   );
 }
 
 function ArtistError({ error }: { error: Error }) {
   return (
-    <main className="mx-auto mt-xxl w-full max-w-md px-xl text-center">
-      <p className="text-body text-paper">{error.message}</p>
-      <Link
-        to="/"
-        className="mt-lg inline-block rounded-sm border border-line-2 px-md py-sm text-body-sm text-mist"
-      >
-        Back to Ratat
-      </Link>
+    <main className="gallery">
+      <div className="wrap layout">
+        <div className="feed">
+          <p className="text-mist py-[24px]">{error.message}</p>
+          <Link to="/" className="btn btn--ghost">
+            Back to Ratat
+          </Link>
+        </div>
+      </div>
     </main>
   );
 }

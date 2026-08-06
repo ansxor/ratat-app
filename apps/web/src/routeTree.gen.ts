@@ -10,13 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as OauthCallbackRouteImport } from './routes/oauth/callback'
 import { Route as OauthClientMetadataDotjsonRouteImport } from './routes/oauth/client-metadata[.]json'
 import { Route as ProfileHandleRouteImport } from './routes/profile.$handle'
+import { Route as ArtHandleRkeyRouteImport } from './routes/art.$handle.$rkey'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OauthCallbackRoute = OauthCallbackRouteImport.update({
@@ -35,46 +42,71 @@ const ProfileHandleRoute = ProfileHandleRouteImport.update({
   path: '/profile/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArtHandleRkeyRoute = ArtHandleRkeyRouteImport.update({
+  id: '/art/$handle/$rkey',
+  path: '/art/$handle/$rkey',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/oauth/client-metadata.json': typeof OauthClientMetadataDotjsonRoute
   '/profile/$handle': typeof ProfileHandleRoute
+  '/art/$handle/$rkey': typeof ArtHandleRkeyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/oauth/client-metadata.json': typeof OauthClientMetadataDotjsonRoute
   '/profile/$handle': typeof ProfileHandleRoute
+  '/art/$handle/$rkey': typeof ArtHandleRkeyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/oauth/client-metadata.json': typeof OauthClientMetadataDotjsonRoute
   '/profile/$handle': typeof ProfileHandleRoute
+  '/art/$handle/$rkey': typeof ArtHandleRkeyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/oauth/callback' | '/oauth/client-metadata.json' | '/profile/$handle'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    '/' | '/oauth/callback' | '/oauth/client-metadata.json' | '/profile/$handle'
-  id:
-    | '__root__'
     | '/'
+    | '/login'
     | '/oauth/callback'
     | '/oauth/client-metadata.json'
     | '/profile/$handle'
+    | '/art/$handle/$rkey'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/login'
+    | '/oauth/callback'
+    | '/oauth/client-metadata.json'
+    | '/profile/$handle'
+    | '/art/$handle/$rkey'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/oauth/callback'
+    | '/oauth/client-metadata.json'
+    | '/profile/$handle'
+    | '/art/$handle/$rkey'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
   OauthCallbackRoute: typeof OauthCallbackRoute
   OauthClientMetadataDotjsonRoute: typeof OauthClientMetadataDotjsonRoute
   ProfileHandleRoute: typeof ProfileHandleRoute
+  ArtHandleRkeyRoute: typeof ArtHandleRkeyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -84,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oauth/callback': {
@@ -107,14 +146,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/art/$handle/$rkey': {
+      id: '/art/$handle/$rkey'
+      path: '/art/$handle/$rkey'
+      fullPath: '/art/$handle/$rkey'
+      preLoaderRoute: typeof ArtHandleRkeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
   OauthCallbackRoute: OauthCallbackRoute,
   OauthClientMetadataDotjsonRoute: OauthClientMetadataDotjsonRoute,
   ProfileHandleRoute: ProfileHandleRoute,
+  ArtHandleRkeyRoute: ArtHandleRkeyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
