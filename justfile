@@ -22,10 +22,13 @@ dev:
 lint:
     bun run lint
 
+lint-colors:
+    bun run lint:colors
+
 format-check:
     bun run format:check
 
 typecheck:
     bun run typecheck
 
-check: lint format-check typecheck
+check: lint lint-colors format-check typecheck

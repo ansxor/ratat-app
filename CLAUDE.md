@@ -47,7 +47,7 @@ bun install
 just up          # Postgres via docker compose
 just migrate     # apply packages/db migrations
 just dev         # all workspace dev servers
-just check       # lint + format-check + typecheck
+just check       # lint + lint-colors + format-check + typecheck
 ```
 
 ## Architecture Overview
@@ -69,3 +69,7 @@ packages/common    Shared ATProto helpers.
 - Backend services use Effect. The frontend does not.
 - Lint/format via oxlint + oxfmt from the repo root; per-package `typecheck`
   scripts run `tsc --noEmit` against `tsconfig.base.json`.
+- Colours in `apps/web` come from the `light-dark()` tokens in
+  `apps/web/src/styles.css`. `bun run lint:colors` rejects hex, `rgb()`/`hsl()`,
+  and Tailwind palette classes anywhere in `apps/web/src`; a colour that must
+  not flip needs a `theme-invariant` comment on or above the line.
