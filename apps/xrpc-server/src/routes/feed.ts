@@ -79,6 +79,7 @@ const indexedAuthorFeed = (
     return {
       feed,
       ...(cursor === undefined ? { page: result.page } : {}),
+      ...(cursor === undefined && result.total !== undefined ? { total: result.total } : {}),
       ...(result.hasMore && last ? { cursor: encodeFeedCursor(last) } : {}),
     };
   }).pipe(

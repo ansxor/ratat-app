@@ -18,7 +18,15 @@ export type ProfileSection = "art" | "following" | "followers";
  * The counts are Ratat's own, so each number links to the list that proves
  * it — the one place the old app's stats row was ported from wholesale.
  */
-function ProfileStats({ profile, section }: { profile: Profile; section: ProfileSection }) {
+function ProfileStats({
+  profile,
+  section,
+  artCount,
+}: {
+  profile: Profile;
+  section: ProfileSection;
+  artCount: number;
+}) {
   return (
     <div className="flex gap-[26px] py-[6px]">
       <Link
@@ -48,7 +56,7 @@ function ProfileStats({ profile, section }: { profile: Profile; section: Profile
         params={{ handle: profile.handle }}
         className="flex flex-col gap-[2px] items-start no-underline text-paper"
       >
-        <b className={STAT_VALUE}>{profile.postsCount ?? 0}</b>
+        <b className={STAT_VALUE}>{artCount}</b>
         <span className={STAT_LABEL}>Pieces</span>
       </Link>
     </div>
@@ -140,7 +148,7 @@ export function ProfileHeader({
           )}
         </div>
 
-        <ProfileStats profile={profile} section={section} />
+        <ProfileStats profile={profile} section={section} artCount={artCount} />
 
         <div className="flex items-center gap-[8px] py-[6px]">
           <FollowButton subject={profile.did} />

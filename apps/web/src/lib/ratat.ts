@@ -17,6 +17,8 @@ export interface Portfolio {
   cursor?: string;
   /** The page the appview served, which is the last one when the feed ran out first. */
   page?: number;
+  /** The artist's exact media-post count, when the appview served from its index. */
+  total?: number;
 }
 
 const APPVIEW_URL = import.meta.env.VITE_RATAT_APPVIEW_URL ?? "http://127.0.0.1:3001";
@@ -100,6 +102,7 @@ export async function getAuthorFeed(
     posts: res.data.feed,
     ...(res.data.cursor ? { cursor: res.data.cursor } : {}),
     ...(res.data.page === undefined ? {} : { page: res.data.page }),
+    ...(res.data.total === undefined ? {} : { total: res.data.total }),
   };
 }
 

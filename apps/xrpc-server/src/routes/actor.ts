@@ -6,12 +6,12 @@ import { actorRequestFailed, appviewUnreachable, Appview } from "../appview.ts";
 import { upstreamFailure } from "../errors.ts";
 import type { RouteEffect } from "../handler.ts";
 import { noteInterestAndWantFollowsInBackground } from "../interest.ts";
-import { graphCounts } from "../store.ts";
+import { actorByDid, graphCounts, indexedPostCount } from "../store.ts";
 import { profileView, profileViewBasic } from "../views.ts";
 
 /**
- * Profiles stay live: the bio and post count are Bluesky's numbers and would
- * be stale the moment we stored them. The graph counts are Ratat's own — the
+ * Profiles stay live: the bio and profile snapshot are Bluesky's and would be
+ * stale the moment we stored them. The graph counts are Ratat's own — the
  * visit is what marks the DID interested and queues the walk of their own
  * follows, so a profile page ends up backfilled for next time, and, since the
  * masthead reads its own avatar this way, how logging in does.
@@ -47,6 +47,25 @@ export const actorGetProfile = (
     if (counts) {
       output.followersCount = counts.followers;
       output.followsCount = counts.follows;
+    }
+
+    // The pieces count is Ratat's own too once the index holds the portfolio:
+    // it is the artist's media-post count, not Bluesky's all-posts number,
+    // which would promise more works than the gallery below can show. The
+    // index is the only place that count exists, so an artist who has not
+    // been backfilled yet keeps Bluesky's number.
+    const known = yield* actorByDid(output.did).pipe(
+      Effect.catchAll(() => Effect.succeed(undefined)),
+    );
+    if (known?.backfilledAt) {
+      const posts = yield* indexedPostCount(output.did).pipe(
+        Effect.catchAll((error) =>
+          Effect.logWarning(`post count of ${output.did} unreadable: ${String(error.cause)}`).pipe(
+            Effect.as(undefined),
+          ),
+        ),
+      );
+      if (posts !== undefined) output.postsCount = posts;
     }
 
     return json(output);

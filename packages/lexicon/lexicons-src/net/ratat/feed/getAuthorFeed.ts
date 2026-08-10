@@ -51,6 +51,10 @@ export default document({
               description:
                 "The page this response holds. Lower than the requested `page` when the feed ended first. Absent when the request named a `cursor` instead, since a cursor does not say where it sits.",
             }),
+            total: integer({
+              description:
+                "The artist's exact media-post count, present when the response is served from the local index — which is the number a numbered pager should show. Absent when the feed is hydrated live from Bluesky (there is no count short of walking the whole feed) or when the request continued by `cursor`.",
+            }),
           },
         }),
       },

@@ -103,6 +103,8 @@ export interface IndexedFeedPage {
   /** The page actually served, clamped to the last page that holds posts. */
   readonly page: number;
   readonly hasMore: boolean;
+  /** Total artworks indexed for this actor; set only by page-numbered reads. */
+  readonly total?: number;
 }
 
 /** Total artworks indexed for this actor, which is what bounds the pager. */
@@ -141,7 +143,7 @@ export const indexedFeedPage = (
         .offset((served - 1) * limit),
     );
 
-    return { rows, page: served, hasMore: served * limit < total };
+    return { rows, page: served, hasMore: served * limit < total, total };
   });
 
 /** One page of an indexed portfolio continued from an opaque cursor. */

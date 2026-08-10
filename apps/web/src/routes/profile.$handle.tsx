@@ -39,9 +39,10 @@ export const Route = createFileRoute("/profile/$handle")({
 
 /**
  * A cursor feed cannot say how long it is, so the page slots are sized from
- * Bluesky's post count — an upper bound, since posts without media are dropped
- * — and shown as a capped total. Reaching the end of the feed replaces the
- * estimate with what was actually paged through.
+ * the best count available. The appview returns the exact media-post count
+ * when the artist is indexed; a live feed only becomes exact once it runs
+ * out, and between those Bluesky's post count — an upper bound, since posts
+ * without media are dropped — is shown as a capped total.
  */
 function paginationFor(
   profile: Profile,
@@ -54,19 +55,20 @@ function paginationFor(
   const page = portfolio.page ?? requested;
   const exhausted = portfolio.cursor === undefined;
   const paged = (page - 1) * PAGE_SIZE + portfolio.posts.length;
-  // A cursor in hand means one more page exists, whatever the post count says.
-  const estimate =
-    profile.postsCount === undefined
+  const exact = portfolio.total ?? (exhausted ? paged : undefined);
+  // A cursor in hand means one more page exists, whatever the count says.
+  const total =
+    exact ??
+    (profile.postsCount === undefined
       ? undefined
-      : Math.max(profile.postsCount, page * PAGE_SIZE + 1);
-  const total = exhausted ? paged : estimate;
+      : Math.max(profile.postsCount, page * PAGE_SIZE + 1));
   const ceiling = MAX_PAGE * PAGE_SIZE;
 
   return pagerLinks({
     page,
     limit: PAGE_SIZE,
     total: total === undefined ? undefined : Math.min(total, ceiling),
-    totalCapped: total !== undefined && (!exhausted || total > ceiling),
+    totalCapped: total !== undefined && (exact === undefined || total > ceiling),
     itemCount: portfolio.posts.length,
     link: (target) => ({
       to: "/profile/$handle",
@@ -88,7 +90,7 @@ function ArtistPage() {
       <main className="gallery">
         <div className="wrap layout">
           <div className="feed">
-            <ProfileHeader profile={profile} artCount={profile.postsCount ?? posts.length} />
+            <ProfileHeader profile={profile} artCount={pagination.total ?? posts.length} />
 
             <div className="pt-[18px] pb-[40px]">
               {posts.length === 0 ? (
