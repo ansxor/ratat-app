@@ -40,7 +40,12 @@ export const SettingsLive: Layer.Layer<IngesterSettings, ConfigError.ConfigError
         EffectConfig.withDefault("https://plc.directory"),
       ),
       jetstreamUrl: yield* EffectConfig.string("JETSTREAM_URL").pipe(
-        EffectConfig.withDefault("wss://jetstream2.us-east.bsky.network"),
+        // jetstream1, not jetstream2: v1 learned the hard way that jetstream2
+        // silently drops events for collections/PDSes outside its live crawl
+        // coverage (the likes tail kept flowing while the custom-collection
+        // tail went quiet for days). jetstream1 also replays custom NSIDs
+        // reliably. See the old app's mise.public.toml + consumer README.
+        EffectConfig.withDefault("wss://jetstream1.us-east.bsky.network"),
       ),
       didRefreshSeconds: yield* EffectConfig.integer("JETSTREAM_DID_REFRESH_SECONDS").pipe(
         EffectConfig.withDefault(30),

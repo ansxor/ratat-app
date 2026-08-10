@@ -22,7 +22,7 @@ dev:
 test:
     bun run test
 
-# One live request per art.ratat.* query, against a server this starts if one
+# One live request per net.ratat.* query, against a server this starts if one
 # is not already listening. Needs Postgres up (`just up`) and the network.
 smoke:
     bun run smoke

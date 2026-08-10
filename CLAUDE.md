@@ -57,10 +57,10 @@ Ratat is a read-mostly art appview over `app.bsky.*` data. See
 
 ```
 apps/web           TanStack Start (React) — XRPC client + OAuth. No Effect.
-apps/xrpc-server   Effect — read API serving art.ratat.* query lexicons.
+apps/xrpc-server   Effect — read API serving net.ratat.* query lexicons.
 apps/ingester      Effect — jetstream tail + lazy per-DID backfill.
 packages/db        Drizzle + Postgres schema and migration runner.
-packages/lexicon   art.ratat.graph.follow record + art.ratat.* query lexicons.
+packages/lexicon   net.ratat.graph.follow record + net.ratat.* query lexicons.
 packages/common    Shared ATProto helpers.
 ```
 

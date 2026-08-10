@@ -211,17 +211,17 @@ backfilled contributes nothing until the worker reaches them.
 
 ## Configuration
 
-| Variable                        | Default                                 | What it does                                             |
-| ------------------------------- | --------------------------------------- | -------------------------------------------------------- |
-| `DATABASE_URL`                  | —                                       | Postgres. Absent in `xrpc-server` means live-only reads. |
-| `BSKY_APPVIEW_URL`              | `https://public.api.bsky.app`           | Where backfill and live reads go.                        |
-| `JETSTREAM_URL`                 | `wss://jetstream2.us-east.bsky.network` | Jetstream instance.                                      |
-| `PLC_DIRECTORY_URL`             | `https://plc.directory`                 | DID documents, which is how a repo's PDS is found.       |
-| `JETSTREAM_LIKE_TAIL`           | `true`                                  | Tail the global like firehose.                           |
-| `JETSTREAM_DID_REFRESH_SECONDS` | `30`                                    | How often the tail re-scopes to the interested set.      |
-| `JETSTREAM_CHECKPOINT_EVERY`    | `50`                                    | Events between cursor writes.                            |
-| `BACKFILL_POLL_SECONDS`         | `5`                                     | Idle wait when the backfill queue is empty.              |
-| `BACKFILL_PAGE_SIZE`            | `100`                                   | Posts per upstream page.                                 |
-| `BACKFILL_PAGE_DELAY_MS`        | `250`                                   | Politeness delay between pages.                          |
-| `BACKFILL_MAX_PAGES`            | `0` (no cap)                            | Guard against a pathological account.                    |
-| `BACKFILL_RETRY_MINUTES`        | `30`                                    | Back-off after a failed backfill.                        |
+| Variable                        | Default                                 | What it does                                                    |
+| ------------------------------- | --------------------------------------- | --------------------------------------------------------------- |
+| `DATABASE_URL`                  | —                                       | Postgres. Absent in `xrpc-server` means live-only reads.        |
+| `BSKY_APPVIEW_URL`              | `https://public.api.bsky.app`           | Where backfill and live reads go.                               |
+| `JETSTREAM_URL`                 | `wss://jetstream1.us-east.bsky.network` | Jetstream instance. jetstream1, not jetstream2 (see config.ts). |
+| `PLC_DIRECTORY_URL`             | `https://plc.directory`                 | DID documents, which is how a repo's PDS is found.              |
+| `JETSTREAM_LIKE_TAIL`           | `true`                                  | Tail the global like firehose.                                  |
+| `JETSTREAM_DID_REFRESH_SECONDS` | `30`                                    | How often the tail re-scopes to the interested set.             |
+| `JETSTREAM_CHECKPOINT_EVERY`    | `50`                                    | Events between cursor writes.                                   |
+| `BACKFILL_POLL_SECONDS`         | `5`                                     | Idle wait when the backfill queue is empty.                     |
+| `BACKFILL_PAGE_SIZE`            | `100`                                   | Posts per upstream page.                                        |
+| `BACKFILL_PAGE_DELAY_MS`        | `250`                                   | Politeness delay between pages.                                 |
+| `BACKFILL_MAX_PAGES`            | `0` (no cap)                            | Guard against a pathological account.                           |
+| `BACKFILL_RETRY_MINUTES`        | `30`                                    | Back-off after a failed backfill.                               |
