@@ -12,17 +12,37 @@ import { cn } from "#/lib/utils.ts";
 const STAT_VALUE = "font-display text-[22px] font-[500] leading-none";
 const STAT_LABEL = "font-mono text-[10.5px] tracking-[0.16em] uppercase text-faint";
 
-function ProfileStats({ profile }: { profile: Profile }) {
+export type ProfileSection = "art" | "following" | "followers";
+
+/**
+ * The counts are Ratat's own, so each number links to the list that proves
+ * it — the one place the old app's stats row was ported from wholesale.
+ */
+function ProfileStats({ profile, section }: { profile: Profile; section: ProfileSection }) {
   return (
     <div className="flex gap-[26px] py-[6px]">
-      <span className="flex flex-col gap-[2px] items-start text-paper">
+      <Link
+        to="/profile/$handle/followers"
+        params={{ handle: profile.handle }}
+        className={cn(
+          "flex flex-col gap-[2px] items-start no-underline",
+          section === "followers" ? "text-primary" : "text-paper",
+        )}
+      >
         <b className={STAT_VALUE}>{profile.followersCount ?? 0}</b>
         <span className={STAT_LABEL}>Followers</span>
-      </span>
-      <span className="flex flex-col gap-[2px] items-start text-paper">
+      </Link>
+      <Link
+        to="/profile/$handle/following"
+        params={{ handle: profile.handle }}
+        className={cn(
+          "flex flex-col gap-[2px] items-start no-underline",
+          section === "following" ? "text-primary" : "text-paper",
+        )}
+      >
         <b className={STAT_VALUE}>{profile.followsCount ?? 0}</b>
         <span className={STAT_LABEL}>Following</span>
-      </span>
+      </Link>
       <Link
         to="/profile/$handle"
         params={{ handle: profile.handle }}
@@ -41,7 +61,15 @@ function ProfileStats({ profile }: { profile: Profile }) {
  * followed a link to an artist asked for this page, and the works below are
  * filtered on their own labels anyway.
  */
-export function ProfileHeader({ profile, artCount }: { profile: Profile; artCount: number }) {
+export function ProfileHeader({
+  profile,
+  artCount,
+  section = "art",
+}: {
+  profile: Profile;
+  artCount: number;
+  section?: ProfileSection;
+}) {
   const { hidden, veil, peeked, animated, reveal } = useContentVeil(profile.labels);
   const cover = hidden ? "black" : veil;
   const covered = cover !== null && !peeked;
@@ -112,7 +140,7 @@ export function ProfileHeader({ profile, artCount }: { profile: Profile; artCoun
           )}
         </div>
 
-        <ProfileStats profile={profile} />
+        <ProfileStats profile={profile} section={section} />
 
         <div className="flex items-center gap-[8px] py-[6px]">
           <FollowButton subject={profile.did} />

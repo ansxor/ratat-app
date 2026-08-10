@@ -5,7 +5,7 @@ import * as lex from "@ratat/lexicon";
 import { runHandler } from "./handler.ts";
 import { actorGetProfile, actorSearchActorsTypeahead } from "./routes/actor.ts";
 import { feedGetAuthorFeed, feedGetPost, feedGetTimeline } from "./routes/feed.ts";
-import { graphGetFollows } from "./routes/graph.ts";
+import { graphGetFollowers, graphGetFollows } from "./routes/graph.ts";
 import type { AppRuntime } from "./runtime.ts";
 
 export interface CreateRouterOptions {
@@ -37,6 +37,9 @@ export const createRouter = ({ runtime, websocket }: CreateRouterOptions): XRPCR
   });
   router.addQuery(lex.NetRatatGraphGetFollows.mainSchema, {
     handler: (ctx) => runHandler(runtime, graphGetFollows(ctx)),
+  });
+  router.addQuery(lex.NetRatatGraphGetFollowers.mainSchema, {
+    handler: (ctx) => runHandler(runtime, graphGetFollowers(ctx)),
   });
 
   return router;

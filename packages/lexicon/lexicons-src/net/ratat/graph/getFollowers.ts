@@ -1,6 +1,5 @@
 import {
   array,
-  boolean,
   document,
   integer,
   object,
@@ -12,18 +11,18 @@ import {
 } from "@atcute/lexicon-doc/builder";
 
 export default document({
-  id: "net.ratat.graph.getFollows",
+  id: "net.ratat.graph.getFollowers",
   defs: {
     main: query({
       description:
-        "The net.ratat.graph.follow records an actor holds, newest first, read from the local index. [public]",
+        "The net.ratat.graph.follow records pointing at an actor, newest first, read from the local index. [public]",
       parameters: params({
         properties: {
           actor: required(string({ description: "DID or handle.", format: "at-identifier" })),
           limit: integer({ minimum: 1, maximum: 100, default: 100 }),
           page: integer({
             description:
-              "Page number for numbered paging, which is what the web's follow list uses. Give page or cursor, not both.",
+              "Page number for numbered paging, which is what the web's follower list uses. Give page or cursor, not both.",
           }),
           cursor: string({
             description: "Opaque cursor from a previous page; omit for the first page.",
@@ -34,7 +33,7 @@ export default document({
         encoding: "application/json",
         schema: object({
           properties: {
-            follows: required(array({ items: ref({ ref: "#followView" }) })),
+            followers: required(array({ items: ref({ ref: "#followView" }) })),
             cursor: string({ description: "Absent when the last page has been served." }),
             page: integer({
               description:
@@ -42,14 +41,8 @@ export default document({
             }),
             total: integer({
               description:
-                "How many follows the index holds for this actor. Present when paged, since numbered paging is what needs a total.",
+                "How many followers the index holds for this actor. Present when paged, since numbered paging is what needs a total.",
             }),
-            indexed: required(
-              boolean({
-                description:
-                  "Whether the index has walked this actor's follow records at least once. False means the answer may be short, and a caller holding the repo should read it directly; asking marks the actor for a walk, so a later call answers fully.",
-              }),
-            ),
           },
         }),
       },
@@ -59,15 +52,15 @@ export default document({
       properties: {
         uri: required(
           string({
-            description: "The follow record's at-uri; delete it to unfollow.",
+            description: "The follow record's at-uri.",
             format: "at-uri",
           }),
         ),
-        subject: required(string({ description: "The followed DID.", format: "did" })),
+        subject: required(string({ description: "The following account's DID.", format: "did" })),
         createdAt: required(string({ format: "datetime" })),
         handle: string({
           description:
-            "The followed account's handle from the index snapshot; absent when the index has not resolved one yet, in which case callers fall back to the DID.",
+            "The following account's handle from the index snapshot; absent when the index has not resolved one yet, in which case callers fall back to the DID.",
           format: "handle",
         }),
         displayName: string({ maxLength: 800, maxGraphemes: 80 }),

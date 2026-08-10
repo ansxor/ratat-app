@@ -1,5 +1,10 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
-import type { NetRatatActorDefs, NetRatatFeedDefs } from "@ratat/lexicon";
+import type {
+  NetRatatActorDefs,
+  NetRatatFeedDefs,
+  NetRatatGraphGetFollowers,
+  NetRatatGraphGetFollows,
+} from "@ratat/lexicon";
 import type {} from "@ratat/lexicon";
 
 export type Profile = NetRatatActorDefs.ProfileView;
@@ -125,6 +130,55 @@ export interface IndexedFollows {
   follows: Array<{ uri: string; subject: string }>;
   /** False while the index has yet to walk this repo, so the list may be short. */
   indexed: boolean;
+}
+
+export type FollowActor = NetRatatGraphGetFollows.FollowView;
+
+export interface FollowListResult {
+  actors: FollowActor[];
+  /** Absent while the index cannot bound the list. */
+  total?: number;
+  /** The page the appview served, which is the last one when the list ran out first. */
+  page?: number;
+}
+
+/**
+ * One numbered page of an actor's Ratat graph, for the profile's following and
+ * follower lists. Both directions answer with the same row shape.
+ */
+export async function getFollowList(
+  actor: string,
+  direction: "following" | "followers",
+  options: { page?: number; limit?: number; signal?: AbortSignal } = {},
+): Promise<FollowListResult> {
+  const lxm =
+    direction === "following" ? "net.ratat.graph.getFollows" : "net.ratat.graph.getFollowers";
+  const res = await client.get(lxm, {
+    params: {
+      actor: actor as FollowActor["subject"],
+      limit: options.limit ?? 100,
+      ...(options.page && options.page > 1 ? { page: options.page } : {}),
+    },
+    ...(options.signal ? { signal: options.signal } : {}),
+  });
+  if (!res.ok) throw new AppviewError(res.data.error, res.data.message);
+
+  const data = res.data as NetRatatGraphGetFollows.$output | NetRatatGraphGetFollowers.$output;
+  const actors = ("follows" in data ? data.follows : data.followers).map(
+    (row): FollowActor => ({
+      uri: row.uri,
+      subject: row.subject,
+      createdAt: row.createdAt,
+      ...(row.handle ? { handle: row.handle } : {}),
+      ...(row.displayName ? { displayName: row.displayName } : {}),
+      ...(row.avatar ? { avatar: row.avatar } : {}),
+    }),
+  );
+  return {
+    actors,
+    ...(data.total === undefined ? {} : { total: data.total }),
+    ...(data.page === undefined ? {} : { page: data.page }),
+  };
 }
 
 export async function getRatatFollows(

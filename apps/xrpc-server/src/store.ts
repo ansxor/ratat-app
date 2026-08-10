@@ -6,7 +6,7 @@
  * to fail the request.
  */
 
-import { Database, type DbError } from "@ratat/db/effect";
+import { Database, type DbError, type Drizzle } from "@ratat/db/effect";
 import {
   actor,
   post,
@@ -219,9 +219,42 @@ export const wantFollowsBackfill = (did: string): Effect.Effect<void, DbError, D
   });
 
 export interface FollowsPage {
-  readonly rows: RatatFollowRow[];
+  readonly rows: GraphRow[];
   readonly hasMore: boolean;
 }
+
+/** A follow row with the followed account's index snapshot, for rendering a row. */
+export interface GraphRow {
+  readonly follow: RatatFollowRow;
+  readonly actor: ActorRow | null;
+}
+
+/**
+ * One page's worth of follows, joined to the account the row is *about* — the
+ * followed account in a following list, the follower in a followers list.
+ */
+const followSelect = (db: Drizzle, joinOn: "followed" | "follower") =>
+  db
+    .select({ follow: ratatFollow, actor })
+    .from(ratatFollow)
+    .leftJoin(actor, eq(actor.did, joinOn === "follower" ? ratatFollow.did : ratatFollow.subject));
+
+/**
+ * The newest follow record per account — one row per followed account for a
+ * follow list, one per follower for a follower list. Duplicate records exist:
+ * the import writes one per Bluesky follow, the follow button one per click,
+ * and the pre-rename `art.ratat.*` records still sit beside their `net.ratat.*`
+ * successors — so counting records would count the same person twice.
+ */
+const latestFollows = (db: Drizzle, by: "did" | "subject", value: string) => {
+  const distinctOn = by === "did" ? ratatFollow.subject : ratatFollow.did;
+  return db
+    .selectDistinctOn([distinctOn], { uri: ratatFollow.uri })
+    .from(ratatFollow)
+    .where(by === "did" ? eq(ratatFollow.did, value) : eq(ratatFollow.subject, value))
+    .orderBy(distinctOn, desc(ratatFollow.createdAt), desc(ratatFollow.uri))
+    .as("latest_follows");
+};
 
 /** One page of an actor's Ratat follows, newest first. */
 export const followsPage = (
@@ -231,27 +264,152 @@ export const followsPage = (
 ): Effect.Effect<FollowsPage, DbError, Database> =>
   Effect.gen(function* () {
     const database = yield* Database;
-    const rows = yield* database.run("followsPage", (db) =>
-      db
-        .select()
-        .from(ratatFollow)
+    const rows = yield* database.run("followsPage", (db) => {
+      const latest = latestFollows(db, "did", did);
+      return followSelect(db, "followed")
+        .innerJoin(latest, eq(ratatFollow.uri, latest.uri))
         .where(
-          after === undefined
-            ? eq(ratatFollow.did, did)
-            : and(
-                eq(ratatFollow.did, did),
-                or(
+          and(
+            eq(ratatFollow.did, did),
+            after === undefined
+              ? undefined
+              : or(
                   lt(ratatFollow.createdAt, after.createdAt),
                   and(eq(ratatFollow.createdAt, after.createdAt), lt(ratatFollow.uri, after.uri)),
                 ),
-              ),
+          ),
         )
         .orderBy(desc(ratatFollow.createdAt), desc(ratatFollow.uri))
-        .limit(limit + 1),
-    );
+        .limit(limit + 1);
+    });
 
     const hasMore = rows.length > limit;
     return { rows: hasMore ? rows.slice(0, limit) : rows, hasMore };
+  });
+
+/** One page of an actor's Ratat followers, newest first. */
+export const followersPage = (
+  did: string,
+  limit: number,
+  after: FeedCursor | undefined,
+): Effect.Effect<FollowsPage, DbError, Database> =>
+  Effect.gen(function* () {
+    const database = yield* Database;
+    const rows = yield* database.run("followersPage", (db) => {
+      const latest = latestFollows(db, "subject", did);
+      return followSelect(db, "follower")
+        .innerJoin(latest, eq(ratatFollow.uri, latest.uri))
+        .where(
+          and(
+            eq(ratatFollow.subject, did),
+            after === undefined
+              ? undefined
+              : or(
+                  lt(ratatFollow.createdAt, after.createdAt),
+                  and(eq(ratatFollow.createdAt, after.createdAt), lt(ratatFollow.uri, after.uri)),
+                ),
+          ),
+        )
+        .orderBy(desc(ratatFollow.createdAt), desc(ratatFollow.uri))
+        .limit(limit + 1);
+    });
+
+    const hasMore = rows.length > limit;
+    return { rows: hasMore ? rows.slice(0, limit) : rows, hasMore };
+  });
+
+export interface FollowsPageByNumber {
+  readonly rows: GraphRow[];
+  /** The page actually served, clamped to the last page that holds follows. */
+  readonly page: number;
+  readonly total: number;
+}
+
+/** How many accounts are in the list, which is what bounds the numbered pager. */
+const latestFollowsTotal = (
+  by: "did" | "subject",
+  value: string,
+): Effect.Effect<number, DbError, Database> =>
+  Effect.gen(function* () {
+    const database = yield* Database;
+    const rows = yield* database.run("latestFollowsTotal", (db) =>
+      db.select({ total: count() }).from(latestFollows(db, by, value)),
+    );
+    return rows[0]?.total ?? 0;
+  });
+
+/**
+ * One page of an actor's Ratat follows by page number, for the numbered pager
+ * the web's follow list is ported from. The index is ordered, so a page is an
+ * offset — no cursor walking, and a deep page costs what a shallow one does.
+ */
+export const followsPageByNumber = (
+  did: string,
+  limit: number,
+  page: number,
+): Effect.Effect<FollowsPageByNumber, DbError, Database> =>
+  Effect.gen(function* () {
+    const total = yield* latestFollowsTotal("did", did);
+    const lastPage = Math.max(1, Math.ceil(total / limit));
+    const served = Math.min(page, lastPage);
+
+    const database = yield* Database;
+    const rows = yield* database.run("followsPageByNumber", (db) => {
+      const latest = latestFollows(db, "did", did);
+      return followSelect(db, "followed")
+        .innerJoin(latest, eq(ratatFollow.uri, latest.uri))
+        .where(eq(ratatFollow.did, did))
+        .orderBy(desc(ratatFollow.createdAt), desc(ratatFollow.uri))
+        .limit(limit)
+        .offset((served - 1) * limit);
+    });
+
+    return { rows, page: served, total };
+  });
+
+/** One page of an actor's Ratat followers by page number. */
+export const followersPageByNumber = (
+  did: string,
+  limit: number,
+  page: number,
+): Effect.Effect<FollowsPageByNumber, DbError, Database> =>
+  Effect.gen(function* () {
+    const total = yield* latestFollowsTotal("subject", did);
+    const lastPage = Math.max(1, Math.ceil(total / limit));
+    const served = Math.min(page, lastPage);
+
+    const database = yield* Database;
+    const rows = yield* database.run("followersPageByNumber", (db) => {
+      const latest = latestFollows(db, "subject", did);
+      return followSelect(db, "follower")
+        .innerJoin(latest, eq(ratatFollow.uri, latest.uri))
+        .where(eq(ratatFollow.subject, did))
+        .orderBy(desc(ratatFollow.createdAt), desc(ratatFollow.uri))
+        .limit(limit)
+        .offset((served - 1) * limit);
+    });
+
+    return { rows, page: served, total };
+  });
+
+/** The profile header's graph counts: follows held and follows received. */
+export const graphCounts = (
+  did: string,
+): Effect.Effect<{ followers: number; follows: number }, DbError, Database> =>
+  Effect.gen(function* () {
+    const database = yield* Database;
+    const [followersRows, followsRows] = yield* Effect.all([
+      database.run("followersCount", (db) =>
+        db.select({ total: count() }).from(latestFollows(db, "subject", did)),
+      ),
+      database.run("followsCount", (db) =>
+        db.select({ total: count() }).from(latestFollows(db, "did", did)),
+      ),
+    ]);
+    return {
+      followers: followersRows[0]?.total ?? 0,
+      follows: followsRows[0]?.total ?? 0,
+    };
   });
 
 // --------------------------------------------------------------- the timeline

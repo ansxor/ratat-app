@@ -11,7 +11,7 @@ import { Effect } from "effect";
 
 import { actorRequestFailed, appviewUnreachable, Appview } from "./appview.ts";
 import type { RouteEffect } from "./handler.ts";
-import { noteInterest } from "./interest.ts";
+import { noteInterestAndWantFollows } from "./interest.ts";
 import { type ActorRow, actorByDid, actorByHandle, wantFollowsBackfill } from "./store.ts";
 
 export interface Viewer {
@@ -51,7 +51,7 @@ export const resolveViewer = (
       if (!res.ok) return yield* Effect.fail(actorRequestFailed(actor, res.data));
 
       const profile = res.data;
-      yield* noteInterest({
+      yield* noteInterestAndWantFollows({
         did: profile.did,
         handle: profile.handle,
         ...(profile.displayName ? { displayName: profile.displayName } : {}),
@@ -59,7 +59,6 @@ export const resolveViewer = (
         ...(profile.avatar ? { avatar: profile.avatar } : {}),
         ...(profile.banner ? { banner: profile.banner } : {}),
       });
-      yield* wantFollowsBackfill(profile.did).pipe(Effect.ignore);
       return { did: profile.did, row: undefined };
     }
 

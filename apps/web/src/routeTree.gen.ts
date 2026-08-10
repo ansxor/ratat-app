@@ -16,6 +16,8 @@ import { Route as OauthCallbackRouteImport } from './routes/oauth/callback'
 import { Route as OauthClientMetadataDotjsonRouteImport } from './routes/oauth/client-metadata[.]json'
 import { Route as ProfileHandleRouteImport } from './routes/profile.$handle'
 import { Route as ArtHandleRkeyRouteImport } from './routes/art.$handle.$rkey'
+import { Route as ProfileHandleFollowersRouteImport } from './routes/profile.$handle_.followers'
+import { Route as ProfileHandleFollowingRouteImport } from './routes/profile.$handle_.following'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -53,6 +55,16 @@ const ArtHandleRkeyRoute = ArtHandleRkeyRouteImport.update({
   path: '/art/$handle/$rkey',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileHandleFollowersRoute = ProfileHandleFollowersRouteImport.update({
+  id: '/profile/$handle_/followers',
+  path: '/profile/$handle/followers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileHandleFollowingRoute = ProfileHandleFollowingRouteImport.update({
+  id: '/profile/$handle_/following',
+  path: '/profile/$handle/following',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -62,6 +74,8 @@ export interface FileRoutesByFullPath {
   '/oauth/client-metadata.json': typeof OauthClientMetadataDotjsonRoute
   '/profile/$handle': typeof ProfileHandleRoute
   '/art/$handle/$rkey': typeof ArtHandleRkeyRoute
+  '/profile/$handle/followers': typeof ProfileHandleFollowersRoute
+  '/profile/$handle/following': typeof ProfileHandleFollowingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -71,6 +85,8 @@ export interface FileRoutesByTo {
   '/oauth/client-metadata.json': typeof OauthClientMetadataDotjsonRoute
   '/profile/$handle': typeof ProfileHandleRoute
   '/art/$handle/$rkey': typeof ArtHandleRkeyRoute
+  '/profile/$handle/followers': typeof ProfileHandleFollowersRoute
+  '/profile/$handle/following': typeof ProfileHandleFollowingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -81,6 +97,8 @@ export interface FileRoutesById {
   '/oauth/client-metadata.json': typeof OauthClientMetadataDotjsonRoute
   '/profile/$handle': typeof ProfileHandleRoute
   '/art/$handle/$rkey': typeof ArtHandleRkeyRoute
+  '/profile/$handle_/followers': typeof ProfileHandleFollowersRoute
+  '/profile/$handle_/following': typeof ProfileHandleFollowingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -92,6 +110,8 @@ export interface FileRouteTypes {
     | '/oauth/client-metadata.json'
     | '/profile/$handle'
     | '/art/$handle/$rkey'
+    | '/profile/$handle/followers'
+    | '/profile/$handle/following'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -101,6 +121,8 @@ export interface FileRouteTypes {
     | '/oauth/client-metadata.json'
     | '/profile/$handle'
     | '/art/$handle/$rkey'
+    | '/profile/$handle/followers'
+    | '/profile/$handle/following'
   id:
     | '__root__'
     | '/'
@@ -110,6 +132,8 @@ export interface FileRouteTypes {
     | '/oauth/client-metadata.json'
     | '/profile/$handle'
     | '/art/$handle/$rkey'
+    | '/profile/$handle_/followers'
+    | '/profile/$handle_/following'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -120,6 +144,8 @@ export interface RootRouteChildren {
   OauthClientMetadataDotjsonRoute: typeof OauthClientMetadataDotjsonRoute
   ProfileHandleRoute: typeof ProfileHandleRoute
   ArtHandleRkeyRoute: typeof ArtHandleRkeyRoute
+  ProfileHandleFollowersRoute: typeof ProfileHandleFollowersRoute
+  ProfileHandleFollowingRoute: typeof ProfileHandleFollowingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -173,6 +199,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtHandleRkeyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile/$handle_/followers': {
+      id: '/profile/$handle_/followers'
+      path: '/profile/$handle/followers'
+      fullPath: '/profile/$handle/followers'
+      preLoaderRoute: typeof ProfileHandleFollowersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/$handle_/following': {
+      id: '/profile/$handle_/following'
+      path: '/profile/$handle/following'
+      fullPath: '/profile/$handle/following'
+      preLoaderRoute: typeof ProfileHandleFollowingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -184,6 +224,8 @@ const rootRouteChildren: RootRouteChildren = {
   OauthClientMetadataDotjsonRoute: OauthClientMetadataDotjsonRoute,
   ProfileHandleRoute: ProfileHandleRoute,
   ArtHandleRkeyRoute: ArtHandleRkeyRoute,
+  ProfileHandleFollowersRoute: ProfileHandleFollowersRoute,
+  ProfileHandleFollowingRoute: ProfileHandleFollowingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -75,6 +75,22 @@ function checkPostView(value: unknown, where: string): { uri: string } {
   return { uri: post["uri"] as string };
 }
 
+function checkFollowView(value: unknown, where: string): void {
+  expect(isRecord(value), `${where}: not an object`);
+  const row = value as Record<string, unknown>;
+  expect(typeof row["uri"] === "string", `${where}: missing uri`);
+  expect(typeof row["subject"] === "string", `${where}: missing subject`);
+  expect(typeof row["createdAt"] === "string", `${where}: missing createdAt`);
+  expect(
+    row["handle"] === undefined || typeof row["handle"] === "string",
+    `${where}: handle is not a string`,
+  );
+  expect(
+    row["displayName"] === undefined || typeof row["displayName"] === "string",
+    `${where}: displayName is not a string`,
+  );
+}
+
 const rkeyOf = (uri: string): string => uri.slice(uri.lastIndexOf("/") + 1);
 
 // ------------------------------------------------------------------- the run
@@ -114,6 +130,14 @@ async function run(): Promise<Check[]> {
     typeof (profile as Record<string, unknown>)["bskyUrl"] === "string",
     "getProfile: missing bskyUrl",
   );
+  // The graph counts are Ratat's own; a server without an index omits them.
+  for (const key of ["followersCount", "followsCount"] as const) {
+    expect(
+      (profile as Record<string, unknown>)[key] === undefined ||
+        typeof (profile as Record<string, unknown>)[key] === "number",
+      `getProfile: ${key} is not a number`,
+    );
+  }
   done.push({ name: "net.ratat.actor.getProfile", detail: `@${named.handle}` });
 
   // The first candidate may post nothing with media, which is a legitimate
@@ -156,18 +180,46 @@ async function run(): Promise<Check[]> {
 
   const follows = await query("net.ratat.graph.getFollows", { actor: withArt.actor.did });
   expect(isRecord(follows), "getFollows: not an object");
-  expect(
-    Array.isArray((follows as Record<string, unknown>)["follows"]),
-    "getFollows: follows is not an array",
-  );
+  const followRows = (follows as Record<string, unknown>)["follows"];
+  expect(Array.isArray(followRows), "getFollows: follows is not an array");
   expect(
     typeof (follows as Record<string, unknown>)["indexed"] === "boolean",
     "getFollows: missing indexed",
   );
+  (followRows as unknown[]).forEach((row, index) =>
+    checkFollowView(row, `getFollows.follows[${index}]`),
+  );
   done.push({
     name: "net.ratat.graph.getFollows",
-    detail: `${((follows as Record<string, unknown>)["follows"] as unknown[]).length} follow(s)`,
+    detail: `${(followRows as unknown[]).length} follow(s)`,
   });
+
+  // The web's follow list pages by number, and the profile's counts come from
+  // the same index, so the numbered shape is checked in both directions.
+  for (const [nsid, key] of [
+    ["net.ratat.graph.getFollows", "follows"],
+    ["net.ratat.graph.getFollowers", "followers"],
+  ] as const) {
+    const paged = await query(nsid, { actor: withArt.actor.did, page: 1, limit: 30 });
+    expect(isRecord(paged), `${nsid} paged: not an object`);
+    const rows = (paged as Record<string, unknown>)[key];
+    expect(Array.isArray(rows), `${nsid} paged: ${key} is not an array`);
+    expect(
+      typeof (paged as Record<string, unknown>)["total"] === "number",
+      `${nsid} paged: missing total`,
+    );
+    expect(
+      typeof (paged as Record<string, unknown>)["page"] === "number",
+      `${nsid} paged: missing page`,
+    );
+    (rows as unknown[]).forEach((row, index) =>
+      checkFollowView(row, `${nsid} paged.${key}[${index}]`),
+    );
+    done.push({
+      name: `${nsid} paged`,
+      detail: `${(rows as unknown[]).length} of ${String((paged as Record<string, unknown>)["total"])}`,
+    });
+  }
 
   // A timeline needs no follows to be well formed; an actor who follows nobody
   // is exactly the empty-but-valid case worth checking.

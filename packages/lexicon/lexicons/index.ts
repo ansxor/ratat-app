@@ -6,4 +6,5 @@ export * as NetRatatFeedGetAuthorFeed from "./types/net/ratat/feed/getAuthorFeed
 export * as NetRatatFeedGetPost from "./types/net/ratat/feed/getPost.js";
 export * as NetRatatFeedGetTimeline from "./types/net/ratat/feed/getTimeline.js";
 export * as NetRatatGraphFollow from "./types/net/ratat/graph/follow.js";
+export * as NetRatatGraphGetFollowers from "./types/net/ratat/graph/getFollowers.js";
 export * as NetRatatGraphGetFollows from "./types/net/ratat/graph/getFollows.js";

@@ -33,7 +33,13 @@ const _profileViewSchema = /*#__PURE__*/ v.object(
 				/*#__PURE__*/ v.stringGraphemes(0, 80)
 			]
 		)),
+		/**
+		 * How many accounts Ratat-follow this one, counted from the local index. Follows written before the ingester watched a follower's repo may be missing.
+		 */
 		"followersCount": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.integer()),
+		/**
+		 * How many accounts this one Ratat-follows, counted from the local index. Zero until the index has walked this actor's follow records.
+		 */
 		"followsCount": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.integer()),
 		"handle": /*#__PURE__*/ v.handleString(),
 		"indexedAt": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.datetimeString()),

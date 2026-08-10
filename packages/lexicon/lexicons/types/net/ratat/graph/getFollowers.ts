@@ -4,7 +4,7 @@ import type {} from '@atcute/lexicons/ambient';
 
 const _followViewSchema = /*#__PURE__*/ v.object(
 	{
-		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("net.ratat.graph.getFollows#followView")),
+		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("net.ratat.graph.getFollowers#followView")),
 		/**
 		 * CDN URL, not a blob ref.
 		 */
@@ -22,21 +22,21 @@ const _followViewSchema = /*#__PURE__*/ v.object(
 			]
 		)),
 		/**
-		 * The followed account's handle from the index snapshot; absent when the index has not resolved one yet, in which case callers fall back to the DID.
+		 * The following account's handle from the index snapshot; absent when the index has not resolved one yet, in which case callers fall back to the DID.
 		 */
 		"handle": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.handleString()),
 		/**
-		 * The followed DID.
+		 * The following account's DID.
 		 */
 		"subject": /*#__PURE__*/ v.didString(),
 		/**
-		 * The follow record's at-uri; delete it to unfollow.
+		 * The follow record's at-uri.
 		 */
 		"uri": /*#__PURE__*/ v.resourceUriString(),
 	}
 );
 const _mainSchema = /*#__PURE__*/ v.query(
-	"net.ratat.graph.getFollows",
+	"net.ratat.graph.getFollowers",
 	{
 		"params": /*#__PURE__*/ v.object(
 			{
@@ -61,7 +61,7 @@ const _mainSchema = /*#__PURE__*/ v.query(
 					100
 				),
 				/**
-				 * Page number for numbered paging, which is what the web's follow list uses. Give page or cursor, not both.
+				 * Page number for numbered paging, which is what the web's follower list uses. Give page or cursor, not both.
 				 */
 				"page": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.integer()),
 			}
@@ -74,19 +74,15 @@ const _mainSchema = /*#__PURE__*/ v.query(
 					 * Absent when the last page has been served.
 					 */
 					"cursor": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.string()),
-					get "follows"() {
+					get "followers"() {
 						return /*#__PURE__*/ v.array(followViewSchema)
 					},
-					/**
-					 * Whether the index has walked this actor's follow records at least once. False means the answer may be short, and a caller holding the repo should read it directly; asking marks the actor for a walk, so a later call answers fully.
-					 */
-					"indexed": /*#__PURE__*/ v.boolean(),
 					/**
 					 * The page actually served, which is the last one when paging ran out first.
 					 */
 					"page": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.integer()),
 					/**
-					 * How many follows the index holds for this actor. Present when paged, since numbered paging is what needs a total.
+					 * How many followers the index holds for this actor. Present when paged, since numbered paging is what needs a total.
 					 */
 					"total": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.integer()),
 				}
@@ -110,6 +106,6 @@ export interface $params extends v.InferInput<mainSchema['params']> {}
 export interface $output extends v.InferXRPCBodyInput<mainSchema['output']> {}
 declare module '@atcute/lexicons/ambient' {
 	interface XRPCQueries {
-		"net.ratat.graph.getFollows": mainSchema;
+		"net.ratat.graph.getFollowers": mainSchema;
 	}
 }

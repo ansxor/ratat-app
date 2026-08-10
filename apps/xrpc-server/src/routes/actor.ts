@@ -5,14 +5,16 @@ import { Effect } from "effect";
 import { actorRequestFailed, appviewUnreachable, Appview } from "../appview.ts";
 import { upstreamFailure } from "../errors.ts";
 import type { RouteEffect } from "../handler.ts";
-import { noteInterestInBackground } from "../interest.ts";
+import { noteInterestAndWantFollowsInBackground } from "../interest.ts";
+import { graphCounts } from "../store.ts";
 import { profileView, profileViewBasic } from "../views.ts";
 
 /**
- * Profiles stay live: followers, follows and post counts are Bluesky's numbers
- * and would be stale the moment we stored them. The visit is what marks the DID
- * interested, which is how a profile page ends up backfilled for next time —
- * and, since the masthead reads its own avatar this way, how logging in does.
+ * Profiles stay live: the bio and post count are Bluesky's numbers and would
+ * be stale the moment we stored them. The graph counts are Ratat's own — the
+ * visit is what marks the DID interested and queues the walk of their own
+ * follows, so a profile page ends up backfilled for next time, and, since the
+ * masthead reads its own avatar this way, how logging in does.
  */
 export const actorGetProfile = (
   ctx: QueryContext<NetRatatActorGetProfile.mainSchema>,
@@ -29,7 +31,23 @@ export const actorGetProfile = (
     if (!res.ok) return yield* Effect.fail(actorRequestFailed(actor, res.data));
 
     const output: NetRatatActorGetProfile.$output = profileView(res.data);
-    yield* noteInterestInBackground(output);
+    yield* noteInterestAndWantFollowsInBackground(output);
+
+    // The graph counts come from the index, never from Bluesky: following on
+    // Ratat is a different graph, and showing Bluesky's numbers here would
+    // promise a list this page's links cannot deliver. An index that cannot
+    // answer keeps the Bluesky numbers rather than showing a wrong zero.
+    const counts = yield* graphCounts(output.did).pipe(
+      Effect.catchAll((error) =>
+        Effect.logWarning(`graph counts of ${output.did} unreadable: ${String(error.cause)}`).pipe(
+          Effect.as(undefined),
+        ),
+      ),
+    );
+    if (counts) {
+      output.followersCount = counts.followers;
+      output.followsCount = counts.follows;
+    }
 
     return json(output);
   });

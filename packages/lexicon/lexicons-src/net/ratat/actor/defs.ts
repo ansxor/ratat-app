@@ -13,7 +13,8 @@ export default document({
       },
     }),
     profileView: object({
-      description: "An artist's profile, hydrated from their Bluesky profile record.",
+      description:
+        "An artist's profile, hydrated from their Bluesky profile record. The graph counts are Ratat's own: how many net.ratat.graph.follow records this actor holds and how many point at them, counted from the local index.",
       properties: {
         did: required(string({ format: "did" })),
         handle: required(string({ format: "handle" })),
@@ -21,8 +22,14 @@ export default document({
         description: string({ maxLength: 20000, maxGraphemes: 2000 }),
         avatar: string({ format: "uri" }),
         banner: string({ format: "uri" }),
-        followersCount: integer(),
-        followsCount: integer(),
+        followersCount: integer({
+          description:
+            "How many accounts Ratat-follow this one, counted from the local index. Follows written before the ingester watched a follower's repo may be missing.",
+        }),
+        followsCount: integer({
+          description:
+            "How many accounts this one Ratat-follows, counted from the local index. Zero until the index has walked this actor's follow records.",
+        }),
         postsCount: integer({
           description:
             "Posts of every kind in the actor's repo, as Bluesky counts them — not the size of this actor's Ratat portfolio, which holds only posts with media.",
