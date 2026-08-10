@@ -1,0 +1,33 @@
+#:schema https://pitchfork.jdx.dev/schema.json
+
+[daemons.support]
+run = "mise x -- sh -c 'docker compose -f docker-compose.yml -p $COMPOSE_PROJECT_NAME up'"
+ready_cmd = "mise x -- sh -c 'nc -z 127.0.0.1 $RATAT_POSTGRES_PORT'"
+auto = ["start"]
+
+[daemons.support.hooks]
+on_exit = "mise x -- sh -c 'docker compose -f docker-compose.yml -p $COMPOSE_PROJECT_NAME down --remove-orphans'"
+
+[daemons.api]
+run = "mise x -- bun run dev"
+dir = "apps/xrpc-server"
+depends = ["support"]
+ready_cmd = "mise x -- sh -c 'nc -z 127.0.0.1 $RATAT_API_PORT'"
+auto = ["start", "stop"]
+retry = 3
+
+[daemons.ingester]
+run = "mise x -- bun run dev"
+dir = "apps/ingester"
+depends = ["support"]
+ready_delay = 5
+auto = ["start", "stop"]
+retry = 3
+
+[daemons.web]
+run = "mise x -- bun run dev"
+dir = "apps/web"
+depends = ["api"]
+ready_cmd = "mise x -- sh -c 'nc -z 127.0.0.1 $RATAT_WEB_PORT'"
+auto = ["start", "stop"]
+retry = 3

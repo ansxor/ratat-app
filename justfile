@@ -1,31 +1,43 @@
-set dotenv-load := true
+set dotenv-load := false
 set positional-arguments := true
+
+set shell := ["mise", "x", "--", "sh", "-c"]
+
+support := "docker compose -f docker-compose.yml -p $COMPOSE_PROJECT_NAME"
 
 _default:
     @just --list --unsorted
 
 up:
-    docker compose up -d --wait
+    {{ support }} up -d --wait
 
 down:
-    -docker compose down --remove-orphans
+    -{{ support }} down --remove-orphans
 
 down-hard:
-    -docker compose down --remove-orphans -v
+    -{{ support }} down --remove-orphans -v
+
+start-all: up migrate dev
 
 migrate:
     bun run migrate
 
 dev:
-    bun run dev
+    pitchfork start -l
+
+smoke:
+    bun run smoke
 
 test:
     bun run test
 
-# One live request per net.ratat.* query, against a server this starts if one
-# is not already listening. Needs Postgres up (`just up`) and the network.
-smoke:
-    bun run smoke
+network target:
+    @test "{{ target }}" = public \
+      || { echo "network: expected 'public', got '{{ target }}'" >&2; exit 2; }
+    MISE_ENV=public pitchfork restart api web
+    @echo "network is now public — run 'export MISE_ENV=public' to move this shell too"
+
+check: lint lint-colors format-check typecheck test
 
 lint:
     bun run lint
@@ -38,5 +50,3 @@ format-check:
 
 typecheck:
     bun run typecheck
-
-check: lint lint-colors format-check typecheck test

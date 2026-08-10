@@ -14,7 +14,8 @@
  * it.
  */
 
-const BASE = process.env["RATAT_SMOKE_URL"] ?? "http://127.0.0.1:3001";
+const BASE =
+  process.env["RATAT_SMOKE_URL"] ?? `http://127.0.0.1:${process.env["RATAT_API_PORT"] ?? 3001}`;
 const QUERY = process.env["RATAT_SMOKE_QUERY"] ?? "bsky";
 const BOOT_TIMEOUT_MS = 40_000;
 
@@ -262,7 +263,7 @@ async function startServer(): Promise<() => void> {
     cwd: new URL("..", import.meta.url).pathname,
     stdout: "pipe",
     stderr: "pipe",
-    env: { ...process.env },
+    env: { ...process.env, PORT: process.env["RATAT_API_PORT"] ?? "3001" },
   });
 
   const deadline = Date.now() + BOOT_TIMEOUT_MS;

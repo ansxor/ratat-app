@@ -17,4 +17,6 @@ dist/
 .env*
 !.env.example
 
+.ratat.env
+
 .DS_Store

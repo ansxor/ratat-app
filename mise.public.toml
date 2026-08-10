@@ -1,0 +1,7 @@
+#:schema https://mise.jdx.dev/schema/mise.json
+
+[env]
+# Point the web app at the deployed appview instead of the local dev server.
+# Everything else (BSKY_APPVIEW_URL, PLC_DIRECTORY_URL, JETSTREAM_URL) is
+# already the public network in the default profile.
+VITE_RATAT_APPVIEW_URL = "https://appview.ratat.net"
