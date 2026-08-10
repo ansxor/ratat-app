@@ -101,7 +101,7 @@ function ArtistPage() {
               ) : (
                 <>
                   <Pager variant="top" pagination={pagination} />
-                  <ArtworkGrid posts={posts} />
+                  <ArtworkGrid posts={posts} header="none" />
                   <Pager variant="bottom" pagination={pagination} />
                 </>
               )}
