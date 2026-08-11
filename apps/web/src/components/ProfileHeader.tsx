@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Link } from "@tanstack/react-router";
 
 import { ArtworkVeil } from "#/components/content/ArtworkVeil.tsx";
@@ -11,6 +13,48 @@ import { cn } from "#/lib/utils.ts";
 
 const STAT_VALUE = "font-display text-[22px] font-[500] leading-none";
 const STAT_LABEL = "font-mono text-[10.5px] tracking-[0.16em] uppercase text-faint";
+
+const BSKY_FAVICON = "https://www.google.com/s2/favicons?domain=bsky.app&sz=64";
+// theme-invariant: Bluesky's brand colour, from the old app's connections palette.
+const BSKY_BRAND = "#1185fe";
+
+/**
+ * The old app's banner connections overlay, ported down to the one link Ratat
+ * can always offer: Bluesky itself. The favicon falls back to a brand-colour
+ * badge when Google's favicon service is unreachable.
+ */
+function BlueskyConnection({ url }: { url: string }) {
+  const [failedSrc, setFailedSrc] = useState<string | undefined>(undefined);
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="group/conn size-[22px] flex-none inline-flex items-center justify-center overflow-hidden bg-none text-accent-ink text-[11px] font-[700] border-none p-0 cursor-pointer no-underline hover:brightness-[1.08]"
+      title="Bluesky"
+      aria-label="Bluesky"
+    >
+      {failedSrc ? (
+        <span
+          className="size-full inline-flex items-center justify-center"
+          style={{ background: BSKY_BRAND }}
+          aria-hidden
+        >
+          B
+        </span>
+      ) : (
+        <img
+          className="size-full box-border bg-ink-raised object-contain p-[3px] group-hover/conn:shadow-[inset_0_0_0_1px_var(--color-primary)]"
+          src={BSKY_FAVICON}
+          alt=""
+          width={16}
+          height={16}
+          onError={() => setFailedSrc(BSKY_FAVICON)}
+        />
+      )}
+    </a>
+  );
+}
 
 export type ProfileSection = "art" | "following" | "followers";
 
@@ -128,6 +172,9 @@ export function ProfileHeader({
             </span>
           </div>
         </div>
+        <div className="absolute bottom-[14px] right-[14px] flex items-center gap-[5px] bg-overlay backdrop-blur-[8px] border border-line p-[5px]">
+          <BlueskyConnection url={profile.bskyUrl} />
+        </div>
         {cover && (
           <ArtworkVeil
             variant={cover}
@@ -152,14 +199,6 @@ export function ProfileHeader({
 
         <div className="flex items-center gap-[8px] py-[6px]">
           <FollowButton subject={profile.did} />
-          <a
-            className="btn btn--ghost"
-            href={profile.bskyUrl}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            On Bluesky
-          </a>
         </div>
       </div>
 
