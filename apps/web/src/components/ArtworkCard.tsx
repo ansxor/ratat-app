@@ -19,7 +19,7 @@ export function ArtworkCard({
   aspect?: string;
   header?: ArtworkCardHeader;
 }) {
-  const { hidden, veil, peeked, animated, reveal } = useContentVeil(post.labels);
+  const { hidden, veil, peeked, animated, reveal, unreveal } = useContentVeil(post.labels);
 
   const cover = post.media[0];
   if (!cover) return null;
@@ -31,7 +31,7 @@ export function ArtworkCard({
   const covered = veil !== null && !peeked;
 
   return (
-    <article className={cn("piece", header === "pinned" && "piece--pinned")}>
+    <article className={cn("piece", header === "pinned" && "piece--pinned")} onMouseLeave={unreveal}>
       <div className="piece__art">
         {header !== "none" && (
           <div className="piece__top">

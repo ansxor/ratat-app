@@ -149,33 +149,40 @@ export interface ContentVeil {
   peeked: boolean;
   animated: boolean;
   reveal: () => void;
+  unreveal: () => void;
 }
 
 /**
  * Uncovering a card is a peek, not a setting: it lives here and is forgotten
- * the moment the mode behind it changes.
+ * the moment the mode behind it changes. On grid tiles the peek also ends
+ * when the pointer leaves, re-censoring the card.
  */
 export function useContentVeil(labels: readonly string[] | undefined): ContentVeil {
   const filters = useContentFilters();
   const mode = veilMode(labels, filters);
 
-  const [peeked, setPeeked] = useState(false);
+  const [peek, setPeek] = useState<"none" | "peeking" | "released">("none");
   const [seenMode, setSeenMode] = useState<VeilMode>(mode);
 
   const staleMode = seenMode !== mode;
   if (staleMode) {
     setSeenMode(mode);
-    setPeeked(false);
+    setPeek("none");
   }
-  const current = staleMode ? false : peeked;
+  const current = staleMode ? "none" : peek;
 
-  const reveal = useCallback(() => setPeeked(true), []);
+  const reveal = useCallback(() => setPeek("peeking"), []);
+  const unreveal = useCallback(
+    () => setPeek((state) => (state === "peeking" ? "released" : state)),
+    [],
+  );
 
   return {
     hidden: mode === "hide",
     veil: mode === "black" || mode === "blur" ? mode : null,
-    peeked: current,
-    animated: current,
+    peeked: current === "peeking",
+    animated: current !== "none",
     reveal,
+    unreveal,
   };
 }
