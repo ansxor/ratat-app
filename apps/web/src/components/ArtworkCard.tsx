@@ -31,7 +31,10 @@ export function ArtworkCard({
   const covered = veil !== null && !peeked;
 
   return (
-    <article className={cn("piece", header === "pinned" && "piece--pinned")} onMouseLeave={unreveal}>
+    <article
+      className={cn("piece", header === "pinned" && "piece--pinned")}
+      onMouseLeave={unreveal}
+    >
       <div className="piece__art">
         {header !== "none" && (
           <div className="piece__top">
