@@ -468,7 +468,8 @@
     left: 0;
     right: 0;
     top: 0;
-    z-index: 2;
+    /* Keep artist details usable when the full-frame censorship veil is open. */
+    z-index: 4;
     display: flex;
     align-items: center;
     gap: 7px;
