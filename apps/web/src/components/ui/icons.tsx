@@ -1,4 +1,6 @@
 export {
+  ArrowLeft as ArrowLeftIcon,
+  ArrowRight as ArrowRightIcon,
   Check as CheckIcon,
   ChevronRight as ChevronRightIcon,
   Eye as EyeIcon,

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ArtworkGate } from "#/components/content/ArtworkGate.tsx";
 import { ArtworkVeil, veilFrameClass } from "#/components/content/ArtworkVeil.tsx";
@@ -8,6 +8,14 @@ import { FeedNotice } from "#/components/FeedNotice.tsx";
 import { FollowButton } from "#/components/FollowButton.tsx";
 import { Footer } from "#/components/Footer.tsx";
 import { Sidebar } from "#/components/Sidebar.tsx";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "#/components/ui/Carousel.tsx";
 import { BlueskyIcon } from "#/components/ui/icons.tsx";
 import { rkeyOf } from "#/lib/artwork-href.ts";
 import { formatDate } from "#/lib/date.ts";
@@ -79,6 +87,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
         <video
           controls
           playsInline
+          data-embla-no-drag
           poster={media.thumbnail}
           src={media.playlist}
           style={{ aspectRatio: aspectRatio(media), height: "100%", width: "100%" }}
@@ -100,6 +109,45 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
       />
       {cover}
     </div>
+  );
+}
+
+function MediaCarousel({ media, alt, veil }: { media: Media[]; alt: string; veil: Veil }) {
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(1);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+    setCount(api.scrollSnapList().length);
+    const onSelect = () => setCurrent(api.selectedScrollSnap() + 1);
+    onSelect();
+    api.on("select", onSelect);
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api]);
+
+  return (
+    <Carousel setApi={setApi}>
+      <CarouselContent className="-ml-[0.4rem]">
+        {media.map((item, index) => (
+          <CarouselItem key={index} className="pl-[0.4rem]">
+            <MediaFrame media={item} alt={alt} veil={veil} />
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+      {count > 1 && (
+        <div
+          className="absolute bottom-[10px] right-[10px] z-[5] bg-scrim-chip px-[7px] py-[3px] font-[700] text-[11px] leading-[1.4] text-accent-ink tabular-nums"
+          aria-hidden="true"
+        >
+          {current} / {count}
+        </div>
+      )}
+    </Carousel>
   );
 }
 
@@ -128,11 +176,11 @@ function ArtworkPage() {
       <main className="gallery">
         <div className="wrap layout">
           <div className="feed">
-            {post.media.map((media, index) => (
-              <div key={index} className={index === 0 ? "" : "mt-[0.4rem]"}>
-                <MediaFrame media={media} alt={mediaAlt} veil={frameVeil} />
-              </div>
-            ))}
+            {post.media.length > 1 ? (
+              <MediaCarousel media={post.media} alt={mediaAlt} veil={frameVeil} />
+            ) : (
+              post.media[0] && <MediaFrame media={post.media[0]} alt={mediaAlt} veil={frameVeil} />
+            )}
 
             <div className="mt-[24px] flex items-start gap-[16px]">
               <div className="min-w-0 flex-auto">
