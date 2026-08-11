@@ -275,8 +275,11 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-
     scroll-padding-top: calc(var(--header-h) + 10px);
+  }
+  /* Do not reapply the page-navigation offset on every focused search update. */
+  html:has(header [role="combobox"]:focus) {
+    scroll-padding-top: 0;
   }
   body {
     background-color: var(--ink);

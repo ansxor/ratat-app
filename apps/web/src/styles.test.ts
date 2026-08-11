@@ -5,11 +5,18 @@ import { readFileSync } from "node:fs";
 const styles = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 
 function declaration(selector: string, property: string): string | undefined {
-  const block = styles.match(new RegExp(`\\${selector}\\s*\\{([^}]*)\\}`))?.[1];
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const block = styles.match(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`))?.[1];
   return block?.match(new RegExp(`${property}\\s*:\\s*([^;]+)`))?.[1]?.trim();
 }
 
 test("censored gallery cards keep their artist header above the veil", () => {
   // ArtworkVeil uses z-[3]; the artist header must remain above it.
   expect(Number(declaration(".piece__top", "z-index"))).toBeGreaterThan(3);
+});
+
+test("the search combobox disables document scroll padding only while focused", () => {
+  expect(declaration("html", "scroll-padding-top")).toBe("calc(var(--header-h) + 10px)");
+  expect(declaration('html:has(header [role="combobox"]:focus)', "scroll-padding-top")).toBe("0");
+  expect(declaration("html:has(header:focus-within)", "scroll-padding-top")).toBeUndefined();
 });
