@@ -446,6 +446,9 @@
     .layout {
       flex-direction: column;
     }
+    .feed {
+      width: 100%;
+    }
     /* Mobile: tight, gapless grid. */
     .masonry {
       column-gap: 0;
