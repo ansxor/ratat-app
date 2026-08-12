@@ -87,7 +87,7 @@ function ArtistPage() {
 
   return (
     <>
-      <main className="gallery">
+      <main className="gallery pt-0">
         <div className="wrap layout">
           <div className="feed">
             <ProfileHeader profile={profile} artCount={pagination.total ?? posts.length} />
@@ -99,11 +99,11 @@ function ArtistPage() {
                   still reading their work in.
                 </FeedNotice>
               ) : (
-                <>
+                <div className="-mx-[var(--pad)]">
                   <Pager variant="top" pagination={pagination} />
                   <ArtworkGrid posts={posts} header="none" />
                   <Pager variant="bottom" pagination={pagination} />
-                </>
+                </div>
               )}
             </div>
           </div>

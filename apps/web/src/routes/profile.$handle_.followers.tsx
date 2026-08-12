@@ -57,7 +57,7 @@ function FollowersPage() {
 
   return (
     <>
-      <main className="gallery">
+      <main className="gallery pt-0">
         <div className="wrap layout">
           <div className="feed">
             <ProfileHeader

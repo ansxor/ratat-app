@@ -431,11 +431,11 @@
   .masonry {
     display: block;
     column-width: 240px;
-    column-gap: 0.4rem;
+    column-gap: 0;
   }
   .masonry > .piece {
     break-inside: avoid;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0;
   }
   @media (max-width: 560px) {
     .masonry {
@@ -455,7 +455,9 @@
     border-radius: 0;
     overflow: hidden;
     position: relative;
-    border: 1px solid var(--line);
+    /* Distinct border stands in for the removed grid gap, so the tiles still
+       read as separate click targets. */
+    border: 1px solid var(--line-2);
   }
   .piece__open {
     display: block;
@@ -637,7 +639,7 @@
 }
 
 body.show-details .piece__art {
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-2);
 }
 body.show-details .piece__top,
 body.show-details .piece__bar {

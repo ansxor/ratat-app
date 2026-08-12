@@ -4,15 +4,13 @@ import { Link } from "@tanstack/react-router";
 
 import { ArtworkVeil } from "#/components/content/ArtworkVeil.tsx";
 import { FollowButton } from "#/components/FollowButton.tsx";
-import { ImageIcon } from "#/components/ui/icons.tsx";
-import { TabNav, type TabNavItem } from "#/components/ui/TabNav.tsx";
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
 import type { Profile } from "#/lib/ratat.ts";
 import { useContentVeil } from "#/lib/settings.tsx";
 import { cn } from "#/lib/utils.ts";
 
-const STAT_VALUE = "font-display text-[22px] font-[500] leading-none";
-const STAT_LABEL = "font-mono text-[10.5px] tracking-[0.16em] uppercase text-faint";
+const STAT_VALUE = "font-display text-[18px] font-[500] leading-none";
+const STAT_LABEL = "font-mono text-[9.5px] tracking-[0.16em] uppercase text-faint";
 
 const BSKY_FAVICON = "https://www.google.com/s2/favicons?domain=bsky.app&sz=64";
 // theme-invariant: Bluesky's brand colour, from the old app's connections palette.
@@ -72,7 +70,7 @@ function ProfileStats({
   artCount: number;
 }) {
   return (
-    <div className="flex gap-[26px] py-[6px]">
+    <div className="flex gap-[18px] py-[4px]">
       <Link
         to="/profile/$handle/followers"
         params={{ handle: profile.handle }}
@@ -131,21 +129,15 @@ export function ProfileHeader({
   const avatarBg = profile.avatar ? `url(${profile.avatar})` : PLACEHOLDER_GRADIENT;
   const blur = covered && cover === "blur" ? "blur(38px)" : undefined;
 
-  const tabs: TabNavItem[] = [
-    {
-      key: "art",
-      link: { to: "/profile/$handle", params: { handle: profile.handle } },
-      label: artCount ? `Art · ${artCount}` : "Art",
-      icon: <ImageIcon />,
-    },
-  ];
-
   return (
     <>
       <header
         className={cn(
           // `isolate` keeps the banner layer's negative z inside this header.
           "relative isolate overflow-hidden h-[clamp(220px,32vw,320px)] border border-line",
+          // Full-bleed: the header escapes `.wrap`'s inline padding to reach
+          // the window edges, matching the gallery below it.
+          "-mx-[var(--pad)]",
           "shadow-[0_24px_48px_-36px_var(--shadow-drop)]",
           "before:content-[''] before:absolute before:inset-0 before:pointer-events-none",
           // theme-invariant: contrast over arbitrary user artwork.
@@ -186,23 +178,16 @@ export function ProfileHeader({
         )}
       </header>
 
-      <div className="flex gap-[24px] items-start flex-wrap mt-[14px]">
-        <div className="flex-1 min-w-[280px]">
-          {profile.description && (
-            <p className="m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words">
-              {profile.description}
-            </p>
-          )}
-        </div>
-
+      <div className="flex items-center justify-between flex-wrap gap-[10px] mt-[14px]">
         <ProfileStats profile={profile} section={section} artCount={artCount} />
-
-        <div className="flex items-center gap-[8px] py-[6px]">
-          <FollowButton subject={profile.did} />
-        </div>
+        <FollowButton subject={profile.did} />
       </div>
 
-      <TabNav items={tabs} activeKey="art" ariaLabel="Profile sections" />
+      {profile.description && (
+        <p className="m-0 mt-[10px] text-[15.5px] text-paper whitespace-pre-wrap break-words">
+          {profile.description}
+        </p>
+      )}
     </>
   );
 }
