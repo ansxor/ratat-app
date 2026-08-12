@@ -149,7 +149,7 @@ export function ProfileHeader({
           className="absolute inset-0 z-[-1] bg-cover bg-center"
           style={{ backgroundImage: bannerBg, ...(blur ? { filter: blur } : {}) }}
         />
-        <div className="absolute inset-0 flex flex-col items-start justify-center gap-[12px] p-[20px_24px]">
+        <div className="absolute inset-0 flex flex-col items-start justify-center gap-[12px] p-[20px_16px]">
           <div
             className="w-[clamp(96px,14vw,160px)] h-[clamp(96px,14vw,160px)] flex-none bg-cover bg-center border border-line shadow-[inset_0_0_0_3px_var(--color-ink-raised),0_18px_36px_-24px_var(--shadow-drop)]"
             style={{ backgroundImage: avatarBg, ...(blur ? { filter: blur } : {}) }}
