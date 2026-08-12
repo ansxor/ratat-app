@@ -82,7 +82,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
 
   if (isVideo(media)) {
     return (
-      <div style={style} className={cn(frame, "p-[16px] max-[880px]:px-0")}>
+      <div style={style} className={cn(frame, "p-[16px] max-[880px]:p-0")}>
         <video
           controls
           playsInline
@@ -100,7 +100,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
   }
 
   return (
-    <div style={style} className={cn(frame, "p-[16px] max-[880px]:px-0")}>
+    <div style={style} className={cn(frame, "p-[16px] max-[880px]:p-0")}>
       <img
         src={media.fullsize}
         alt={covered ? "" : (media.alt ?? alt)}
@@ -185,13 +185,13 @@ function ArtworkPage() {
               )}
             </div>
 
-            <div className="mt-[24px] flex items-start gap-[16px]">
+            <div className="mt-[24px] flex items-start gap-[16px] max-[880px]:items-center max-[880px]:gap-[12px] max-[880px]:mt-0 max-[880px]:-mx-[var(--pad)] max-[880px]:bg-ink-raised max-[880px]:border-x max-[880px]:border-line-2 max-[880px]:p-[6px_12px]">
               <div className="min-w-0 flex-auto">
                 <div className="flex items-center gap-[10px]">
                   <Link
                     to="/profile/$handle"
                     params={{ handle: post.author.handle }}
-                    className="inline-flex items-center gap-[7px] border-b border-line text-paper rounded-[6px] px-[7px] py-[3px] mx-[-7px] my-[-3px] transition-[background] duration-[140ms] hover:bg-ink-hi"
+                    className="inline-flex items-center gap-[7px] border-b border-line text-paper rounded-[6px] px-[7px] py-[3px] mx-[-7px] my-[-3px] transition-[background] duration-[140ms] hover:bg-ink-hi max-[880px]:border-b-0"
                   >
                     {post.author.avatar ? (
                       <img
@@ -204,9 +204,15 @@ function ArtworkPage() {
                     ) : (
                       <span className="size-[20px] flex-none rounded-[4px] border border-line-2 bg-mat" />
                     )}
-                    <span>{artistName}</span>
+                    <span className="max-[880px]:text-[17px] max-[880px]:font-[600]">
+                      {artistName}
+                    </span>
                   </Link>
-                  <FollowButton subject={post.author.did} variant="compact" />
+                  <FollowButton
+                    subject={post.author.did}
+                    variant="compact"
+                    className="max-[880px]:h-[34px] max-[880px]:px-[12px] max-[880px]:text-[14px] max-[880px]:[&_svg]:size-[15px]"
+                  />
                 </div>
               </div>
 
@@ -229,11 +235,10 @@ function ArtworkPage() {
 function ArtworkMeta({ post, description }: { post: Post; description: string | undefined }) {
   return (
     <div
-      className="mt-[16px] max-[880px]:mt-0 max-[880px]:-mx-[var(--pad)]"
+      className="mt-[16px] max-[880px]:mt-0 max-[880px]:-mx-[var(--pad)] rounded-[4px] max-[880px]:rounded-none"
       style={{
         background: "var(--ink-raised)",
         border: "1px solid var(--line-2)",
-        borderRadius: "4px",
         boxShadow: "0 2px 0 var(--shadow)",
       }}
     >

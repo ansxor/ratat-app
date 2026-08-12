@@ -17,9 +17,11 @@ const COMPACT =
 export function FollowButton({
   subject,
   variant = "default",
+  className,
 }: {
   subject: string;
   variant?: "default" | "compact";
+  className?: string;
 }) {
   const { session } = useSession();
   const { isFollowing, loaded, follow, unfollow } = useFollows();
@@ -40,7 +42,7 @@ export function FollowButton({
     return following ? (
       <button
         type="button"
-        className={cn(COMPACT, "px-[8px] text-up")}
+        className={cn(COMPACT, "px-[8px] text-up", className)}
         title="Following — click to unfollow"
         aria-label="Following"
         onClick={run(() => unfollow(subject))}
@@ -51,7 +53,7 @@ export function FollowButton({
     ) : (
       <button
         type="button"
-        className={COMPACT}
+        className={cn(COMPACT, className)}
         onClick={run(() => follow(subject))}
         disabled={pending}
       >
@@ -64,7 +66,7 @@ export function FollowButton({
   return following ? (
     <button
       type="button"
-      className={cn("btn btn--ghost", "[&_svg]:size-[14px] text-mist")}
+      className={cn("btn btn--ghost", "[&_svg]:size-[14px] text-mist", className)}
       title="Unfollow"
       onClick={run(() => unfollow(subject))}
       disabled={pending}
@@ -75,7 +77,7 @@ export function FollowButton({
   ) : (
     <button
       type="button"
-      className={cn("btn btn--accent", "[&_svg]:size-[14px]")}
+      className={cn("btn btn--accent", "[&_svg]:size-[14px]", className)}
       onClick={run(() => follow(subject))}
       disabled={pending}
     >
