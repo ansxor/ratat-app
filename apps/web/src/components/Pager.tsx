@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
-import { formatTotal, type PagerPagination } from "#/lib/pagination.ts";
+import { formatTotal, type PagerPagination, type PagerSlot } from "#/lib/pagination.ts";
 import { cn } from "#/lib/utils.ts";
 
 /**
@@ -20,6 +20,16 @@ import { cn } from "#/lib/utils.ts";
  * `aria-current` onto the nav.
  */
 const ACTIVE_OPTIONS = { exact: true, includeSearch: true } as const;
+
+/** Keep the mobile page-number line useful without competing with its controls. */
+export function mobilePageSlots(
+  slots: ReadonlyArray<PagerSlot | "gap">,
+  current: number,
+): PagerSlot[] {
+  const numbered = slots.filter((slot): slot is PagerSlot => slot !== "gap");
+  const currentIndex = numbered.findIndex((slot) => slot.page === current);
+  return numbered.slice(Math.max(0, currentIndex - 1), currentIndex + 2);
+}
 
 const pageLink = (
   variants: { current?: boolean; step?: boolean; disabled?: boolean } = {},
@@ -42,6 +52,8 @@ export function Pager({
   pagination?: PagerPagination;
   countNoun?: readonly [string, string];
 }) {
+  const mobileSlots = pagination && new Set(mobilePageSlots(pagination.slots, pagination.current));
+
   return (
     <div
       className={cn(
@@ -83,13 +95,20 @@ export function Pager({
                 …
               </span>
             ) : slot.page === pagination.current ? (
-              <span key={slot.page} className={pageLink({ current: true })} aria-current="page">
+              <span
+                key={slot.page}
+                className={cn(
+                  pageLink({ current: true }),
+                  !mobileSlots?.has(slot) && "max-[880px]:hidden",
+                )}
+                aria-current="page"
+              >
                 {slot.page}
               </span>
             ) : (
               <Link
                 key={slot.page}
-                className={cn(pageLink(), "max-[880px]:hidden")}
+                className={cn(pageLink(), !mobileSlots?.has(slot) && "max-[880px]:hidden")}
                 activeOptions={ACTIVE_OPTIONS}
                 {...slot.link}
               >
