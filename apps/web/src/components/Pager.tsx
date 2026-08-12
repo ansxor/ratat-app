@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 
 import { formatTotal, type PagerPagination, type PagerSlot } from "#/lib/pagination.ts";
 import { cn } from "#/lib/utils.ts";
@@ -21,14 +21,61 @@ import { cn } from "#/lib/utils.ts";
  */
 const ACTIVE_OPTIONS = { exact: true, includeSearch: true } as const;
 
-/** Keep the mobile page-number line useful without competing with its controls. */
-export function mobilePageSlots(
-  slots: ReadonlyArray<PagerSlot | "gap">,
-  current: number,
-): PagerSlot[] {
-  const numbered = slots.filter((slot): slot is PagerSlot => slot !== "gap");
-  const currentIndex = numbered.findIndex((slot) => slot.page === current);
-  return numbered.slice(Math.max(0, currentIndex - 1), currentIndex + 2);
+function useVisibleSlots(slots: Array<PagerSlot | "gap">): {
+  areaRef: RefObject<HTMLDivElement | null>;
+  probeRef: RefObject<HTMLDivElement | null>;
+  visibleCount: number;
+} {
+  const areaRef = useRef<HTMLDivElement>(null);
+  const probeRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [mobile, setMobile] = useState(false);
+
+  useLayoutEffect(() => {
+    const query = window.matchMedia("(max-width: 880px)");
+    const updateMobile = () => setMobile(query.matches);
+    query.addEventListener("change", updateMobile);
+    updateMobile();
+    return () => query.removeEventListener("change", updateMobile);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!mobile) {
+      setVisibleCount(slots.length);
+      return;
+    }
+
+    setVisibleCount(0);
+
+    const area = areaRef.current;
+    const probe = probeRef.current;
+    if (!area || !probe) return;
+
+    let disposed = false;
+    const update = () => {
+      if (disposed) return;
+      const available = area.getBoundingClientRect().width;
+      const start = probe.getBoundingClientRect().left;
+      let count = 0;
+      for (const child of probe.children) {
+        if (child.getBoundingClientRect().right - start > available) break;
+        count += 1;
+      }
+      setVisibleCount(count);
+    };
+
+    const observer = new ResizeObserver(update);
+    observer.observe(area);
+    observer.observe(probe);
+    document.fonts?.ready.then(update);
+    update();
+    return () => {
+      disposed = true;
+      observer.disconnect();
+    };
+  }, [mobile, slots]);
+
+  return { areaRef, probeRef, visibleCount };
 }
 
 const pageLink = (
@@ -41,6 +88,33 @@ const pageLink = (
     variants.disabled && "text-faint cursor-not-allowed hover:text-faint hover:bg-transparent",
   );
 
+function pageSlot(slot: PagerSlot | "gap", index: number, current: number): ReactNode {
+  if (slot === "gap") {
+    return (
+      <span key={`gap-${index}`} className="text-faint px-[3px]" aria-hidden="true">
+        …
+      </span>
+    );
+  }
+  if (slot.page === current) {
+    return (
+      <span key={slot.page} className={pageLink({ current: true })} aria-current="page">
+        {slot.page}
+      </span>
+    );
+  }
+  return (
+    <Link key={slot.page} className={pageLink()} activeOptions={ACTIVE_OPTIONS} {...slot.link}>
+      {slot.page}
+    </Link>
+  );
+}
+
+function slotProbe(slot: PagerSlot | "gap", current: number): ReactNode {
+  if (slot === "gap") return <span className="text-faint px-[3px]">…</span>;
+  return <span className={pageLink({ current: slot.page === current })}>{slot.page}</span>;
+}
+
 export function Pager({
   variant = "top",
   leading,
@@ -52,7 +126,8 @@ export function Pager({
   pagination?: PagerPagination;
   countNoun?: readonly [string, string];
 }) {
-  const mobileSlots = pagination && new Set(mobilePageSlots(pagination.slots, pagination.current));
+  const slots = pagination?.slots ?? [];
+  const { areaRef, probeRef, visibleCount } = useVisibleSlots(slots);
 
   return (
     <div
@@ -73,7 +148,10 @@ export function Pager({
         ))}
       {pagination && (pagination.slots.length > 1 || pagination.nextLink) && (
         <nav
-          className={cn("flex items-center gap-[3px]", variant !== "standalone" && "ml-auto")}
+          className={cn(
+            "flex min-w-0 items-center gap-[3px]",
+            variant !== "standalone" && "ml-auto",
+          )}
           aria-label="Pagination"
         >
           {pagination.prevLink && (
@@ -85,37 +163,28 @@ export function Pager({
               ‹ Prev
             </Link>
           )}
-          {pagination.slots.map((slot, i) =>
-            slot === "gap" ? (
-              <span
-                key={`gap-${i}`}
-                className="text-faint px-[3px] max-[880px]:hidden"
-                aria-hidden="true"
+          <div ref={areaRef} className="min-w-0 flex-1">
+            <div className="flex items-center gap-[3px]">
+              {pagination.slots.map((slot, index) => (
+                <div
+                  key={slot === "gap" ? `gap-${index}` : slot.page}
+                  className={cn("flex-none", index >= visibleCount && "hidden")}
+                >
+                  {pageSlot(slot, index, pagination.current)}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div ref={probeRef} className="absolute invisible flex w-max items-center gap-[3px]">
+            {pagination.slots.map((slot, index) => (
+              <div
+                key={slot === "gap" ? `probe-gap-${index}` : `probe-${slot.page}`}
+                className="flex-none"
               >
-                …
-              </span>
-            ) : slot.page === pagination.current ? (
-              <span
-                key={slot.page}
-                className={cn(
-                  pageLink({ current: true }),
-                  !mobileSlots?.has(slot) && "max-[880px]:hidden",
-                )}
-                aria-current="page"
-              >
-                {slot.page}
-              </span>
-            ) : (
-              <Link
-                key={slot.page}
-                className={cn(pageLink(), !mobileSlots?.has(slot) && "max-[880px]:hidden")}
-                activeOptions={ACTIVE_OPTIONS}
-                {...slot.link}
-              >
-                {slot.page}
-              </Link>
-            ),
-          )}
+                {slotProbe(slot, pagination.current)}
+              </div>
+            ))}
+          </div>
           {pagination.nextLink ? (
             <Link
               className={pageLink({ step: true })}
