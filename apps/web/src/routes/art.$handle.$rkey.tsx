@@ -61,7 +61,6 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
     height: "calc(100vh - 260px)",
     background: "var(--ink-raised)",
     border: "1px solid var(--line)",
-    padding: "16px",
   };
 
   const covered = veil.variant !== null && !veil.peeked;
@@ -83,7 +82,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
 
   if (isVideo(media)) {
     return (
-      <div style={style} className={frame}>
+      <div style={style} className={cn(frame, "p-[16px] max-[880px]:px-0")}>
         <video
           controls
           playsInline
@@ -101,7 +100,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
   }
 
   return (
-    <div style={style} className={frame}>
+    <div style={style} className={cn(frame, "p-[16px] max-[880px]:px-0")}>
       <img
         src={media.fullsize}
         alt={covered ? "" : (media.alt ?? alt)}
