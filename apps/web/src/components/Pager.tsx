@@ -75,7 +75,11 @@ export function Pager({
           )}
           {pagination.slots.map((slot, i) =>
             slot === "gap" ? (
-              <span key={`gap-${i}`} className="text-faint px-[3px]" aria-hidden="true">
+              <span
+                key={`gap-${i}`}
+                className="text-faint px-[3px] max-[880px]:hidden"
+                aria-hidden="true"
+              >
                 …
               </span>
             ) : slot.page === pagination.current ? (
@@ -85,7 +89,7 @@ export function Pager({
             ) : (
               <Link
                 key={slot.page}
-                className={pageLink()}
+                className={cn(pageLink(), "max-[880px]:hidden")}
                 activeOptions={ACTIVE_OPTIONS}
                 {...slot.link}
               >
