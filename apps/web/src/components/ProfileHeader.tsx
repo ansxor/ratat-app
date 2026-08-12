@@ -9,9 +9,14 @@ import type { Profile } from "#/lib/ratat.ts";
 import { useContentVeil } from "#/lib/settings.tsx";
 import { cn } from "#/lib/utils.ts";
 
+// Desktop: the old app's stacked stat (number over label). Mobile: a compact
+// inline "0 Followers" so the three read as one dot-separated row.
 const STAT_LINK =
-  "no-underline font-bold text-[14px] transition-colors duration-[140ms] hover:text-primary";
-const STAT_LABEL = "text-[12px] opacity-60";
+  "flex flex-col gap-[2px] items-start no-underline max-[880px]:inline max-[880px]:font-bold max-[880px]:text-[14px]";
+const STAT_VALUE =
+  "font-display text-[22px] font-[500] leading-none max-[880px]:font-bold max-[880px]:text-[14px]";
+const STAT_LABEL =
+  "font-mono text-[10.5px] tracking-[0.16em] uppercase text-faint max-[880px]:text-[12px] max-[880px]:normal-case max-[880px]:tracking-normal";
 
 const BSKY_FAVICON = "https://www.google.com/s2/favicons?domain=bsky.app&sz=64";
 // theme-invariant: Bluesky's brand colour, from the old app's connections palette.
@@ -71,15 +76,16 @@ function ProfileStats({
   artCount: number;
 }) {
   return (
-    <div className="flex flex-wrap items-baseline gap-x-[10px] gap-y-[6px] py-[4px]">
+    <div className="flex gap-[26px] py-[6px] max-[880px]:order-1 max-[880px]:flex-1 max-[880px]:flex-wrap max-[880px]:items-baseline max-[880px]:gap-x-[10px] max-[880px]:gap-y-[6px]">
       <Link
         to="/profile/$handle/followers"
         params={{ handle: profile.handle }}
         className={cn(STAT_LINK, section === "followers" ? "text-primary" : "text-paper")}
       >
-        <b>{profile.followersCount ?? 0}</b> <span className={STAT_LABEL}>Followers</span>
+        <b className={STAT_VALUE}>{profile.followersCount ?? 0}</b>{" "}
+        <span className={STAT_LABEL}>Followers</span>
       </Link>
-      <span className="text-[13px] text-faint" aria-hidden="true">
+      <span className="hidden max-[880px]:inline text-[13px] text-faint" aria-hidden="true">
         ·
       </span>
       <Link
@@ -87,9 +93,10 @@ function ProfileStats({
         params={{ handle: profile.handle }}
         className={cn(STAT_LINK, section === "following" ? "text-primary" : "text-paper")}
       >
-        <b>{profile.followsCount ?? 0}</b> <span className={STAT_LABEL}>Following</span>
+        <b className={STAT_VALUE}>{profile.followsCount ?? 0}</b>{" "}
+        <span className={STAT_LABEL}>Following</span>
       </Link>
-      <span className="text-[13px] text-faint" aria-hidden="true">
+      <span className="hidden max-[880px]:inline text-[13px] text-faint" aria-hidden="true">
         ·
       </span>
       <Link
@@ -97,7 +104,7 @@ function ProfileStats({
         params={{ handle: profile.handle }}
         className={cn(STAT_LINK, "text-paper")}
       >
-        <b>{artCount}</b> <span className={STAT_LABEL}>Pieces</span>
+        <b className={STAT_VALUE}>{artCount}</b> <span className={STAT_LABEL}>Pieces</span>
       </Link>
     </div>
   );
@@ -149,7 +156,7 @@ export function ProfileHeader({
           className="absolute inset-0 z-[-1] bg-cover bg-center"
           style={{ backgroundImage: bannerBg, ...(blur ? { filter: blur } : {}) }}
         />
-        <div className="absolute inset-0 flex flex-col items-start justify-center gap-[12px] p-[20px_16px]">
+        <div className="absolute inset-0 flex flex-col items-start justify-center gap-[12px] py-[20px] px-[24px] max-[880px]:px-[16px]">
           <div
             className="w-[clamp(96px,14vw,160px)] h-[clamp(96px,14vw,160px)] flex-none bg-cover bg-center border border-line shadow-[inset_0_0_0_3px_var(--color-ink-raised),0_18px_36px_-24px_var(--shadow-drop)]"
             style={{ backgroundImage: avatarBg, ...(blur ? { filter: blur } : {}) }}
@@ -177,16 +184,23 @@ export function ProfileHeader({
         )}
       </header>
 
-      <div className="flex items-center justify-between flex-wrap gap-[10px] mt-[14px]">
-        <ProfileStats profile={profile} section={section} artCount={artCount} />
-        <FollowButton subject={profile.did} />
-      </div>
+      {/* Desktop: description | stats | follow in one row (the old layout).
+          Mobile: stats+follow first, description below. */}
+      <div className="flex items-start flex-wrap gap-[24px] mt-[14px] max-[880px]:items-center max-[880px]:gap-[10px]">
+        <div className="flex-1 min-w-[280px] max-[880px]:order-3 max-[880px]:basis-full max-[880px]:min-w-0">
+          {profile.description && (
+            <p className="m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words">
+              {profile.description}
+            </p>
+          )}
+        </div>
 
-      {profile.description && (
-        <p className="m-0 mt-[10px] text-[15.5px] text-paper whitespace-pre-wrap break-words">
-          {profile.description}
-        </p>
-      )}
+        <ProfileStats profile={profile} section={section} artCount={artCount} />
+
+        <div className="flex items-center gap-[8px] py-[6px] max-[880px]:order-2 max-[880px]:py-0">
+          <FollowButton subject={profile.did} />
+        </div>
+      </div>
     </>
   );
 }
