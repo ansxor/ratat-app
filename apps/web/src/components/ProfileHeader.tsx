@@ -9,8 +9,9 @@ import type { Profile } from "#/lib/ratat.ts";
 import { useContentVeil } from "#/lib/settings.tsx";
 import { cn } from "#/lib/utils.ts";
 
-const STAT_VALUE = "font-display text-[18px] font-[500] leading-none";
-const STAT_LABEL = "font-mono text-[9.5px] tracking-[0.16em] uppercase text-faint";
+const STAT_LINK =
+  "no-underline font-bold text-[14px] transition-colors duration-[140ms] hover:text-primary";
+const STAT_LABEL = "text-[12px] opacity-60";
 
 const BSKY_FAVICON = "https://www.google.com/s2/favicons?domain=bsky.app&sz=64";
 // theme-invariant: Bluesky's brand colour, from the old app's connections palette.
@@ -70,36 +71,33 @@ function ProfileStats({
   artCount: number;
 }) {
   return (
-    <div className="flex gap-[18px] py-[4px]">
+    <div className="flex flex-wrap items-baseline gap-x-[10px] gap-y-[6px] py-[4px]">
       <Link
         to="/profile/$handle/followers"
         params={{ handle: profile.handle }}
-        className={cn(
-          "flex flex-col gap-[2px] items-start no-underline",
-          section === "followers" ? "text-primary" : "text-paper",
-        )}
+        className={cn(STAT_LINK, section === "followers" ? "text-primary" : "text-paper")}
       >
-        <b className={STAT_VALUE}>{profile.followersCount ?? 0}</b>
-        <span className={STAT_LABEL}>Followers</span>
+        <b>{profile.followersCount ?? 0}</b> <span className={STAT_LABEL}>Followers</span>
       </Link>
+      <span className="text-[13px] text-faint" aria-hidden="true">
+        ·
+      </span>
       <Link
         to="/profile/$handle/following"
         params={{ handle: profile.handle }}
-        className={cn(
-          "flex flex-col gap-[2px] items-start no-underline",
-          section === "following" ? "text-primary" : "text-paper",
-        )}
+        className={cn(STAT_LINK, section === "following" ? "text-primary" : "text-paper")}
       >
-        <b className={STAT_VALUE}>{profile.followsCount ?? 0}</b>
-        <span className={STAT_LABEL}>Following</span>
+        <b>{profile.followsCount ?? 0}</b> <span className={STAT_LABEL}>Following</span>
       </Link>
+      <span className="text-[13px] text-faint" aria-hidden="true">
+        ·
+      </span>
       <Link
         to="/profile/$handle"
         params={{ handle: profile.handle }}
-        className="flex flex-col gap-[2px] items-start no-underline text-paper"
+        className={cn(STAT_LINK, "text-paper")}
       >
-        <b className={STAT_VALUE}>{artCount}</b>
-        <span className={STAT_LABEL}>Pieces</span>
+        <b>{artCount}</b> <span className={STAT_LABEL}>Pieces</span>
       </Link>
     </div>
   );
@@ -135,9 +133,10 @@ export function ProfileHeader({
         className={cn(
           // `isolate` keeps the banner layer's negative z inside this header.
           "relative isolate overflow-hidden h-[clamp(220px,32vw,320px)] border border-line",
-          // Full-bleed: the header escapes `.wrap`'s inline padding to reach
-          // the window edges, matching the gallery below it.
-          "-mx-[var(--pad)]",
+          // Mobile full-bleed: the header escapes `.wrap`'s inline padding to
+          // reach the window edges, matching the gallery below it. Desktop keeps
+          // the wrap padding.
+          "max-[880px]:-mx-[var(--pad)]",
           "shadow-[0_24px_48px_-36px_var(--shadow-drop)]",
           "before:content-[''] before:absolute before:inset-0 before:pointer-events-none",
           // theme-invariant: contrast over arbitrary user artwork.

@@ -57,7 +57,7 @@ function FollowingPage() {
 
   return (
     <>
-      <main className="gallery pt-0">
+      <main className="gallery max-[880px]:pt-0">
         <div className="wrap layout">
           <div className="feed">
             <ProfileHeader

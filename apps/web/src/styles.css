@@ -431,11 +431,11 @@
   .masonry {
     display: block;
     column-width: 240px;
-    column-gap: 0;
+    column-gap: 0.4rem;
   }
   .masonry > .piece {
     break-inside: avoid;
-    margin-bottom: 0;
+    margin-bottom: 0.4rem;
   }
   @media (max-width: 560px) {
     .masonry {
@@ -446,6 +446,13 @@
     .layout {
       flex-direction: column;
     }
+    /* Mobile: tight, gapless grid. */
+    .masonry {
+      column-gap: 0;
+    }
+    .masonry > .piece {
+      margin-bottom: 0;
+    }
   }
 
   .piece {
@@ -455,9 +462,7 @@
     border-radius: 0;
     overflow: hidden;
     position: relative;
-    /* Distinct border stands in for the removed grid gap, so the tiles still
-       read as separate click targets. */
-    border: 1px solid var(--line-2);
+    border: 1px solid var(--line);
   }
   .piece__open {
     display: block;
@@ -639,7 +644,7 @@
 }
 
 body.show-details .piece__art {
-  border: 1px solid var(--line-2);
+  border: 1px solid var(--line);
 }
 body.show-details .piece__top,
 body.show-details .piece__bar {
@@ -648,4 +653,16 @@ body.show-details .piece__bar {
   opacity: 1;
   background: var(--ink-raised);
   backdrop-filter: none;
+}
+
+/* Mobile: the tile border stands in for the removed grid gap, so tiles still
+   read as separate click targets. Unlayered (and last) so it also wins over
+   the `show-details` border above. */
+@media (max-width: 880px) {
+  .piece__art {
+    border-color: var(--line-2);
+  }
+  body.show-details .piece__art {
+    border-color: var(--line-2);
+  }
 }
