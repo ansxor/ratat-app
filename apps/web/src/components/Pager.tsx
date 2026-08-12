@@ -54,7 +54,7 @@ export function Pager({
     >
       {leading ??
         (pagination?.total !== undefined && (
-          <span className="text-[12px] tracking-[0.04em] text-faint whitespace-nowrap">
+          <span className="text-[12px] tracking-[0.04em] text-faint whitespace-nowrap max-[880px]:hidden">
             {formatTotal(pagination.total, pagination.totalCapped)}{" "}
             {pagination.total === 1 ? countNoun[0] : countNoun[1]}
           </span>

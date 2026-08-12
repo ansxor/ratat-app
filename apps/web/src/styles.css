@@ -665,4 +665,17 @@ body.show-details .piece__bar {
   body.show-details .piece__art {
     border-color: var(--line-2);
   }
+
+  /* Focused masthead search takes the whole row and dims the page behind it. */
+  header:has(input[role="combobox"]:focus) .brand,
+  header:has(input[role="combobox"]:focus) .masthead-actions {
+    display: none;
+  }
+  body:has(header input[role="combobox"]:focus)::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: var(--backdrop);
+  }
 }

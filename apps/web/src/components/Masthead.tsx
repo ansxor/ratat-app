@@ -22,7 +22,7 @@ export function Masthead() {
           <SearchBar />
         </div>
 
-        <div className="flex flex-1 basis-0 items-center justify-end gap-[9px] max-[520px]:gap-[8px] max-[880px]:flex-none">
+        <div className="masthead-actions flex flex-1 basis-0 items-center justify-end gap-[9px] max-[520px]:gap-[8px] max-[880px]:flex-none">
           <QuickSettingsMenu />
           <AuthControl />
         </div>

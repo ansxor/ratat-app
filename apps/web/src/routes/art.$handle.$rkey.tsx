@@ -173,14 +173,18 @@ function ArtworkPage() {
 
   return (
     <>
-      <main className="gallery">
+      <main className="gallery max-[880px]:pt-0">
         <div className="wrap layout">
           <div className="feed">
-            {post.media.length > 1 ? (
-              <MediaCarousel media={post.media} alt={mediaAlt} veil={frameVeil} />
-            ) : (
-              post.media[0] && <MediaFrame media={post.media[0]} alt={mediaAlt} veil={frameVeil} />
-            )}
+            <div className="max-[880px]:-mx-[var(--pad)]">
+              {post.media.length > 1 ? (
+                <MediaCarousel media={post.media} alt={mediaAlt} veil={frameVeil} />
+              ) : (
+                post.media[0] && (
+                  <MediaFrame media={post.media[0]} alt={mediaAlt} veil={frameVeil} />
+                )
+              )}
+            </div>
 
             <div className="mt-[24px] flex items-start gap-[16px]">
               <div className="min-w-0 flex-auto">
@@ -226,8 +230,8 @@ function ArtworkPage() {
 function ArtworkMeta({ post, description }: { post: Post; description: string | undefined }) {
   return (
     <div
+      className="mt-[16px] max-[880px]:mt-0 max-[880px]:-mx-[var(--pad)]"
       style={{
-        marginTop: "16px",
         background: "var(--ink-raised)",
         border: "1px solid var(--line-2)",
         borderRadius: "4px",
