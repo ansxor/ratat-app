@@ -68,21 +68,23 @@ export function FollowButton({
       type="button"
       className={cn("btn btn--ghost", "[&_svg]:size-[14px] text-mist", className)}
       title="Unfollow"
+      aria-label="Unfollow"
       onClick={run(() => unfollow(subject))}
       disabled={pending}
     >
       <CheckIcon />
-      <span>Following</span>
+      <span className="max-[880px]:hidden">Following</span>
     </button>
   ) : (
     <button
       type="button"
       className={cn("btn btn--accent", "[&_svg]:size-[14px]", className)}
+      aria-label="Follow"
       onClick={run(() => follow(subject))}
       disabled={pending}
     >
       <PlusIcon />
-      <span>Follow</span>
+      <span className="max-[880px]:hidden">Follow</span>
     </button>
   );
 }
