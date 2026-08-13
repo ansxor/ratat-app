@@ -186,10 +186,10 @@ export function ProfileHeader({
 
       {/* Desktop: description | stats | follow in one row (the old layout).
           Mobile: stats+follow first, description below. */}
-      <div className="flex items-start flex-wrap gap-[24px] mt-[14px] max-[880px]:items-center max-[880px]:gap-[10px]">
+      <div className="flex items-start flex-wrap gap-[24px] mt-[14px] max-[880px]:items-center max-[880px]:gap-[10px] max-[880px]:-mx-[12px] max-[880px]:mt-[8px]">
         <div className="flex-1 min-w-[280px] max-[880px]:order-3 max-[880px]:basis-full max-[880px]:min-w-0">
           {profile.description && (
-            <p className="m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words">
+            <p className="m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words max-[880px]:text-[13px]">
               {profile.description}
             </p>
           )}

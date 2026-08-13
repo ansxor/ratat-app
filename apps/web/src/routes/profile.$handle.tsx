@@ -92,7 +92,7 @@ function ArtistPage() {
           <div className="feed">
             <ProfileHeader profile={profile} artCount={pagination.total ?? posts.length} />
 
-            <div className="pt-[18px] pb-[40px]">
+            <div className="pt-[18px] pb-[40px] max-[880px]:pt-[8px]">
               {posts.length === 0 ? (
                 <FeedNotice>
                   No artworks to show yet — this artist has posted nothing with media, or Ratat is
