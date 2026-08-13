@@ -244,9 +244,9 @@ function ArtworkMeta({ post, description }: { post: Post; description: string | 
     >
       {description && (
         <div
+          className="text-[15px] max-[880px]:text-[13px]"
           style={{
             padding: "16px",
-            fontSize: "15px",
             lineHeight: 1.6,
             color: "var(--paper)",
             whiteSpace: "pre-wrap",
