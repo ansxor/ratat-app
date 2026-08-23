@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ArtworkGrid } from "#/components/ArtworkGrid.tsx";
 import { FeedNotice } from "#/components/FeedNotice.tsx";
@@ -13,6 +13,7 @@ import {
   paginationSearch,
   useInfinitePagination,
   useMobileInfinitePagination,
+  useScrollToPaginationMode,
   type PagerPagination,
 } from "#/lib/pagination.tsx";
 import { getTimeline, type Timeline } from "#/lib/ratat.ts";
@@ -129,6 +130,7 @@ function HomeFeed({ did, page }: { did: string; page: number }) {
 }
 
 function HomeFeedContent({ did, timeline }: { did: string; timeline: Timeline }) {
+  const anchorRef = useRef<HTMLDivElement>(null);
   const infinite = useInfinitePagination({
     enabled: useMobileInfinitePagination(),
     resetKey: did,
@@ -141,12 +143,18 @@ function HomeFeedContent({ did, timeline }: { did: string; timeline: Timeline })
   const displayTimeline = infinite.lastPage;
   const pagination = paginationFor(displayTimeline);
   const posts = infinite.enabled ? infinite.items : displayTimeline.posts;
+  useScrollToPaginationMode(anchorRef);
 
   return (
     <FeedShell>
       <div className="max-[880px]:-mx-[var(--pad)]">
         {infinite.enabled ? null : <Pager variant="top" pagination={pagination} />}
-        <ArtworkGrid posts={posts} header="pinned" />
+        <ArtworkGrid
+          posts={posts}
+          header="pinned"
+          anchorIndex={infinite.enabled ? infinite.lastPageStart : 0}
+          anchorRef={anchorRef}
+        />
         {infinite.enabled ? (
           <MobileInfinitePagination pagination={infinite} />
         ) : (

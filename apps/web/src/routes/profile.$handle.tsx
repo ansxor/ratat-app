@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useRef } from "react";
 
 import { ArtworkGrid } from "#/components/ArtworkGrid.tsx";
 import { FeedNotice } from "#/components/FeedNotice.tsx";
@@ -11,6 +12,7 @@ import {
   paginationSearch,
   useInfinitePagination,
   useMobileInfinitePagination,
+  useScrollToPaginationMode,
   type PagerPagination,
 } from "#/lib/pagination.tsx";
 import {
@@ -90,6 +92,7 @@ function ArtistPage() {
   const { handle } = Route.useParams();
   const search = Route.useSearch();
   const page = search.page ?? 1;
+  const anchorRef = useRef<HTMLDivElement>(null);
   const infinite = useInfinitePagination({
     enabled: useMobileInfinitePagination(),
     resetKey: profile.did,
@@ -103,6 +106,7 @@ function ArtistPage() {
   const displayPage = displayPortfolio.page ?? page;
   const posts = infinite.enabled ? infinite.items : displayPortfolio.posts;
   const pagination = paginationFor(profile, displayPortfolio, displayPage, handle);
+  useScrollToPaginationMode(anchorRef);
 
   return (
     <>
@@ -119,13 +123,18 @@ function ArtistPage() {
                 </FeedNotice>
               ) : infinite.enabled ? (
                 <>
-                  <ArtworkGrid posts={infinite.items} header="none" />
+                  <ArtworkGrid
+                    posts={infinite.items}
+                    header="none"
+                    anchorIndex={infinite.lastPageStart}
+                    anchorRef={anchorRef}
+                  />
                   <MobileInfinitePagination pagination={infinite} />
                 </>
               ) : (
                 <div className="max-[880px]:-mx-[var(--pad)]">
                   <Pager variant="top" pagination={pagination} />
-                  <ArtworkGrid posts={posts} header="none" />
+                  <ArtworkGrid posts={posts} header="none" anchorIndex={0} anchorRef={anchorRef} />
                   <Pager variant="bottom" pagination={pagination} />
                 </div>
               )}

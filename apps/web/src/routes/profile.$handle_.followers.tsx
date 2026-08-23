@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useRef } from "react";
 
 import { FollowList } from "#/components/FollowList.tsx";
 import { Footer } from "#/components/Footer.tsx";
@@ -8,6 +9,7 @@ import {
   paginationSearch,
   useInfinitePagination,
   useMobileInfinitePagination,
+  useScrollToPaginationMode,
   type PagerPagination,
 } from "#/lib/pagination.tsx";
 import {
@@ -57,6 +59,7 @@ function FollowersPage() {
   const { handle } = Route.useParams();
   const search = Route.useSearch();
   const page = search.page ?? 1;
+  const anchorRef = useRef<HTMLDivElement>(null);
   const infinite = useInfinitePagination({
     enabled: useMobileInfinitePagination(),
     resetKey: `${profile.did}:followers`,
@@ -73,6 +76,7 @@ function FollowersPage() {
   const displayList = infinite.lastPage;
   const displayPage = displayList.page ?? page;
   const pagination = paginationFor(displayList, displayPage, handle);
+  useScrollToPaginationMode(anchorRef);
 
   return (
     <>
@@ -89,6 +93,8 @@ function FollowersPage() {
                 actors={infinite.enabled ? infinite.items : displayList.actors}
                 pagination={pagination}
                 infinite={infinite}
+                anchorIndex={infinite.enabled ? infinite.lastPageStart : 0}
+                anchorRef={anchorRef}
               />
             </div>
           </div>

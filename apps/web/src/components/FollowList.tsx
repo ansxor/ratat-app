@@ -10,6 +10,7 @@ import {
   type PagerPagination,
 } from "#/lib/pagination.tsx";
 import type { FollowActor } from "#/lib/ratat.ts";
+import { Fragment, type RefObject } from "react";
 
 /**
  * Ported from the old app's `src/components/profile/ActorRow.tsx`: same markup
@@ -53,11 +54,15 @@ export function FollowList({
   loading = false,
   pagination,
   infinite,
+  anchorIndex,
+  anchorRef,
 }: {
   actors: FollowActor[];
   loading?: boolean;
   pagination?: PagerPagination;
   infinite?: InfinitePaginationState<FollowActor>;
+  anchorIndex?: number;
+  anchorRef?: RefObject<HTMLDivElement | null>;
 }) {
   if (loading && actors.length === 0) {
     return <p className="text-mist py-[24px]">Loading…</p>;
@@ -68,8 +73,13 @@ export function FollowList({
   return (
     <>
       <div className="border border-line bg-ink-raised">
-        {actors.map((account) => (
-          <FollowRow key={account.uri} account={account} />
+        {actors.map((account, index) => (
+          <Fragment key={account.uri}>
+            {anchorIndex === index && anchorRef ? (
+              <div ref={anchorRef} className="h-0" aria-hidden="true" />
+            ) : null}
+            <FollowRow account={account} />
+          </Fragment>
         ))}
       </div>
       {infinite?.enabled ? (

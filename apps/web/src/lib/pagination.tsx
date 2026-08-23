@@ -49,10 +49,25 @@ export function usePaginationViewport(): PaginationViewport {
   return useContext(PaginationViewportContext);
 }
 
+export function useScrollToPaginationMode(anchorRef: RefObject<HTMLElement | null>): void {
+  const { isMobile } = usePaginationViewport();
+  const previousMode = useRef(isMobile);
+
+  useEffect(() => {
+    if (previousMode.current === isMobile) return;
+    previousMode.current = isMobile;
+    const frame = requestAnimationFrame(() => {
+      anchorRef.current?.scrollIntoView({ block: "start", behavior: "instant" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [anchorRef, isMobile]);
+}
+
 export interface InfinitePaginationState<Item, Page = unknown> {
   enabled: boolean;
   pages: Page[];
   lastPage: Page;
+  lastPageStart: number;
   items: Item[];
   hasNextPage: boolean;
   isLoading: boolean;
@@ -89,6 +104,9 @@ export function useInfinitePagination<Page, Item>(opts: {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const pages = loaded.key === resetKey ? loaded.pages : [initialPage];
   const lastPage = pages[pages.length - 1] ?? initialPage;
+  const lastPageStart = pages
+    .slice(0, -1)
+    .reduce((count, page) => count + getItems(page).length, 0);
   const hasNextPage = enabled && pageHasNext(lastPage);
 
   useEffect(() => {
@@ -144,6 +162,7 @@ export function useInfinitePagination<Page, Item>(opts: {
     enabled,
     pages,
     lastPage,
+    lastPageStart,
     items: pages.flatMap(getItems),
     hasNextPage,
     isLoading,
