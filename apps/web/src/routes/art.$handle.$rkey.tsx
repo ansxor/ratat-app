@@ -19,6 +19,7 @@ import {
 import { BlueskyIcon } from "#/components/ui/icons.tsx";
 import { rkeyOf } from "#/lib/artwork-href.ts";
 import { formatDate } from "#/lib/date.ts";
+import { Image, BLACKOUT_IMAGES } from "#/lib/image.tsx";
 import {
   aspectRatio,
   getAuthorFeed,
@@ -87,7 +88,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
           controls
           playsInline
           data-embla-no-drag
-          poster={media.thumbnail}
+          poster={BLACKOUT_IMAGES ? undefined : media.thumbnail}
           src={media.playlist}
           style={{ aspectRatio: aspectRatio(media), height: "100%", width: "100%" }}
           className="bg-mat object-contain"
@@ -101,7 +102,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
 
   return (
     <div style={style} className={cn(frame, "p-[16px] max-[880px]:p-0")}>
-      <img
+      <Image
         src={media.fullsize}
         alt={covered ? "" : (media.alt ?? alt)}
         className="h-full w-full bg-mat object-contain"
@@ -162,7 +163,7 @@ function ArtistActions({ post }: { post: Post }) {
             className="inline-flex items-center gap-[7px] border-b border-line text-paper rounded-[6px] px-[7px] py-[3px] mx-[-7px] my-[-3px] transition-[background] duration-[140ms] hover:bg-ink-hi max-[880px]:border-b-0"
           >
             {post.author.avatar ? (
-              <img
+              <Image
                 src={post.author.avatar}
                 alt={artistName}
                 width={20}

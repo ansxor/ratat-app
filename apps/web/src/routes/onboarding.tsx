@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
+import { imageBackground } from "#/lib/image.tsx";
 import { useFollows } from "#/lib/follows.tsx";
 import {
   type BlueskyFollow,
@@ -165,11 +166,7 @@ function OnboardingPage() {
                   >
                     <span
                       className="size-[32px] flex-none bg-cover bg-center border border-line shadow-[inset_0_0_0_2px_var(--color-ink-raised)]"
-                      style={{
-                        backgroundImage: account.avatar
-                          ? `url(${account.avatar})`
-                          : PLACEHOLDER_GRADIENT,
-                      }}
+                      style={imageBackground(account.avatar, PLACEHOLDER_GRADIENT)}
                     />
                     <span className="min-w-0 flex-1">
                       <span className="block text-[13.5px] font-[700] leading-[1.25] truncate text-paper">

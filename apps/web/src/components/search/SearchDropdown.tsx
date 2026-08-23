@@ -1,6 +1,7 @@
 import { HighlightMatch } from "#/components/search/HighlightMatch.tsx";
 import { SearchIcon } from "#/components/ui/icons.tsx";
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
+import { imageBackground } from "#/lib/image.tsx";
 import type { ProfileBasic } from "#/lib/ratat.ts";
 import { cn } from "#/lib/utils.ts";
 
@@ -78,11 +79,7 @@ export function SearchDropdown({
                     <>
                       <span
                         className="w-7 h-7 flex-none bg-cover bg-center border border-line-soft"
-                        style={{
-                          backgroundImage: row.actor.avatar
-                            ? `url(${row.actor.avatar})`
-                            : PLACEHOLDER_GRADIENT,
-                        }}
+                        style={imageBackground(row.actor.avatar, PLACEHOLDER_GRADIENT)}
                         aria-hidden="true"
                       />
                       <span className="flex flex-col gap-[1px] min-w-0 flex-1 text-[13px] [&_mark]:bg-transparent [&_mark]:text-primary [&_mark]:font-[800]">

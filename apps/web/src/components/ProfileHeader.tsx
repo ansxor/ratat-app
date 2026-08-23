@@ -5,6 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { ArtworkVeil } from "#/components/content/ArtworkVeil.tsx";
 import { FollowButton } from "#/components/FollowButton.tsx";
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
+import { Image, imageBackground } from "#/lib/image.tsx";
 import type { Profile } from "#/lib/ratat.ts";
 import { useContentVeil } from "#/lib/settings.tsx";
 import { cn } from "#/lib/utils.ts";
@@ -47,7 +48,7 @@ function BlueskyConnection({ url }: { url: string }) {
           B
         </span>
       ) : (
-        <img
+        <Image
           className="size-full box-border bg-ink-raised object-contain p-[3px] group-hover/conn:shadow-[inset_0_0_0_1px_var(--color-primary)]"
           src={BSKY_FAVICON}
           alt=""
@@ -130,8 +131,8 @@ export function ProfileHeader({
   const covered = cover !== null && !peeked;
 
   const name = profile.displayName?.trim() || profile.handle;
-  const bannerBg = profile.banner ? `url(${profile.banner})` : PLACEHOLDER_GRADIENT;
-  const avatarBg = profile.avatar ? `url(${profile.avatar})` : PLACEHOLDER_GRADIENT;
+  const bannerStyle = imageBackground(profile.banner, PLACEHOLDER_GRADIENT);
+  const avatarStyle = imageBackground(profile.avatar, PLACEHOLDER_GRADIENT);
   const blur = covered && cover === "blur" ? "blur(38px)" : undefined;
 
   return (
@@ -154,12 +155,12 @@ export function ProfileHeader({
         <div
           aria-hidden="true"
           className="absolute inset-0 z-[-1] bg-cover bg-center"
-          style={{ backgroundImage: bannerBg, ...(blur ? { filter: blur } : {}) }}
+          style={{ ...bannerStyle, ...(blur ? { filter: blur } : {}) }}
         />
         <div className="absolute inset-0 flex flex-col items-start justify-center gap-[12px] py-[20px] px-[24px] max-[880px]:px-[16px]">
           <div
             className="w-[clamp(96px,14vw,160px)] h-[clamp(96px,14vw,160px)] flex-none bg-cover bg-center border border-line shadow-[inset_0_0_0_3px_var(--color-ink-raised),0_18px_36px_-24px_var(--shadow-drop)]"
-            style={{ backgroundImage: avatarBg, ...(blur ? { filter: blur } : {}) }}
+            style={{ ...avatarStyle, ...(blur ? { filter: blur } : {}) }}
           />
           <div className="flex flex-col items-start gap-[6px]">
             <h1 className="m-0 font-display text-[clamp(22px,4vw,30px)] font-[500] tracking-[-0.02em] leading-[1.1] text-paper bg-overlay backdrop-blur-[8px] border border-line p-[5px_13px]">

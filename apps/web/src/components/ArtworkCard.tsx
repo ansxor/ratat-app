@@ -4,6 +4,7 @@ import { ArtworkVeil, veilFrameClass } from "#/components/content/ArtworkVeil.ts
 import { EngagementButton } from "#/components/EngagementButton.tsx";
 import { BoostIcon, ChatIcon } from "#/components/ui/icons.tsx";
 import { artworkParams } from "#/lib/artwork-href.ts";
+import { Image } from "#/lib/image.tsx";
 import { aspectRatio, isVideo, type Post } from "#/lib/ratat.ts";
 import { useContentVeil } from "#/lib/settings.tsx";
 import { cn } from "#/lib/utils.ts";
@@ -39,7 +40,7 @@ export function ArtworkCard({
         {header !== "none" && (
           <div className="piece__top">
             {post.author.avatar ? (
-              <img
+              <Image
                 className="piece__av"
                 src={post.author.avatar}
                 alt={post.author.displayName ?? post.author.handle}
@@ -69,7 +70,7 @@ export function ArtworkCard({
             params={params}
             aria-label={covered ? "Filtered artwork" : title}
           >
-            <img
+            <Image
               className="canvas h-full w-full object-cover"
               src={isVideo(cover) ? cover.thumbnail : cover.thumb}
               alt={covered ? "" : (cover.alt ?? "")}

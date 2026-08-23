@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { SignInIcon } from "#/components/ui/icons.tsx";
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
+import { imageBackground } from "#/lib/image.tsx";
 import { getProfile } from "#/lib/ratat.ts";
 import { useSession } from "#/lib/session.tsx";
 
@@ -85,15 +86,11 @@ export function AuthControl() {
         aria-haspopup="menu"
         aria-expanded={menuOpen}
         onClick={() => setMenuOpen((open) => !open)}
-        style={
-          avatar
-            ? {
-                backgroundImage: `url(${avatar})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }
-            : { background: PLACEHOLDER_GRADIENT }
-        }
+        style={{
+          ...imageBackground(avatar, PLACEHOLDER_GRADIENT),
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       />
       {menuOpen && (
         <div

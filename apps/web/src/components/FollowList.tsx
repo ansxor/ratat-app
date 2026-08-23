@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { FollowButton } from "#/components/FollowButton.tsx";
 import { Pager } from "#/components/Pager.tsx";
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
+import { imageBackground } from "#/lib/image.tsx";
 import type { PagerPagination } from "#/lib/pagination.ts";
 import type { FollowActor } from "#/lib/ratat.ts";
 
@@ -20,9 +21,7 @@ export function FollowRow({ account }: { account: FollowActor }) {
         to="/profile/$handle"
         params={{ handle: account.handle ?? account.subject }}
         className="size-[32px] flex-none bg-cover bg-center border border-line shadow-[inset_0_0_0_2px_var(--color-ink-raised)]"
-        style={{
-          backgroundImage: account.avatar ? `url(${account.avatar})` : PLACEHOLDER_GRADIENT,
-        }}
+        style={imageBackground(account.avatar, PLACEHOLDER_GRADIENT)}
       />
       <div className="min-w-0 flex-1">
         <Link
