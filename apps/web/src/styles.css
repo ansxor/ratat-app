@@ -40,8 +40,6 @@
 
   --accent: #e54b2a; /* theme-invariant: Ratat brand */
   --accent-ink: #fff3ee; /* theme-invariant: Ratat brand contrast */
-  --pager-active: #d45638; /* theme-invariant: pager reference */
-  --pager-active-ink: #ffffff; /* theme-invariant: pager reference contrast */
   --accent-soft: light-dark(rgba(229, 75, 42, 0.12), rgba(255, 138, 104, 0.16));
   --gilt: light-dark(#b07d2b, #c9a05a);
   --gold: light-dark(#c99a2e, #d9b959);

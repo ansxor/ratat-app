@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 
 import { formatTotal, type PagerPagination, type PagerSlot } from "#/lib/pagination.ts";
@@ -83,10 +82,9 @@ const pageLink = (
   variants: { current?: boolean; step?: boolean; disabled?: boolean } = {},
 ): string =>
   cn(
-    "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:inline-flex max-[880px]:min-h-[52px] max-[880px]:min-w-[52px] max-[880px]:items-center max-[880px]:justify-center max-[880px]:px-[16px] max-[880px]:text-[17px] max-[880px]:font-[700]",
-    variants.current &&
-      "bg-[var(--pager-active)] !text-[var(--pager-active-ink)] hover:bg-[var(--pager-active)] hover:!text-[var(--pager-active-ink)] max-[880px]:size-[52px] max-[880px]:min-h-0 max-[880px]:rounded-full max-[880px]:p-0",
-    variants.step && "text-primary hover:text-accent-ink hover:bg-primary max-[880px]:min-w-[56px]",
+    "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi",
+    variants.current && "bg-primary text-accent-ink hover:bg-primary hover:text-accent-ink",
+    variants.step && "text-primary hover:text-accent-ink hover:bg-primary",
     variants.disabled && "text-faint cursor-not-allowed hover:text-faint hover:bg-transparent",
   );
 
@@ -130,104 +128,88 @@ export function Pager({
 }) {
   const slots = pagination?.slots ?? [];
   const { areaRef, probeRef, visibleCount } = useVisibleSlots(slots);
-  const hasControls = Boolean(pagination && (pagination.slots.length > 1 || pagination.nextLink));
-  const mobileDocked = variant !== "top";
 
   return (
-    <>
-      {/* Reserve space so the last row stays above the fixed mobile controls. */}
-      {mobileDocked && hasControls && <div className="hidden h-[112px] max-[880px]:block" aria-hidden="true" />}
-      <div
-        className={cn(
-          "flex items-center gap-[8px]",
-          variant !== "standalone" &&
-            "bg-[color-mix(in_srgb,var(--color-ink-raised)_92%,transparent)] border border-line px-[10px] py-[4px] mb-[0.4rem] max-[880px]:mb-0",
-          variant === "bottom" && "mt-[0.4rem] mb-0 max-[880px]:mt-0",
-          variant === "standalone" && "justify-center mt-[1.5rem]",
-          variant === "top" && "max-[880px]:hidden",
-          mobileDocked &&
-            "max-[880px]:fixed max-[880px]:bottom-[calc(12px+env(safe-area-inset-bottom))] max-[880px]:left-1/2 max-[880px]:z-30 max-[880px]:w-[calc(100%-24px)] max-[880px]:-translate-x-1/2 max-[880px]:justify-center max-[880px]:rounded-full max-[880px]:border max-[880px]:border-line max-[880px]:bg-[color-mix(in_srgb,var(--color-ink-raised)_96%,transparent)] max-[880px]:px-[8px] max-[880px]:py-[4px] max-[880px]:shadow-[0_8px_24px_color-mix(in_srgb,var(--color-backdrop)_70%,transparent)] max-[880px]:backdrop-blur",
-          !hasControls && "max-[880px]:hidden",
-        )}
-      >
-        {leading ??
-          (pagination?.total !== undefined && (
-            <span className="text-[12px] tracking-[0.04em] text-faint whitespace-nowrap max-[880px]:hidden">
-              {formatTotal(pagination.total, pagination.totalCapped)}{" "}
-              {pagination.total === 1 ? countNoun[0] : countNoun[1]}
-            </span>
-          ))}
-        {hasControls && pagination && (
-          <nav
-            className={cn(
-              "flex min-w-0 items-center gap-[3px] max-[880px]:flex-1",
-              variant !== "standalone" && "ml-auto",
-            )}
-            aria-label="Pagination"
-          >
-            {pagination.prevLink ? (
-              <Link
-                className={pageLink({ step: true })}
-                activeOptions={ACTIVE_OPTIONS}
-                {...pagination.prevLink}
-                aria-label="Previous page"
-              >
-                <ChevronLeft aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
-              </Link>
-            ) : (
-              <span className={pageLink({ step: true, disabled: true })} aria-disabled="true" aria-label="No previous page">
-                <ChevronLeft aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
-              </span>
-            )}
-            <div ref={areaRef} className="min-w-0 flex-1">
-              <div className="flex items-center gap-[3px]">
-                {pagination.slots.map((slot, index) => (
-                  <div
-                    key={slot === "gap" ? `gap-${index}` : slot.page}
-                    className={cn("flex-none", index >= visibleCount && "hidden")}
-                  >
-                    {pageSlot(slot, index, pagination.current)}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div ref={probeRef} className="absolute invisible flex w-max items-center gap-[3px]">
+    <div
+      className={cn(
+        "flex items-center gap-[8px]",
+        variant !== "standalone" &&
+          "bg-[color-mix(in_srgb,var(--color-ink-raised)_92%,transparent)] border border-line px-[10px] py-[4px] mb-[0.4rem] max-[880px]:mb-0",
+        variant === "bottom" && "mt-[0.4rem] mb-0 max-[880px]:mt-0",
+        variant === "standalone" && "justify-center mt-[1.5rem]",
+      )}
+    >
+      {leading ??
+        (pagination?.total !== undefined && (
+          <span className="text-[12px] tracking-[0.04em] text-faint whitespace-nowrap max-[880px]:hidden">
+            {formatTotal(pagination.total, pagination.totalCapped)}{" "}
+            {pagination.total === 1 ? countNoun[0] : countNoun[1]}
+          </span>
+        ))}
+      {pagination && (pagination.slots.length > 1 || pagination.nextLink) && (
+        <nav
+          className={cn(
+            "flex min-w-0 items-center gap-[3px]",
+            variant !== "standalone" && "ml-auto",
+          )}
+          aria-label="Pagination"
+        >
+          {pagination.prevLink && (
+            <Link
+              className={pageLink({ step: true })}
+              activeOptions={ACTIVE_OPTIONS}
+              {...pagination.prevLink}
+            >
+              ‹ Prev
+            </Link>
+          )}
+          <div ref={areaRef} className="min-w-0 flex-1">
+            <div className="flex items-center gap-[3px]">
               {pagination.slots.map((slot, index) => (
                 <div
-                  key={slot === "gap" ? `probe-gap-${index}` : `probe-${slot.page}`}
-                  className="flex-none"
+                  key={slot === "gap" ? `gap-${index}` : slot.page}
+                  className={cn("flex-none", index >= visibleCount && "hidden")}
                 >
-                  {slotProbe(slot, pagination.current)}
+                  {pageSlot(slot, index, pagination.current)}
                 </div>
               ))}
             </div>
-            {pagination.nextLink ? (
-              <Link
-                className={pageLink({ step: true })}
-                activeOptions={ACTIVE_OPTIONS}
-                {...pagination.nextLink}
-                aria-label="Next page"
+          </div>
+          <div ref={probeRef} className="absolute invisible flex w-max items-center gap-[3px]">
+            {pagination.slots.map((slot, index) => (
+              <div
+                key={slot === "gap" ? `probe-gap-${index}` : `probe-${slot.page}`}
+                className="flex-none"
               >
-                <ChevronRight aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
-              </Link>
-            ) : (
-              <span className={pageLink({ step: true, disabled: true })} aria-disabled="true" aria-label="No next page">
-                <ChevronRight aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
-              </span>
-            )}
-            {pagination.lastLink && (
-              <Link
-                className={pageLink({ step: true })}
-                activeOptions={ACTIVE_OPTIONS}
-                {...pagination.lastLink}
-                aria-label={`Last page (${pagination.totalPages})`}
-              >
-                <ChevronsRight aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
-              </Link>
-            )}
-          </nav>
-        )}
-      </div>
-    </>
+                {slotProbe(slot, pagination.current)}
+              </div>
+            ))}
+          </div>
+          {pagination.nextLink ? (
+            <Link
+              className={pageLink({ step: true })}
+              activeOptions={ACTIVE_OPTIONS}
+              {...pagination.nextLink}
+            >
+              Next ›
+            </Link>
+          ) : (
+            <span className={pageLink({ disabled: true })} aria-disabled="true">
+              Next ›
+            </span>
+          )}
+          {pagination.lastLink && (
+            <Link
+              className={pageLink({ step: true })}
+              activeOptions={ACTIVE_OPTIONS}
+              {...pagination.lastLink}
+              aria-label={`Last page (${pagination.totalPages})`}
+            >
+              Last »
+            </Link>
+          )}
+        </nav>
+      )}
+    </div>
   );
 }
