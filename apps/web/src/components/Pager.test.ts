@@ -27,6 +27,9 @@ test("mobile pager docks only the lower pager and reserves space for it", () => 
   expect(pager).toContain('max-[880px]:min-h-[48px]');
   expect(pager).toContain('max-[880px]:min-w-[52px]');
   expect(pager).toContain('max-[880px]:text-[17px]');
+  expect(pager).toContain('max-[880px]:size-[52px]');
+  expect(pager).toContain('max-[880px]:rounded-full');
+  expect(pager).toContain('bg-[var(--pager-active)]');
 });
 
 test("pager uses icon-only controls with accessible labels", () => {

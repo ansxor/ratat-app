@@ -84,7 +84,8 @@ const pageLink = (
 ): string =>
   cn(
     "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:inline-flex max-[880px]:min-h-[48px] max-[880px]:min-w-[52px] max-[880px]:items-center max-[880px]:justify-center max-[880px]:px-[16px] max-[880px]:text-[17px] max-[880px]:font-[700]",
-    variants.current && "bg-primary text-accent-ink hover:bg-primary hover:text-accent-ink",
+    variants.current &&
+      "bg-[var(--pager-active)] text-[var(--pager-active-ink)] hover:bg-[var(--pager-active)] hover:text-[var(--pager-active-ink)] max-[880px]:size-[52px] max-[880px]:min-h-0 max-[880px]:rounded-full max-[880px]:p-0",
     variants.step && "text-primary hover:text-accent-ink hover:bg-primary max-[880px]:min-w-[56px]",
     variants.disabled && "text-faint cursor-not-allowed hover:text-faint hover:bg-transparent",
   );
