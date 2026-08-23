@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 
 import { formatTotal, type PagerPagination, type PagerSlot } from "#/lib/pagination.ts";
@@ -82,9 +83,9 @@ const pageLink = (
   variants: { current?: boolean; step?: boolean; disabled?: boolean } = {},
 ): string =>
   cn(
-    "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:inline-flex max-[880px]:min-h-[48px] max-[880px]:items-center max-[880px]:justify-center max-[880px]:px-[12px]",
+    "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:inline-flex max-[880px]:min-h-[48px] max-[880px]:min-w-[52px] max-[880px]:items-center max-[880px]:justify-center max-[880px]:px-[16px] max-[880px]:text-[17px] max-[880px]:font-[700]",
     variants.current && "bg-primary text-accent-ink hover:bg-primary hover:text-accent-ink",
-    variants.step && "text-primary hover:text-accent-ink hover:bg-primary",
+    variants.step && "text-primary hover:text-accent-ink hover:bg-primary max-[880px]:min-w-[56px]",
     variants.disabled && "text-faint cursor-not-allowed hover:text-faint hover:bg-transparent",
   );
 
@@ -168,8 +169,9 @@ export function Pager({
                 className={pageLink({ step: true })}
                 activeOptions={ACTIVE_OPTIONS}
                 {...pagination.prevLink}
+                aria-label="Previous page"
               >
-                ‹ Prev
+                <ChevronLeft aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
               </Link>
             )}
             <div ref={areaRef} className="min-w-0 flex-1">
@@ -199,12 +201,13 @@ export function Pager({
                 className={pageLink({ step: true })}
                 activeOptions={ACTIVE_OPTIONS}
                 {...pagination.nextLink}
+                aria-label="Next page"
               >
-                Next ›
+                <ChevronRight aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
               </Link>
             ) : (
-              <span className={pageLink({ disabled: true })} aria-disabled="true">
-                Next ›
+              <span className={pageLink({ step: true, disabled: true })} aria-disabled="true" aria-label="No next page">
+                <ChevronRight aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
               </span>
             )}
             {pagination.lastLink && (
@@ -214,7 +217,7 @@ export function Pager({
                 {...pagination.lastLink}
                 aria-label={`Last page (${pagination.totalPages})`}
               >
-                Last »
+                <ChevronsRight aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
               </Link>
             )}
           </nav>

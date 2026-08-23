@@ -25,4 +25,17 @@ test("mobile pager docks only the lower pager and reserves space for it", () => 
   expect(pager).toContain('max-[880px]:bottom-[calc(12px+env(safe-area-inset-bottom))]');
   expect(pager).toContain('hidden h-[112px] max-[880px]:block');
   expect(pager).toContain('max-[880px]:min-h-[48px]');
+  expect(pager).toContain('max-[880px]:min-w-[52px]');
+  expect(pager).toContain('max-[880px]:text-[17px]');
+});
+
+test("pager uses icon-only controls with accessible labels", () => {
+  expect(pager).toContain('aria-label="Previous page"');
+  expect(pager).toContain('aria-label="Next page"');
+  expect(pager).toContain('<ChevronLeft aria-hidden="true"');
+  expect(pager).toContain('<ChevronRight aria-hidden="true"');
+  expect(pager).toContain('<ChevronsRight aria-hidden="true"');
+  expect(pager).not.toContain("‹ Prev");
+  expect(pager).not.toContain("Next ›");
+  expect(pager).not.toContain("Last »");
 });
