@@ -76,7 +76,7 @@ function FollowersPage() {
   const displayList = infinite.lastPage;
   const displayPage = displayList.page ?? page;
   const pagination = paginationFor(displayList, displayPage, handle);
-  useScrollToPaginationMode(anchorRef, !infinite.isPreparing);
+  useScrollToPaginationMode(anchorRef);
 
   return (
     <>
@@ -90,10 +90,10 @@ function FollowersPage() {
             />
             <div className="pt-[18px] pb-[40px]">
               <FollowList
-                actors={infinite.enabled ? infinite.items : displayList.actors}
+                actors={infinite.items}
                 pagination={pagination}
                 infinite={infinite}
-                anchorIndex={infinite.enabled ? infinite.lastPageStart : 0}
+                anchorIndex={infinite.lastPageStart}
                 anchorRef={anchorRef}
               />
             </div>

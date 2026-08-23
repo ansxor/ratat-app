@@ -85,7 +85,12 @@ export function FollowList({
       {infinite?.enabled ? (
         <MobileInfinitePagination pagination={infinite} />
       ) : pagination ? (
-        <Pager variant="standalone" pagination={pagination} countNoun={["account", "accounts"]} />
+        <Pager
+          variant="standalone"
+          pagination={pagination}
+          countNoun={["account", "accounts"]}
+          visualOnly
+        />
       ) : null}
     </>
   );

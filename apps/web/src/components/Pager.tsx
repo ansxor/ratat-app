@@ -85,7 +85,12 @@ const pageLink = (
     variants.disabled && "text-faint cursor-not-allowed hover:text-faint hover:bg-transparent",
   );
 
-function pageSlot(slot: PagerSlot | "gap", index: number, current: number): ReactNode {
+function pageSlot(
+  slot: PagerSlot | "gap",
+  index: number,
+  current: number,
+  visualOnly: boolean,
+): ReactNode {
   if (slot === "gap") {
     return (
       <span key={`gap-${index}`} className="text-faint px-[3px]" aria-hidden="true">
@@ -96,6 +101,13 @@ function pageSlot(slot: PagerSlot | "gap", index: number, current: number): Reac
   if (slot.page === current) {
     return (
       <span key={slot.page} className={pageLink({ current: true })} aria-current="page">
+        {slot.page}
+      </span>
+    );
+  }
+  if (visualOnly) {
+    return (
+      <span key={slot.page} className={pageLink()}>
         {slot.page}
       </span>
     );
@@ -117,11 +129,13 @@ export function Pager({
   leading,
   pagination,
   countNoun = ["work", "works"],
+  visualOnly = false,
 }: {
   variant?: "top" | "bottom" | "standalone";
   leading?: ReactNode;
   pagination?: PagerPagination;
   countNoun?: readonly [string, string];
+  visualOnly?: boolean;
 }) {
   const slots = pagination?.slots ?? [];
   const { areaRef, probeRef, visibleCount } = useVisibleSlots(slots);
@@ -151,15 +165,18 @@ export function Pager({
           )}
           aria-label="Pagination"
         >
-          {pagination.prevLink && (
-            <Link
-              className={pageLink({ step: true })}
-              activeOptions={ACTIVE_OPTIONS}
-              {...pagination.prevLink}
-            >
-              ‹ Prev
-            </Link>
-          )}
+          {pagination.prevLink &&
+            (visualOnly ? (
+              <span className={pageLink({ step: true })}>‹ Prev</span>
+            ) : (
+              <Link
+                className={pageLink({ step: true })}
+                activeOptions={ACTIVE_OPTIONS}
+                {...pagination.prevLink}
+              >
+                ‹ Prev
+              </Link>
+            ))}
           <div ref={areaRef} className="min-w-0 flex-1">
             <div className="flex items-center gap-[3px]">
               {pagination.slots.map((slot, index) => (
@@ -167,7 +184,7 @@ export function Pager({
                   key={slot === "gap" ? `gap-${index}` : slot.page}
                   className={cn("flex-none", index >= visibleCount && "hidden")}
                 >
-                  {pageSlot(slot, index, pagination.current)}
+                  {pageSlot(slot, index, pagination.current, visualOnly)}
                 </div>
               ))}
             </div>
@@ -183,28 +200,35 @@ export function Pager({
             ))}
           </div>
           {pagination.nextLink ? (
-            <Link
-              className={pageLink({ step: true })}
-              activeOptions={ACTIVE_OPTIONS}
-              {...pagination.nextLink}
-            >
-              Next ›
-            </Link>
+            visualOnly ? (
+              <span className={pageLink({ step: true })}>Next ›</span>
+            ) : (
+              <Link
+                className={pageLink({ step: true })}
+                activeOptions={ACTIVE_OPTIONS}
+                {...pagination.nextLink}
+              >
+                Next ›
+              </Link>
+            )
           ) : (
             <span className={pageLink({ disabled: true })} aria-disabled="true">
               Next ›
             </span>
           )}
-          {pagination.lastLink && (
-            <Link
-              className={pageLink({ step: true })}
-              activeOptions={ACTIVE_OPTIONS}
-              {...pagination.lastLink}
-              aria-label={`Last page (${pagination.totalPages})`}
-            >
-              Last »
-            </Link>
-          )}
+          {pagination.lastLink &&
+            (visualOnly ? (
+              <span className={pageLink({ step: true })}>Last »</span>
+            ) : (
+              <Link
+                className={pageLink({ step: true })}
+                activeOptions={ACTIVE_OPTIONS}
+                {...pagination.lastLink}
+                aria-label={`Last page (${pagination.totalPages})`}
+              >
+                Last »
+              </Link>
+            ))}
         </nav>
       )}
     </div>

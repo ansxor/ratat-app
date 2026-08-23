@@ -142,23 +142,23 @@ function HomeFeedContent({ did, timeline }: { did: string; timeline: Timeline })
   });
   const displayTimeline = infinite.lastPage;
   const pagination = paginationFor(displayTimeline);
-  const posts = infinite.enabled ? infinite.items : displayTimeline.posts;
-  useScrollToPaginationMode(anchorRef, !infinite.isPreparing);
+  const posts = infinite.items;
+  useScrollToPaginationMode(anchorRef);
 
   return (
     <FeedShell>
       <div className="max-[880px]:-mx-[var(--pad)]">
-        {infinite.enabled ? null : <Pager variant="top" pagination={pagination} />}
+        {infinite.enabled ? null : <Pager variant="top" pagination={pagination} visualOnly />}
         <ArtworkGrid
           posts={posts}
           header="pinned"
-          anchorIndex={infinite.enabled ? infinite.lastPageStart : 0}
+          anchorIndex={infinite.lastPageStart}
           anchorRef={anchorRef}
         />
         {infinite.enabled ? (
           <MobileInfinitePagination pagination={infinite} />
         ) : (
-          <Pager variant="bottom" pagination={pagination} />
+          <Pager variant="bottom" pagination={pagination} visualOnly />
         )}
       </div>
     </FeedShell>

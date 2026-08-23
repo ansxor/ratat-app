@@ -104,9 +104,9 @@ function ArtistPage() {
   });
   const displayPortfolio = infinite.lastPage;
   const displayPage = displayPortfolio.page ?? page;
-  const posts = infinite.enabled ? infinite.items : displayPortfolio.posts;
+  const posts = infinite.items;
   const pagination = paginationFor(profile, displayPortfolio, displayPage, handle);
-  useScrollToPaginationMode(anchorRef, !infinite.isPreparing);
+  useScrollToPaginationMode(anchorRef);
 
   return (
     <>
@@ -133,9 +133,14 @@ function ArtistPage() {
                 </>
               ) : (
                 <div className="max-[880px]:-mx-[var(--pad)]">
-                  <Pager variant="top" pagination={pagination} />
-                  <ArtworkGrid posts={posts} header="none" anchorIndex={0} anchorRef={anchorRef} />
-                  <Pager variant="bottom" pagination={pagination} />
+                  <Pager variant="top" pagination={pagination} visualOnly />
+                  <ArtworkGrid
+                    posts={posts}
+                    header="none"
+                    anchorIndex={infinite.lastPageStart}
+                    anchorRef={anchorRef}
+                  />
+                  <Pager variant="bottom" pagination={pagination} visualOnly />
                 </div>
               )}
             </div>
