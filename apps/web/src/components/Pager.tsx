@@ -83,7 +83,7 @@ const pageLink = (
   variants: { current?: boolean; step?: boolean; disabled?: boolean } = {},
 ): string =>
   cn(
-    "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:inline-flex max-[880px]:min-h-[48px] max-[880px]:min-w-[52px] max-[880px]:items-center max-[880px]:justify-center max-[880px]:px-[16px] max-[880px]:text-[17px] max-[880px]:font-[700]",
+    "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:inline-flex max-[880px]:min-h-[52px] max-[880px]:min-w-[52px] max-[880px]:items-center max-[880px]:justify-center max-[880px]:px-[16px] max-[880px]:text-[17px] max-[880px]:font-[700]",
     variants.current &&
       "bg-[var(--pager-active)] !text-[var(--pager-active-ink)] hover:bg-[var(--pager-active)] hover:!text-[var(--pager-active-ink)] max-[880px]:size-[52px] max-[880px]:min-h-0 max-[880px]:rounded-full max-[880px]:p-0",
     variants.step && "text-primary hover:text-accent-ink hover:bg-primary max-[880px]:min-w-[56px]",
@@ -165,7 +165,7 @@ export function Pager({
             )}
             aria-label="Pagination"
           >
-            {pagination.prevLink && (
+            {pagination.prevLink ? (
               <Link
                 className={pageLink({ step: true })}
                 activeOptions={ACTIVE_OPTIONS}
@@ -174,6 +174,10 @@ export function Pager({
               >
                 <ChevronLeft aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
               </Link>
+            ) : (
+              <span className={pageLink({ step: true, disabled: true })} aria-disabled="true" aria-label="No previous page">
+                <ChevronLeft aria-hidden="true" className="size-[18px]" strokeWidth={2.5} />
+              </span>
             )}
             <div ref={areaRef} className="min-w-0 flex-1">
               <div className="flex items-center gap-[3px]">
