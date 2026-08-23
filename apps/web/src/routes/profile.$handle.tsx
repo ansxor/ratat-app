@@ -5,7 +5,14 @@ import { FeedNotice } from "#/components/FeedNotice.tsx";
 import { Footer } from "#/components/Footer.tsx";
 import { Pager } from "#/components/Pager.tsx";
 import { ProfileHeader } from "#/components/ProfileHeader.tsx";
-import { pagerLinks, type PagerPagination } from "#/lib/pagination.ts";
+import {
+  MobileInfinitePagination,
+  pagerLinks,
+  paginationSearch,
+  useInfinitePagination,
+  useMobileInfinitePagination,
+  type PagerPagination,
+} from "#/lib/pagination.tsx";
 import {
   getAuthorFeed,
   getProfile,
@@ -21,8 +28,8 @@ const MAX_PAGE = 100;
 
 export const Route = createFileRoute("/profile/$handle")({
   validateSearch: (search: Record<string, unknown>): { page?: number } => {
-    const page = Math.trunc(Number(search.page));
-    return Number.isFinite(page) && page > 1 ? { page: Math.min(page, MAX_PAGE) } : {};
+    const validated = paginationSearch(search);
+    return validated.page === undefined ? {} : { page: Math.min(validated.page, MAX_PAGE) };
   },
   loaderDeps: ({ search }) => ({ page: search.page ?? 1 }),
   loader: async ({ params, deps }) => {
@@ -81,7 +88,17 @@ function paginationFor(
 function ArtistPage() {
   const { profile, portfolio } = Route.useLoaderData();
   const { handle } = Route.useParams();
-  const { page = 1 } = Route.useSearch();
+  const search = Route.useSearch();
+  const page = search.page ?? 1;
+  const infinite = useInfinitePagination({
+    enabled: useMobileInfinitePagination(search.page !== undefined),
+    resetKey: profile.did,
+    initialPage: portfolio,
+    pageNumber: (result) => result.page ?? 1,
+    getItems: (result) => result.posts,
+    hasNextPage: (result) => result.cursor !== undefined,
+    loadPage: (target) => getAuthorFeed(profile.did, { page: target, limit: PAGE_SIZE }),
+  });
   const posts = portfolio.posts;
   const pagination = paginationFor(profile, portfolio, page, handle);
 
@@ -90,7 +107,12 @@ function ArtistPage() {
       <main className="gallery max-[880px]:pt-0">
         <div className="wrap layout">
           <div className="feed">
-            <ProfileHeader profile={profile} artCount={pagination.total ?? posts.length} />
+            <ProfileHeader
+              profile={profile}
+              artCount={
+                pagination.total ?? (infinite.enabled ? infinite.items.length : posts.length)
+              }
+            />
 
             <div className="pt-[18px] pb-[40px] max-[880px]:pt-[8px]">
               {posts.length === 0 ? (
@@ -98,6 +120,11 @@ function ArtistPage() {
                   No artworks to show yet — this artist has posted nothing with media, or Ratat is
                   still reading their work in.
                 </FeedNotice>
+              ) : infinite.enabled ? (
+                <>
+                  <ArtworkGrid posts={infinite.items} header="none" />
+                  <MobileInfinitePagination pagination={infinite} />
+                </>
               ) : (
                 <div className="max-[880px]:-mx-[var(--pad)]">
                   <Pager variant="top" pagination={pagination} />

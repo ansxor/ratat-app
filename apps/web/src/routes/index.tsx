@@ -7,17 +7,21 @@ import { Footer } from "#/components/Footer.tsx";
 import { LoginPanel } from "#/components/LoginPanel.tsx";
 import { Pager } from "#/components/Pager.tsx";
 import { useFollows } from "#/lib/follows.tsx";
-import { pagerLinks, type PagerPagination } from "#/lib/pagination.ts";
+import {
+  MobileInfinitePagination,
+  pagerLinks,
+  paginationSearch,
+  useInfinitePagination,
+  useMobileInfinitePagination,
+  type PagerPagination,
+} from "#/lib/pagination.tsx";
 import { getTimeline, type Timeline } from "#/lib/ratat.ts";
 import { useSession } from "#/lib/session.tsx";
 
 const PAGE_SIZE = 30;
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): { page?: number } => {
-    const page = Math.trunc(Number(search.page));
-    return Number.isFinite(page) && page > 1 ? { page } : {};
-  },
+  validateSearch: paginationSearch,
   component: Home,
 });
 
@@ -27,7 +31,8 @@ export const Route = createFileRoute("/")({
  */
 function Home() {
   const { session, restored } = useSession();
-  const { page = 1 } = Route.useSearch();
+  const search = Route.useSearch();
+  const page = search.page ?? 1;
 
   if (!restored) {
     return (
@@ -37,7 +42,7 @@ function Home() {
     );
   }
   if (!session) return <LoginPanel />;
-  return <HomeFeed did={session.did} page={page} />;
+  return <HomeFeed did={session.did} page={page} hasPageParam={search.page !== undefined} />;
 }
 
 function FeedShell({ children }: { children?: React.ReactNode }) {
@@ -63,7 +68,15 @@ function paginationFor(timeline: Timeline): PagerPagination {
   });
 }
 
-function HomeFeed({ did, page }: { did: string; page: number }) {
+function HomeFeed({
+  did,
+  page,
+  hasPageParam,
+}: {
+  did: string;
+  page: number;
+  hasPageParam: boolean;
+}) {
   const { follows, loaded } = useFollows();
   const [timeline, setTimeline] = useState<Timeline | undefined>(undefined);
   const [failed, setFailed] = useState(false);
@@ -120,14 +133,40 @@ function HomeFeed({ did, page }: { did: string; page: number }) {
     );
   }
 
+  return <HomeFeedContent did={did} timeline={timeline} hasPageParam={hasPageParam} />;
+}
+
+function HomeFeedContent({
+  did,
+  timeline,
+  hasPageParam,
+}: {
+  did: string;
+  timeline: Timeline;
+  hasPageParam: boolean;
+}) {
+  const infinite = useInfinitePagination({
+    enabled: useMobileInfinitePagination(hasPageParam),
+    resetKey: did,
+    initialPage: timeline,
+    pageNumber: (result) => result.page,
+    getItems: (result) => result.posts,
+    hasNextPage: (result) => result.page * PAGE_SIZE < result.total,
+    loadPage: (target) => getTimeline(did, { page: target, limit: PAGE_SIZE }),
+  });
   const pagination = paginationFor(timeline);
+  const posts = infinite.enabled ? infinite.items : timeline.posts;
 
   return (
     <FeedShell>
       <div className="max-[880px]:-mx-[var(--pad)]">
-        <Pager variant="top" pagination={pagination} />
-        <ArtworkGrid posts={timeline.posts} header="pinned" />
-        <Pager variant="bottom" pagination={pagination} />
+        {infinite.enabled ? null : <Pager variant="top" pagination={pagination} />}
+        <ArtworkGrid posts={posts} header="pinned" />
+        {infinite.enabled ? (
+          <MobileInfinitePagination pagination={infinite} />
+        ) : (
+          <Pager variant="bottom" pagination={pagination} />
+        )}
       </div>
     </FeedShell>
   );

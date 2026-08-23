@@ -3,6 +3,7 @@ import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 import { DevLoopbackRedirect } from "#/components/DevLoopbackRedirect.tsx";
 import { Masthead } from "#/components/Masthead.tsx";
 import { FollowsProvider } from "#/lib/follows.tsx";
+import { PaginationViewportProvider } from "#/lib/pagination.tsx";
 import { SessionProvider } from "#/lib/session.tsx";
 import { SettingsProvider } from "#/lib/settings.tsx";
 import { THEME_BOOT_SCRIPT } from "#/lib/theme.ts";
@@ -40,15 +41,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body>
-        <SettingsProvider>
-          <SessionProvider>
-            <FollowsProvider>
-              <DevLoopbackRedirect />
-              <Masthead />
-              {children}
-            </FollowsProvider>
-          </SessionProvider>
-        </SettingsProvider>
+        <PaginationViewportProvider>
+          <SettingsProvider>
+            <SessionProvider>
+              <FollowsProvider>
+                <DevLoopbackRedirect />
+                <Masthead />
+                {children}
+              </FollowsProvider>
+            </SessionProvider>
+          </SettingsProvider>
+        </PaginationViewportProvider>
 
         <Scripts />
       </body>

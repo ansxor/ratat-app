@@ -1,7 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 
-import { formatTotal, type PagerPagination, type PagerSlot } from "#/lib/pagination.ts";
+import {
+  formatTotal,
+  type PagerPagination,
+  type PagerSlot,
+  usePaginationViewport,
+} from "#/lib/pagination.tsx";
 import { cn } from "#/lib/utils.ts";
 
 /**
@@ -29,15 +34,7 @@ function useVisibleSlots(slots: Array<PagerSlot | "gap">): {
   const areaRef = useRef<HTMLDivElement>(null);
   const probeRef = useRef<HTMLDivElement>(null);
   const [visibleCount, setVisibleCount] = useState(0);
-  const [mobile, setMobile] = useState(false);
-
-  useLayoutEffect(() => {
-    const query = window.matchMedia("(max-width: 880px)");
-    const updateMobile = () => setMobile(query.matches);
-    query.addEventListener("change", updateMobile);
-    updateMobile();
-    return () => query.removeEventListener("change", updateMobile);
-  }, []);
+  const { isMobile: mobile } = usePaginationViewport();
 
   useLayoutEffect(() => {
     if (!mobile) {

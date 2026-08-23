@@ -4,7 +4,11 @@ import { FollowButton } from "#/components/FollowButton.tsx";
 import { Pager } from "#/components/Pager.tsx";
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
 import { imageBackground } from "#/lib/image.tsx";
-import type { PagerPagination } from "#/lib/pagination.ts";
+import {
+  MobileInfinitePagination,
+  type InfinitePaginationState,
+  type PagerPagination,
+} from "#/lib/pagination.tsx";
 import type { FollowActor } from "#/lib/ratat.ts";
 
 /**
@@ -48,10 +52,12 @@ export function FollowList({
   actors,
   loading = false,
   pagination,
+  infinite,
 }: {
   actors: FollowActor[];
   loading?: boolean;
   pagination?: PagerPagination;
+  infinite?: InfinitePaginationState<FollowActor>;
 }) {
   if (loading && actors.length === 0) {
     return <p className="text-mist py-[24px]">Loading…</p>;
@@ -66,9 +72,11 @@ export function FollowList({
           <FollowRow key={account.uri} account={account} />
         ))}
       </div>
-      {pagination && (
+      {infinite?.enabled ? (
+        <MobileInfinitePagination pagination={infinite} />
+      ) : pagination ? (
         <Pager variant="standalone" pagination={pagination} countNoun={["account", "accounts"]} />
-      )}
+      ) : null}
     </>
   );
 }

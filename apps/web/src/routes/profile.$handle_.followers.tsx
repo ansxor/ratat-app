@@ -3,7 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { FollowList } from "#/components/FollowList.tsx";
 import { Footer } from "#/components/Footer.tsx";
 import { ProfileHeader } from "#/components/ProfileHeader.tsx";
-import { pagerLinks, type PagerPagination } from "#/lib/pagination.ts";
+import {
+  pagerLinks,
+  paginationSearch,
+  useInfinitePagination,
+  useMobileInfinitePagination,
+  type PagerPagination,
+} from "#/lib/pagination.tsx";
 import {
   getFollowList,
   getProfile,
@@ -14,10 +20,7 @@ import {
 const PAGE_SIZE = 30;
 
 export const Route = createFileRoute("/profile/$handle_/followers")({
-  validateSearch: (search: Record<string, unknown>): { page?: number } => {
-    const page = Math.trunc(Number(search.page));
-    return Number.isFinite(page) && page > 1 ? { page } : {};
-  },
+  validateSearch: paginationSearch,
   loaderDeps: ({ search }) => ({ page: search.page ?? 1 }),
   loader: async ({ params, deps }) => {
     const profile = await getProfile(params.handle).catch((cause: unknown) => {
@@ -52,7 +55,21 @@ function paginationFor(list: FollowListResult, requested: number, handle: string
 function FollowersPage() {
   const { profile, list } = Route.useLoaderData();
   const { handle } = Route.useParams();
-  const { page = 1 } = Route.useSearch();
+  const search = Route.useSearch();
+  const page = search.page ?? 1;
+  const infinite = useInfinitePagination({
+    enabled: useMobileInfinitePagination(search.page !== undefined),
+    resetKey: `${profile.did}:followers`,
+    initialPage: list,
+    pageNumber: (result) => result.page ?? 1,
+    getItems: (result) => result.actors,
+    hasNextPage: (result) =>
+      result.total === undefined
+        ? result.actors.length >= PAGE_SIZE
+        : (result.page ?? 1) * PAGE_SIZE < result.total,
+    loadPage: (target) =>
+      getFollowList(profile.did, "followers", { page: target, limit: PAGE_SIZE }),
+  });
   const pagination = paginationFor(list, page, handle);
 
   return (
@@ -66,7 +83,11 @@ function FollowersPage() {
               section="followers"
             />
             <div className="pt-[18px] pb-[40px]">
-              <FollowList actors={list.actors} pagination={pagination} />
+              <FollowList
+                actors={infinite.enabled ? infinite.items : list.actors}
+                pagination={pagination}
+                infinite={infinite}
+              />
             </div>
           </div>
         </div>
