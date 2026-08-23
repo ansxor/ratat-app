@@ -49,18 +49,28 @@ export function usePaginationViewport(): PaginationViewport {
   return useContext(PaginationViewportContext);
 }
 
-export function useScrollToPaginationMode(anchorRef: RefObject<HTMLElement | null>): void {
+export function useScrollToPaginationMode(
+  anchorRef: RefObject<HTMLElement | null>,
+  ready = true,
+): void {
   const { isMobile } = usePaginationViewport();
   const previousMode = useRef(isMobile);
+  const pendingMode = useRef<boolean | null>(null);
 
   useEffect(() => {
     if (previousMode.current === isMobile) return;
     previousMode.current = isMobile;
+    pendingMode.current = isMobile;
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (pendingMode.current === null || !ready) return;
+    pendingMode.current = null;
     const frame = requestAnimationFrame(() => {
       anchorRef.current?.scrollIntoView({ block: "start", behavior: "instant" });
     });
     return () => cancelAnimationFrame(frame);
-  }, [anchorRef, isMobile]);
+  }, [anchorRef, ready]);
 }
 
 export interface InfinitePaginationState<Item, Page = unknown> {
@@ -68,6 +78,7 @@ export interface InfinitePaginationState<Item, Page = unknown> {
   pages: Page[];
   lastPage: Page;
   lastPageStart: number;
+  isPreparing: boolean;
   items: Item[];
   hasNextPage: boolean;
   isLoading: boolean;
@@ -100,23 +111,64 @@ export function useInfinitePagination<Page, Item>(opts: {
   }));
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const [isBackfilling, setIsBackfilling] = useState(false);
   const requestRef = useRef(0);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const pages = loaded.key === resetKey ? loaded.pages : [initialPage];
   const lastPage = pages[pages.length - 1] ?? initialPage;
+  const firstPage = pages[0] ?? initialPage;
+  const needsBackfill = enabled && pageNumber(firstPage) > 1;
+  const isPreparing = isBackfilling || needsBackfill;
   const lastPageStart = pages
     .slice(0, -1)
     .reduce((count, page) => count + getItems(page).length, 0);
-  const hasNextPage = enabled && pageHasNext(lastPage);
+  const hasNextPage = enabled && !isPreparing && pageHasNext(lastPage);
 
   useEffect(() => {
     requestRef.current += 1;
     setLoaded({ key: resetKey, pages: [initialPage] });
     setIsLoading(false);
+    setIsBackfilling(false);
     setError(null);
   }, [initialPage, resetKey]);
 
+  useEffect(() => {
+    if (!needsBackfill || isBackfilling || error) return;
+
+    const request = ++requestRef.current;
+    const firstPageNumber = pageNumber(firstPage);
+    setIsBackfilling(true);
+    setIsLoading(true);
+    setError(null);
+
+    void (async () => {
+      const preceding: Page[] = [];
+      try {
+        for (let target = firstPageNumber - 1; target >= 1; target -= 1) {
+          preceding.unshift(await loadPage(target));
+        }
+        if (request !== requestRef.current) return;
+        setLoaded((current) =>
+          current.key === resetKey
+            ? { key: resetKey, pages: [...preceding, ...current.pages] }
+            : current,
+        );
+      } catch (cause: unknown) {
+        if (request === requestRef.current) setError(cause);
+      } finally {
+        if (request === requestRef.current) {
+          setIsBackfilling(false);
+          setIsLoading(false);
+        }
+      }
+    })();
+  }, [error, firstPage, isBackfilling, loadPage, needsBackfill, pageNumber, resetKey]);
+
   const loadNext = useCallback(async () => {
+    if (needsBackfill) {
+      setError(null);
+      return;
+    }
     if (!enabled || !hasNextPage || isLoading) return;
 
     const request = ++requestRef.current;
@@ -134,7 +186,7 @@ export function useInfinitePagination<Page, Item>(opts: {
     } finally {
       if (request === requestRef.current) setIsLoading(false);
     }
-  }, [enabled, hasNextPage, isLoading, lastPage, loadPage, pageNumber, resetKey]);
+  }, [enabled, hasNextPage, isLoading, lastPage, loadPage, needsBackfill, pageNumber, resetKey]);
 
   useEffect(() => {
     if (
@@ -163,6 +215,7 @@ export function useInfinitePagination<Page, Item>(opts: {
     pages,
     lastPage,
     lastPageStart,
+    isPreparing,
     items: pages.flatMap(getItems),
     hasNextPage,
     isLoading,

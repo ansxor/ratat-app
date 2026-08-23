@@ -143,7 +143,7 @@ function HomeFeedContent({ did, timeline }: { did: string; timeline: Timeline })
   const displayTimeline = infinite.lastPage;
   const pagination = paginationFor(displayTimeline);
   const posts = infinite.enabled ? infinite.items : displayTimeline.posts;
-  useScrollToPaginationMode(anchorRef);
+  useScrollToPaginationMode(anchorRef, !infinite.isPreparing);
 
   return (
     <FeedShell>

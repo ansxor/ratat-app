@@ -76,7 +76,7 @@ function FollowersPage() {
   const displayList = infinite.lastPage;
   const displayPage = displayList.page ?? page;
   const pagination = paginationFor(displayList, displayPage, handle);
-  useScrollToPaginationMode(anchorRef);
+  useScrollToPaginationMode(anchorRef, !infinite.isPreparing);
 
   return (
     <>

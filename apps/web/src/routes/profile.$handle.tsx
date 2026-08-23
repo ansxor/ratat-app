@@ -106,7 +106,7 @@ function ArtistPage() {
   const displayPage = displayPortfolio.page ?? page;
   const posts = infinite.enabled ? infinite.items : displayPortfolio.posts;
   const pagination = paginationFor(profile, displayPortfolio, displayPage, handle);
-  useScrollToPaginationMode(anchorRef);
+  useScrollToPaginationMode(anchorRef, !infinite.isPreparing);
 
   return (
     <>
