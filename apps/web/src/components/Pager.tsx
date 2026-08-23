@@ -146,7 +146,7 @@ export function Pager({
           variant === "standalone" && "justify-center mt-[1.5rem]",
           variant === "top" && "max-[880px]:hidden",
           mobileDocked &&
-            "max-[880px]:fixed max-[880px]:bottom-[calc(12px+env(safe-area-inset-bottom))] max-[880px]:left-1/2 max-[880px]:z-30 max-[880px]:w-[calc(100%-24px)] max-[880px]:-translate-x-1/2 max-[880px]:justify-center max-[880px]:rounded-[var(--r-md)] max-[880px]:border max-[880px]:border-line max-[880px]:bg-[color-mix(in_srgb,var(--color-ink-raised)_96%,transparent)] max-[880px]:px-[8px] max-[880px]:py-[4px] max-[880px]:shadow-[0_8px_24px_color-mix(in_srgb,var(--color-backdrop)_70%,transparent)] max-[880px]:backdrop-blur",
+            "max-[880px]:fixed max-[880px]:bottom-[calc(12px+env(safe-area-inset-bottom))] max-[880px]:left-1/2 max-[880px]:z-30 max-[880px]:w-[calc(100%-24px)] max-[880px]:-translate-x-1/2 max-[880px]:justify-center max-[880px]:rounded-full max-[880px]:border max-[880px]:border-line max-[880px]:bg-[color-mix(in_srgb,var(--color-ink-raised)_96%,transparent)] max-[880px]:px-[8px] max-[880px]:py-[4px] max-[880px]:shadow-[0_8px_24px_color-mix(in_srgb,var(--color-backdrop)_70%,transparent)] max-[880px]:backdrop-blur",
           !hasControls && "max-[880px]:hidden",
         )}
       >

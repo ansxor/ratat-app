@@ -23,6 +23,7 @@ test("mobile pager docks only the lower pager and reserves space for it", () => 
   expect(pager).toContain('variant === "top" && "max-[880px]:hidden"');
   expect(pager).toContain('max-[880px]:fixed');
   expect(pager).toContain('max-[880px]:bottom-[calc(12px+env(safe-area-inset-bottom))]');
+  expect(pager).toContain('max-[880px]:rounded-full');
   expect(pager).toContain('hidden h-[112px] max-[880px]:block');
   expect(pager).toContain('max-[880px]:min-h-[48px]');
   expect(pager).toContain('max-[880px]:min-w-[52px]');
