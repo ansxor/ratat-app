@@ -104,16 +104,22 @@ export const post = pgTable(
 /**
  * A like on a post we index. Stored only so a like *delete* — which arrives
  * from jetstream carrying no record, and so no subject — can still be
- * attributed to the post it was counted against. Never read for display.
+ * attributed to the post it was counted against. The actor is retained as
+ * well, so the appview can include a viewer's liked state in its timeline
+ * response without asking Bluesky once per card.
  */
 export const postLike = pgTable(
   "post_like",
   {
     uri: text("uri").primaryKey(),
+    did: text("did").notNull(),
     subjectUri: text("subject_uri").notNull(),
     indexedAt: stamp("indexed_at").notNull().defaultNow(),
   },
-  (table) => [index("post_like_subject_idx").on(table.subjectUri)],
+  (table) => [
+    index("post_like_subject_idx").on(table.subjectUri),
+    index("post_like_subject_viewer_idx").on(table.subjectUri, table.did),
+  ],
 );
 
 /**

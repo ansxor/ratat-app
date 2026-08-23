@@ -100,6 +100,7 @@ export const rowProfileViewBasic = (row: ActorRow): NetRatatActorDefs.ProfileVie
 export const rowPostView = (
   row: PostRow,
   author: ActorRow,
+  viewerLike?: string,
 ): NetRatatFeedDefs.PostView | undefined => {
   if (row.media.length === 0) return undefined;
   const bskyUrl = bskyPostUrl(row.did, row.uri);
@@ -113,6 +114,7 @@ export const rowPostView = (
     media: row.media as NetRatatFeedDefs.PostView["media"],
     labels: row.labels,
     likeCount: row.likeCount,
+    ...(viewerLike ? { viewerLike: viewerLike as NetRatatFeedDefs.PostView["viewerLike"] } : {}),
     replyCount: row.replyCount,
     repostCount: row.repostCount,
     bskyUrl: bskyUrl as NetRatatFeedDefs.PostView["bskyUrl"],

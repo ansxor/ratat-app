@@ -1,15 +1,10 @@
 import { Client } from "@atcute/client";
 import type {} from "@atcute/atproto";
 import type {} from "@atcute/bluesky";
-import type { Did, Nsid, ResourceUri } from "@atcute/lexicons";
+import type { Did, Nsid } from "@atcute/lexicons";
 import type { OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { parseAtUri } from "@ratat/common";
 import { BskyCollection } from "@ratat/lexicon/collections";
-
-export interface LikeState {
-  likeCount: number;
-  likeUri?: string;
-}
 
 export interface PostRef {
   uri: string;
@@ -20,28 +15,6 @@ const LIKE_COLLECTION = BskyCollection.feedLike;
 
 function fail(op: string, error: string | undefined): never {
   throw new Error(`${op} failed: ${error ?? "unknown"}`);
-}
-
-/**
- * Reads through the user's PDS, which proxies app.bsky.* to its appview and so
- * answers with viewer state the public appview cannot give us.
- */
-export async function getLikeState(
-  agent: OAuthUserAgent,
-  uri: string,
-  signal?: AbortSignal,
-): Promise<LikeState | undefined> {
-  const res = await new Client({ handler: agent }).get("app.bsky.feed.getPosts", {
-    params: { uris: [uri as ResourceUri] },
-    ...(signal ? { signal } : {}),
-  });
-  if (!res.ok) return undefined;
-  const post = res.data.posts[0];
-  if (!post) return undefined;
-  return {
-    likeCount: post.likeCount ?? 0,
-    ...(post.viewer?.like ? { likeUri: post.viewer.like } : {}),
-  };
 }
 
 export async function createLike(agent: OAuthUserAgent, subject: PostRef): Promise<string> {

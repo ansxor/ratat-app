@@ -48,6 +48,11 @@ export default document({
             "Moderation label values on this post, from the poster's self-labels and from the labelers the Bluesky appview applies. Negations are already resolved away. Clients filter on these device-side.",
           items: string({ maxLength: 128 }),
         }),
+        viewerLike: string({
+          description:
+            "The requesting viewer's indexed app.bsky.feed.like record URI, when they have liked this artwork.",
+          format: "at-uri",
+        }),
         likeCount: integer(),
         replyCount: integer(),
         repostCount: integer(),

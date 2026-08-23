@@ -10,6 +10,7 @@ import { Database, type DbError, type Drizzle } from "@ratat/db/effect";
 import {
   actor,
   post,
+  postLike,
   ratatFollow,
   type ActorRow,
   type PostRow,
@@ -419,6 +420,8 @@ export const graphCounts = (
 export interface TimelineItem {
   readonly post: PostRow;
   readonly author: ActorRow;
+  /** The viewer's indexed like record for this artwork, when one exists. */
+  readonly viewerLike?: string | undefined;
 }
 
 export interface TimelinePage {
@@ -452,17 +455,23 @@ export const timelinePage = (
     const lastPage = Math.max(1, Math.ceil(total / limit));
     const served = Math.min(page, lastPage);
 
-    const items = yield* database.run("timelinePage", (db) =>
+    const rows = yield* database.run("timelinePage", (db) =>
       db
-        .select({ post, author: actor })
+        .select({ post, author: actor, viewerLike: postLike.uri })
         .from(post)
         .innerJoin(actor, eq(actor.did, post.did))
+        .leftJoin(postLike, and(eq(postLike.subjectUri, post.uri), eq(postLike.did, viewer)))
         .where(byFollowedAuthor(viewer))
         .orderBy(desc(post.createdAt), desc(post.uri))
         .limit(limit)
         .offset((served - 1) * limit),
     );
 
+    const items = rows.map(({ post: indexed, author, viewerLike }) => ({
+      post: indexed,
+      author,
+      ...(viewerLike ? { viewerLike } : {}),
+    }));
     return { items, page: served, total };
   });
 

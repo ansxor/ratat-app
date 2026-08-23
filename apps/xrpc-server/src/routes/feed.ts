@@ -266,7 +266,7 @@ export const feedGetTimeline = (
 
     const output: NetRatatFeedGetTimeline.$output = {
       feed: result.items
-        .map((item) => rowPostView(item.post, item.author))
+        .map((item) => rowPostView(item.post, item.author, item.viewerLike))
         .filter((view): view is NetRatatFeedDefs.PostView => view !== undefined),
       page: result.page,
       total: result.total,

@@ -236,7 +236,7 @@ const handleLikeEvent = (
   if (author === undefined || !interested.has(author)) return Effect.void;
 
   counted.add(uri);
-  return applyLike(uri, subject).pipe(
+  return applyLike(uri, event.did, subject).pipe(
     Effect.catchAll((error) => Effect.logWarning(`could not count ${uri}: ${String(error.cause)}`)),
   );
 };

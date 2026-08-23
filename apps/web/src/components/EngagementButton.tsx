@@ -5,7 +5,6 @@ import {
   acknowledgeFirstLike,
   createLike,
   deleteLike,
-  getLikeState,
   hasAcknowledgedFirstLike,
 } from "#/lib/likes.ts";
 import type { Post } from "#/lib/ratat.ts";
@@ -22,7 +21,7 @@ const DETAIL_CLASS =
 export function EngagementButton({ post, variant }: { post: Post; variant: "card" | "detail" }) {
   const { session } = useSession();
   const [count, setCount] = useState(post.likeCount ?? 0);
-  const [likeUri, setLikeUri] = useState<string | undefined>(undefined);
+  const [likeUri, setLikeUri] = useState<string | undefined>(post.viewerLike);
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,19 +30,9 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
 
   useEffect(() => {
     setCount(post.likeCount ?? 0);
-    setLikeUri(undefined);
+    setLikeUri(post.viewerLike);
     setError(null);
-    if (!agent) return;
-
-    const controller = new AbortController();
-    (async () => {
-      const state = await getLikeState(agent, post.uri, controller.signal).catch(() => undefined);
-      if (controller.signal.aborted || !state) return;
-      setCount(state.likeCount);
-      setLikeUri(state.likeUri);
-    })();
-    return () => controller.abort();
-  }, [agent, post.uri, post.likeCount]);
+  }, [post.uri, post.likeCount, post.viewerLike]);
 
   const toggle = async () => {
     if (!agent || pending) return;

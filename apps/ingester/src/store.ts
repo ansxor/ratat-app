@@ -190,10 +190,12 @@ export const updateActorHandle = (
 /**
  * Counts a like, but only against a post we actually index, and only once.
  * The like row exists solely so the matching delete — which arrives with no
- * record, and so no subject — can find the post to decrement.
+ * record, and so no subject — can find the post to decrement. The liker DID
+ * is kept for viewer-specific timeline state.
  */
 export const applyLike = (
   uri: string,
+  did: string,
   subjectUri: string,
 ): Effect.Effect<void, DbError, Database> =>
   Effect.gen(function* () {
@@ -201,8 +203,8 @@ export const applyLike = (
     yield* database.run("applyLike", (db) =>
       db.execute(sql`
         with inserted as (
-          insert into post_like (uri, subject_uri)
-          select ${uri}, ${subjectUri}
+          insert into post_like (uri, did, subject_uri)
+          select ${uri}, ${did}, ${subjectUri}
           where exists (select 1 from post where uri = ${subjectUri})
           on conflict (uri) do nothing
           returning subject_uri

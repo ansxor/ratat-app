@@ -71,6 +71,10 @@ const _postViewSchema = /*#__PURE__*/ v.object(
 			]
 		)),
 		"uri": /*#__PURE__*/ v.resourceUriString(),
+		/**
+		 * The requesting viewer's indexed app.bsky.feed.like record URI, when they have liked this artwork.
+		 */
+		"viewerLike": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.resourceUriString()),
 	}
 );
 const _videoViewSchema = /*#__PURE__*/ v.object(
