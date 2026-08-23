@@ -201,17 +201,27 @@ export const applyLike = (
   Effect.gen(function* () {
     const database = yield* Database;
     yield* database.run("applyLike", (db) =>
-      db.execute(sql`
-        with inserted as (
-          insert into post_like (uri, did, subject_uri)
-          select ${uri}, ${did}, ${subjectUri}
-          where exists (select 1 from post where uri = ${subjectUri})
-          on conflict (uri) do nothing
-          returning subject_uri
-        )
-        update post set like_count = like_count + 1, updated_at = now()
-        where uri in (select subject_uri from inserted)
-      `),
+      db.transaction(async (tx) => {
+        const indexed = await tx
+          .select({ uri: post.uri })
+          .from(post)
+          .where(eq(post.uri, subjectUri))
+          .limit(1);
+        if (indexed.length === 0) return;
+
+        const inserted = await tx
+          .insert(postLike)
+          .values({ uri, did, subjectUri })
+          .onConflictDoNothing()
+          .returning({ subjectUri: postLike.subjectUri });
+        const like = inserted[0];
+        if (!like) return;
+
+        await tx
+          .update(post)
+          .set({ likeCount: sql`${post.likeCount} + 1`, updatedAt: new Date() })
+          .where(eq(post.uri, like.subjectUri));
+      }),
     );
   });
 
@@ -229,13 +239,19 @@ export const removeLike = (uri: string): Effect.Effect<void, DbError, Database> 
   Effect.gen(function* () {
     const database = yield* Database;
     yield* database.run("removeLike", (db) =>
-      db.execute(sql`
-        with removed as (
-          delete from post_like where uri = ${uri} returning subject_uri
-        )
-        update post set like_count = greatest(like_count - 1, 0), updated_at = now()
-        where uri in (select subject_uri from removed)
-      `),
+      db.transaction(async (tx) => {
+        const removed = await tx
+          .delete(postLike)
+          .where(eq(postLike.uri, uri))
+          .returning({ subjectUri: postLike.subjectUri });
+        const like = removed[0];
+        if (!like) return;
+
+        await tx
+          .update(post)
+          .set({ likeCount: sql`greatest(${post.likeCount} - 1, 0)`, updatedAt: new Date() })
+          .where(eq(post.uri, like.subjectUri));
+      }),
     );
   });
 
