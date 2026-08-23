@@ -91,7 +91,7 @@ function ArtistPage() {
   const search = Route.useSearch();
   const page = search.page ?? 1;
   const infinite = useInfinitePagination({
-    enabled: useMobileInfinitePagination(search.page !== undefined),
+    enabled: useMobileInfinitePagination(),
     resetKey: profile.did,
     initialPage: portfolio,
     pageNumber: (result) => result.page ?? 1,
@@ -99,20 +99,17 @@ function ArtistPage() {
     hasNextPage: (result) => result.cursor !== undefined,
     loadPage: (target) => getAuthorFeed(profile.did, { page: target, limit: PAGE_SIZE }),
   });
-  const posts = portfolio.posts;
-  const pagination = paginationFor(profile, portfolio, page, handle);
+  const displayPortfolio = infinite.lastPage;
+  const displayPage = displayPortfolio.page ?? page;
+  const posts = infinite.enabled ? infinite.items : displayPortfolio.posts;
+  const pagination = paginationFor(profile, displayPortfolio, displayPage, handle);
 
   return (
     <>
       <main className="gallery max-[880px]:pt-0">
         <div className="wrap layout">
           <div className="feed">
-            <ProfileHeader
-              profile={profile}
-              artCount={
-                pagination.total ?? (infinite.enabled ? infinite.items.length : posts.length)
-              }
-            />
+            <ProfileHeader profile={profile} artCount={pagination.total ?? posts.length} />
 
             <div className="pt-[18px] pb-[40px] max-[880px]:pt-[8px]">
               {posts.length === 0 ? (

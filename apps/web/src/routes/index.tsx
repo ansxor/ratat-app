@@ -42,7 +42,7 @@ function Home() {
     );
   }
   if (!session) return <LoginPanel />;
-  return <HomeFeed did={session.did} page={page} hasPageParam={search.page !== undefined} />;
+  return <HomeFeed did={session.did} page={page} />;
 }
 
 function FeedShell({ children }: { children?: React.ReactNode }) {
@@ -68,15 +68,7 @@ function paginationFor(timeline: Timeline): PagerPagination {
   });
 }
 
-function HomeFeed({
-  did,
-  page,
-  hasPageParam,
-}: {
-  did: string;
-  page: number;
-  hasPageParam: boolean;
-}) {
+function HomeFeed({ did, page }: { did: string; page: number }) {
   const { follows, loaded } = useFollows();
   const [timeline, setTimeline] = useState<Timeline | undefined>(undefined);
   const [failed, setFailed] = useState(false);
@@ -133,20 +125,12 @@ function HomeFeed({
     );
   }
 
-  return <HomeFeedContent did={did} timeline={timeline} hasPageParam={hasPageParam} />;
+  return <HomeFeedContent did={did} timeline={timeline} />;
 }
 
-function HomeFeedContent({
-  did,
-  timeline,
-  hasPageParam,
-}: {
-  did: string;
-  timeline: Timeline;
-  hasPageParam: boolean;
-}) {
+function HomeFeedContent({ did, timeline }: { did: string; timeline: Timeline }) {
   const infinite = useInfinitePagination({
-    enabled: useMobileInfinitePagination(hasPageParam),
+    enabled: useMobileInfinitePagination(),
     resetKey: did,
     initialPage: timeline,
     pageNumber: (result) => result.page,
@@ -154,8 +138,9 @@ function HomeFeedContent({
     hasNextPage: (result) => result.page * PAGE_SIZE < result.total,
     loadPage: (target) => getTimeline(did, { page: target, limit: PAGE_SIZE }),
   });
-  const pagination = paginationFor(timeline);
-  const posts = infinite.enabled ? infinite.items : timeline.posts;
+  const displayTimeline = infinite.lastPage;
+  const pagination = paginationFor(displayTimeline);
+  const posts = infinite.enabled ? infinite.items : displayTimeline.posts;
 
   return (
     <FeedShell>

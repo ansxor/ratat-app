@@ -12,60 +12,47 @@ import {
 
 interface PaginationViewport {
   isMobile: boolean;
-  hasBeenDesktop: boolean;
 }
 
 const PaginationViewportContext = createContext<PaginationViewport>({
   isMobile: false,
-  hasBeenDesktop: false,
 });
 
-/**
- * Tracks viewport history for pagination. A mobile visit can use infinite
- * scrolling, but once the app has observed a desktop viewport we keep the
- * numbered pager for the rest of the session.
- */
 export function PaginationViewportProvider({ children }: { children: ReactNode }) {
   const [isMobile, setIsMobile] = useState(false);
-  const [hasBeenDesktop, setHasBeenDesktop] = useState(false);
 
   useEffect(() => {
     const query = window.matchMedia("(max-width: 880px)");
-    const update = () => {
-      setIsMobile(query.matches);
-      if (!query.matches) setHasBeenDesktop(true);
-    };
+    const update = () => setIsMobile(query.matches);
     query.addEventListener("change", update);
     update();
     return () => query.removeEventListener("change", update);
   }, []);
 
   return (
-    <PaginationViewportContext.Provider value={{ isMobile, hasBeenDesktop }}>
+    <PaginationViewportContext.Provider value={{ isMobile }}>
       {children}
     </PaginationViewportContext.Provider>
   );
 }
 
-export function useMobileInfinitePagination(hasPageParam: boolean): boolean {
-  const { isMobile, hasBeenDesktop } = useContext(PaginationViewportContext);
-  return shouldUseMobileInfinitePagination({ isMobile, hasBeenDesktop, hasPageParam });
+export function useMobileInfinitePagination(): boolean {
+  const { isMobile } = useContext(PaginationViewportContext);
+  return shouldUseMobileInfinitePagination({ isMobile });
 }
 
-export function shouldUseMobileInfinitePagination(opts: {
-  isMobile: boolean;
-  hasBeenDesktop: boolean;
-  hasPageParam: boolean;
-}): boolean {
-  return opts.isMobile && !opts.hasBeenDesktop && !opts.hasPageParam;
+export function shouldUseMobileInfinitePagination(opts: { isMobile: boolean }): boolean {
+  return opts.isMobile;
 }
 
 export function usePaginationViewport(): PaginationViewport {
   return useContext(PaginationViewportContext);
 }
 
-export interface InfinitePaginationState<Item> {
+export interface InfinitePaginationState<Item, Page = unknown> {
   enabled: boolean;
+  pages: Page[];
+  lastPage: Page;
   items: Item[];
   hasNextPage: boolean;
   isLoading: boolean;
@@ -82,7 +69,7 @@ export function useInfinitePagination<Page, Item>(opts: {
   getItems: (page: Page) => readonly Item[];
   hasNextPage: (page: Page) => boolean;
   loadPage: (page: number) => Promise<Page>;
-}): InfinitePaginationState<Item> {
+}): InfinitePaginationState<Item, Page> {
   const {
     enabled,
     resetKey,
@@ -155,6 +142,8 @@ export function useInfinitePagination<Page, Item>(opts: {
 
   return {
     enabled,
+    pages,
+    lastPage,
     items: pages.flatMap(getItems),
     hasNextPage,
     isLoading,
@@ -164,10 +153,10 @@ export function useInfinitePagination<Page, Item>(opts: {
   };
 }
 
-export function MobileInfinitePagination<Item>({
+export function MobileInfinitePagination<Item, Page>({
   pagination,
 }: {
-  pagination: InfinitePaginationState<Item>;
+  pagination: InfinitePaginationState<Item, Page>;
 }) {
   if (!pagination.enabled) return null;
   return (

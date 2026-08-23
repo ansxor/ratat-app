@@ -12,33 +12,7 @@ test("pagination search ignores invalid page values", () => {
   expect(paginationSearch({ page: "not-a-page" })).toEqual({});
 });
 
-test("mobile infinite pagination has the desktop and URL opt-outs", () => {
-  expect(
-    shouldUseMobileInfinitePagination({
-      isMobile: true,
-      hasBeenDesktop: false,
-      hasPageParam: false,
-    }),
-  ).toBe(true);
-  expect(
-    shouldUseMobileInfinitePagination({
-      isMobile: false,
-      hasBeenDesktop: false,
-      hasPageParam: false,
-    }),
-  ).toBe(false);
-  expect(
-    shouldUseMobileInfinitePagination({
-      isMobile: true,
-      hasBeenDesktop: true,
-      hasPageParam: false,
-    }),
-  ).toBe(false);
-  expect(
-    shouldUseMobileInfinitePagination({
-      isMobile: true,
-      hasBeenDesktop: false,
-      hasPageParam: true,
-    }),
-  ).toBe(false);
+test("mobile infinite pagination follows the viewport mode", () => {
+  expect(shouldUseMobileInfinitePagination({ isMobile: true })).toBe(true);
+  expect(shouldUseMobileInfinitePagination({ isMobile: false })).toBe(false);
 });

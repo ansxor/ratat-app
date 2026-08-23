@@ -58,7 +58,7 @@ function FollowersPage() {
   const search = Route.useSearch();
   const page = search.page ?? 1;
   const infinite = useInfinitePagination({
-    enabled: useMobileInfinitePagination(search.page !== undefined),
+    enabled: useMobileInfinitePagination(),
     resetKey: `${profile.did}:followers`,
     initialPage: list,
     pageNumber: (result) => result.page ?? 1,
@@ -70,7 +70,9 @@ function FollowersPage() {
     loadPage: (target) =>
       getFollowList(profile.did, "followers", { page: target, limit: PAGE_SIZE }),
   });
-  const pagination = paginationFor(list, page, handle);
+  const displayList = infinite.lastPage;
+  const displayPage = displayList.page ?? page;
+  const pagination = paginationFor(displayList, displayPage, handle);
 
   return (
     <>
@@ -84,7 +86,7 @@ function FollowersPage() {
             />
             <div className="pt-[18px] pb-[40px]">
               <FollowList
-                actors={infinite.enabled ? infinite.items : list.actors}
+                actors={infinite.enabled ? infinite.items : displayList.actors}
                 pagination={pagination}
                 infinite={infinite}
               />
