@@ -114,7 +114,7 @@ function ArtistPage() {
   );
 }
 
-function ArtistShell({ children }: { children: React.ReactNode }) {
+export function ArtistShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="gallery">
       <div className="wrap layout">
