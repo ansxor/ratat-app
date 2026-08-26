@@ -79,7 +79,7 @@ const pageLink = (
   variants: { current?: boolean; step?: boolean; disabled?: boolean } = {},
 ): string =>
   cn(
-    "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi",
+    "inline-flex items-center text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:min-h-[40px] max-[880px]:px-[10px] max-[880px]:py-[8px]",
     variants.current &&
       "bg-primary !text-[var(--pager-active-ink)] hover:bg-primary hover:!text-[var(--pager-active-ink)]",
     variants.step && "text-primary hover:!text-[var(--pager-active-ink)] hover:bg-primary",
@@ -146,7 +146,7 @@ export function Pager({
       className={cn(
         "flex items-center gap-[8px]",
         variant !== "standalone" &&
-          "bg-[color-mix(in_srgb,var(--color-ink-raised)_92%,transparent)] border border-line px-[10px] py-[4px] mb-[0.4rem] max-[880px]:mb-0",
+          "bg-[color-mix(in_srgb,var(--color-ink-raised)_92%,transparent)] border border-line px-[10px] py-[4px] mb-[0.4rem] max-[880px]:mb-0 max-[880px]:py-[8px]",
         variant === "bottom" && "mt-[0.4rem] mb-0 max-[880px]:mt-0",
         variant === "standalone" && "justify-center mt-[1.5rem]",
       )}
@@ -162,7 +162,7 @@ export function Pager({
         <nav
           className={cn(
             "flex min-w-0 items-center gap-[3px]",
-            variant !== "standalone" && "ml-auto",
+            variant !== "standalone" && "ml-auto max-[880px]:w-full",
           )}
           aria-label="Pagination"
         >
