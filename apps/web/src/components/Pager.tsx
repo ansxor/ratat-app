@@ -139,6 +139,7 @@ export function Pager({
         "flex items-center gap-[8px]",
         variant !== "standalone" &&
           "bg-[color-mix(in_srgb,var(--color-ink-raised)_92%,transparent)] border border-line px-[10px] py-[4px] mb-[0.4rem] max-[880px]:mb-0",
+        variant === "top" && "max-[880px]:hidden",
         variant === "bottom" && "mt-[0.4rem] mb-0 max-[880px]:mt-0",
         variant === "standalone" && "justify-center mt-[1.5rem]",
       )}

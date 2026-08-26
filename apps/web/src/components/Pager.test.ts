@@ -24,3 +24,8 @@ test("mobile pager controls have larger touch targets", () => {
   expect(pager).toContain("max-[880px]:min-h-[44px]");
   expect(pager).toContain("max-[880px]:min-w-[44px]");
 });
+
+test("top pager is hidden on mobile without hiding other variants", () => {
+  expect(pager).toContain('variant === "top" && "max-[880px]:hidden"');
+  expect(pager).toContain('variant === "bottom" && "mt-[0.4rem] mb-0 max-[880px]:mt-0"');
+});
