@@ -1,12 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 
-import {
-  formatTotal,
-  type PagerPagination,
-  type PagerSlot,
-  usePaginationViewport,
-} from "#/lib/pagination.tsx";
+import { type PagerPagination, type PagerSlot, usePaginationViewport } from "#/lib/pagination.tsx";
 import { cn } from "#/lib/utils.ts";
 
 /**
@@ -79,7 +74,7 @@ const pageLink = (
   variants: { current?: boolean; step?: boolean; disabled?: boolean } = {},
 ): string =>
   cn(
-    "inline-flex items-center text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:min-h-[40px] max-[880px]:px-[10px] max-[880px]:py-[8px]",
+    "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi",
     variants.current &&
       "bg-primary !text-[var(--pager-active-ink)] hover:bg-primary hover:!text-[var(--pager-active-ink)]",
     variants.step && "text-primary hover:!text-[var(--pager-active-ink)] hover:bg-primary",
@@ -129,13 +124,11 @@ export function Pager({
   variant = "top",
   leading,
   pagination,
-  countNoun = ["work", "works"],
   visualOnly = false,
 }: {
   variant?: "top" | "bottom" | "standalone";
   leading?: ReactNode;
   pagination?: PagerPagination;
-  countNoun?: readonly [string, string];
   visualOnly?: boolean;
 }) {
   const slots = pagination?.slots ?? [];
@@ -146,23 +139,17 @@ export function Pager({
       className={cn(
         "flex items-center gap-[8px]",
         variant !== "standalone" &&
-          "bg-[color-mix(in_srgb,var(--color-ink-raised)_92%,transparent)] border border-line px-[10px] py-[4px] mb-[0.4rem] max-[880px]:mb-0 max-[880px]:py-[8px]",
+          "bg-[color-mix(in_srgb,var(--color-ink-raised)_92%,transparent)] border border-line px-[10px] py-[4px] mb-[0.4rem] max-[880px]:mb-0",
         variant === "bottom" && "mt-[0.4rem] mb-0 max-[880px]:mt-0",
         variant === "standalone" && "justify-center mt-[1.5rem]",
       )}
     >
-      {leading ??
-        (pagination?.total !== undefined && (
-          <span className="text-[12px] tracking-[0.04em] text-faint whitespace-nowrap max-[880px]:hidden">
-            {formatTotal(pagination.total, pagination.totalCapped)}{" "}
-            {pagination.total === 1 ? countNoun[0] : countNoun[1]}
-          </span>
-        ))}
+      {leading}
       {pagination && (pagination.slots.length > 1 || pagination.nextLink) && (
         <nav
           className={cn(
             "flex min-w-0 items-center gap-[3px]",
-            variant !== "standalone" && "ml-auto max-[880px]:w-full",
+            variant !== "standalone" && "ml-auto",
           )}
           aria-label="Pagination"
         >
