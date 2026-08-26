@@ -4,7 +4,7 @@ import type { CSSProperties, ImgHTMLAttributes } from "react";
  * Keeps screenshots and demos free of external artwork when explicitly enabled
  * at build time. Vite exposes only `VITE_`-prefixed variables to the browser.
  */
-export const BLACKOUT_IMAGES = import.meta.env.VITE_RATAT_BLACKOUT_IMAGES === "true";
+export const BLACKOUT_IMAGES = false;
 
 /** Returns CSS background styles without ever requesting the source in blackout mode. */
 export function imageBackground(source: string | undefined, fallback: string): CSSProperties {
