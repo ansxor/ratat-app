@@ -15,7 +15,6 @@ import {
 import {
   CATEGORY_META,
   FILTER_CATEGORIES,
-  filterSummary,
   MODE_META,
   VEIL_MODES,
   type VeilMode,
@@ -170,9 +169,6 @@ export function QuickSettingsMenu() {
             </label>
           </div>
 
-          <div className="bg-ink px-[12px] py-[8px] text-[11px] text-faint">
-            {filterSummary(filters)}
-          </div>
         </div>
       )}
     </div>
