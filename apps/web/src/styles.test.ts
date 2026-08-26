@@ -26,7 +26,7 @@ test("the focused mobile search overlays the masthead with a spring transition",
     /\.masthead-search--overlay\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?inset-inline-start:\s*var\(--masthead-search-start\);[\s\S]*?inset-inline-end:\s*var\(--masthead-search-end\);[\s\S]*?inset-inline-end 320ms cubic-bezier\(0\.34, 1\.45, 0\.64, 1\)/,
   );
   expect(styles).toMatch(
-    /\.masthead-search--overlay\.masthead-search--expanded\s*\{[\s\S]*?inset-inline-end 480ms cubic-bezier\(0\.4, 0\.15, 0\.25, 1\.3\)/,
+    /\.masthead-search--overlay\.masthead-search--expanded\s*\{[\s\S]*?inset-inline-end 430ms cubic-bezier\(0\.4, 0\.15, 0\.25, 1\.3\)/,
   );
 });
 
