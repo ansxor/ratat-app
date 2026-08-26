@@ -7,8 +7,6 @@ import { SearchField } from "#/components/search/SearchField.tsx";
  */
 export function SearchBar() {
   return (
-    <SearchField
-      className="allow-width-transition relative shrink-0 w-[340px] transition-[width] duration-[260ms] ease-out focus-within:w-[460px] motion-reduce:transition-none max-[880px]:w-full max-[880px]:min-w-0 max-[880px]:focus-within:w-full"
-    />
+    <SearchField className="relative shrink-0 w-[340px] transition-[width] duration-[260ms] ease-out focus-within:w-[460px] motion-reduce:transition-none max-[880px]:hidden" />
   );
 }
