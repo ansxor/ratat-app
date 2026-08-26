@@ -1,5 +1,17 @@
 # Agent Instructions
 
+## Worktree development
+
+Run `just worktree-start` from the worktree root to start Postgres and the
+Pitchfork servers. Mise derives a worktree-specific port base and Compose
+project name from the worktree root, so each worktree gets isolated web, API,
+and Postgres ports. Use `just down` to stop the worktree services.
+
+At the end of every task, leave the application running with the applied
+changes and verify it is reachable. Include the active web and API ports and
+URLs in the handoff (use `mise env` or the running service output to determine
+them). Do not stop the services before handing off unless explicitly asked.
+
 This project uses **bd** (beads) for issue tracking. Run `bd prime` for full workflow context.
 
 > **Architecture in one line:** Issues live in a local Dolt database

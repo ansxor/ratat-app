@@ -12,12 +12,17 @@ up:
     {{ support }} up -d --wait
 
 down:
+    -pitchfork stop -l
     -{{ support }} down --remove-orphans
 
 down-hard:
+    -pitchfork stop -l
     -{{ support }} down --remove-orphans -v
 
 start-all: up migrate dev
+
+# Start this worktree with its isolated ports and Compose project.
+worktree-start: start-all
 
 # Restart every local development daemon, including Postgres via pitchfork.
 restart:
