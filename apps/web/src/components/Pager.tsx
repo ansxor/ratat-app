@@ -81,7 +81,7 @@ const pageLink = (
   cn(
     "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi",
     variants.current &&
-      "bg-primary text-[var(--pager-active-ink)] hover:bg-primary hover:text-[var(--pager-active-ink)]",
+      "bg-primary !text-[var(--pager-active-ink)] hover:bg-primary hover:!text-[var(--pager-active-ink)]",
     variants.step && "text-primary hover:text-accent-ink hover:bg-primary",
     variants.disabled && "text-faint cursor-not-allowed hover:text-faint hover:bg-transparent",
   );
