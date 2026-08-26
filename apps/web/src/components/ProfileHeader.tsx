@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Link } from "@tanstack/react-router";
 
@@ -117,6 +117,60 @@ function ProfileStats({
  * followed a link to an artist asked for this page, and the works below are
  * filtered on their own labels anyway.
  */
+
+function ProfileBio({ description, bioId }: { description?: string | null; bioId: string }) {
+  const bioRef = useRef<HTMLParagraphElement>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [canExpand, setCanExpand] = useState(false);
+
+  useEffect(() => {
+    setExpanded(false);
+    setCanExpand(false);
+  }, [description]);
+
+  useEffect(() => {
+    const bio = bioRef.current;
+    if (!bio || expanded) return;
+
+    const checkOverflow = () => setCanExpand(bio.scrollHeight > bio.clientHeight + 1);
+    checkOverflow();
+    const observer = new ResizeObserver(checkOverflow);
+    observer.observe(bio);
+    return () => observer.disconnect();
+  }, [description, expanded]);
+
+  if (!description)
+    return (
+      <div className="flex-1 min-w-[280px] max-[880px]:order-3 max-[880px]:basis-full max-[880px]:min-w-0" />
+    );
+
+  return (
+    <div className="flex-1 min-w-[280px] max-[880px]:order-3 max-[880px]:basis-full max-[880px]:min-w-0">
+      <p
+        ref={bioRef}
+        id={bioId}
+        className={cn(
+          "m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words max-[880px]:text-[13px]",
+          !expanded && "line-clamp-4",
+        )}
+      >
+        {description}
+      </p>
+      {canExpand && (
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={bioId}
+          className="mt-[3px] cursor-pointer border-0 bg-transparent p-0 text-primary font-bold underline"
+          onClick={() => setExpanded((isExpanded) => !isExpanded)}
+        >
+          {expanded ? "Show less" : "Show more"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function ProfileHeader({
   profile,
   artCount,
@@ -188,13 +242,10 @@ export function ProfileHeader({
       {/* Desktop: description | stats | follow in one row (the old layout).
           Mobile: stats+follow first, description below. */}
       <div className="flex items-start flex-wrap gap-[24px] mt-[14px] max-[880px]:items-center max-[880px]:gap-[10px] max-[880px]:-mx-[12px] max-[880px]:mt-[8px]">
-        <div className="flex-1 min-w-[280px] max-[880px]:order-3 max-[880px]:basis-full max-[880px]:min-w-0">
-          {profile.description && (
-            <p className="m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words max-[880px]:text-[13px]">
-              {profile.description}
-            </p>
-          )}
-        </div>
+        <ProfileBio
+          description={profile.description}
+          bioId={`profile-bio-${profile.did.replace(/[^a-zA-Z0-9_-]/g, "-")}`}
+        />
 
         <ProfileStats profile={profile} section={section} artCount={artCount} />
 
