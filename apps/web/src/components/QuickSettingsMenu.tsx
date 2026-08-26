@@ -126,10 +126,6 @@ export function QuickSettingsMenu() {
             aria-hidden="true"
             className="absolute -top-[5px] right-[10px] size-[8px] rotate-45 bg-ink border-l border-t border-paper"
           />
-          <p className="m-0 bg-ink border-b border-line px-[12px] py-[7px] text-[10.5px] font-[800] tracking-[0.12em] uppercase text-mist">
-            Quick settings
-          </p>
-
           {FILTER_CATEGORIES.map((category) => (
             <SettingRow
               key={category}
