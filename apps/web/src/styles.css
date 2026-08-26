@@ -331,9 +331,35 @@
       transition: none !important;
       scroll-behavior: auto;
     }
+  }
 
-    .allow-width-transition {
-      transition: width 260ms ease-out !important;
+  @media (max-width: 880px) {
+    .masthead-row {
+      transition: gap 260ms ease-out;
+    }
+
+    .masthead-leading,
+    .masthead-actions {
+      flex: 1 1 0 !important;
+      overflow: hidden;
+      transition:
+        flex-grow 260ms ease-out,
+        opacity 180ms ease-out;
+    }
+
+    .masthead-search {
+      flex: 1.4 1 0 !important;
+      transition: flex-grow 260ms ease-out;
+    }
+
+    .masthead-row:has(.masthead-search:focus-within) {
+      gap: 0;
+    }
+
+    .masthead-row:has(.masthead-search:focus-within) .masthead-leading,
+    .masthead-row:has(.masthead-search:focus-within) .masthead-actions {
+      flex-grow: 0 !important;
+      opacity: 0;
     }
   }
 
