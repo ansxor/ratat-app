@@ -18,3 +18,9 @@ test("mobile pager measures whole page controls instead of clipping their text",
 test("mobile pager keeps each visible page control intact", () => {
   expect(pager).toContain('className={cn("flex-none", index >= visibleCount && "hidden")}');
 });
+
+test("mobile pager controls have larger touch targets", () => {
+  expect(pager).toContain("max-[880px]:inline-flex");
+  expect(pager).toContain("max-[880px]:min-h-[44px]");
+  expect(pager).toContain("max-[880px]:min-w-[44px]");
+});
