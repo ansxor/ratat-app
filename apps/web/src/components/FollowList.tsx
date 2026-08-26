@@ -89,7 +89,6 @@ export function FollowList({
           variant="standalone"
           pagination={pagination}
           countNoun={["account", "accounts"]}
-          visualOnly
         />
       ) : null}
     </>

@@ -148,7 +148,7 @@ function HomeFeedContent({ did, timeline }: { did: string; timeline: Timeline })
   return (
     <FeedShell>
       <div className="max-[880px]:-mx-[var(--pad)]">
-        {infinite.enabled ? null : <Pager variant="top" pagination={pagination} visualOnly />}
+        {infinite.enabled ? null : <Pager variant="top" pagination={pagination} />}
         <ArtworkGrid
           posts={posts}
           header="pinned"
@@ -158,7 +158,7 @@ function HomeFeedContent({ did, timeline }: { did: string; timeline: Timeline })
         {infinite.enabled ? (
           <MobileInfinitePagination pagination={infinite} />
         ) : (
-          <Pager variant="bottom" pagination={pagination} visualOnly />
+          <Pager variant="bottom" pagination={pagination} />
         )}
       </div>
     </FeedShell>

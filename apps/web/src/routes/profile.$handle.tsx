@@ -133,14 +133,14 @@ function ArtistPage() {
                 </>
               ) : (
                 <div className="max-[880px]:-mx-[var(--pad)]">
-                  <Pager variant="top" pagination={pagination} visualOnly />
+                  <Pager variant="top" pagination={pagination} />
                   <ArtworkGrid
                     posts={posts}
                     header="none"
                     anchorIndex={infinite.lastPageStart}
                     anchorRef={anchorRef}
                   />
-                  <Pager variant="bottom" pagination={pagination} visualOnly />
+                  <Pager variant="bottom" pagination={pagination} />
                 </div>
               )}
             </div>
