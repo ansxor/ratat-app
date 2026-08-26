@@ -31,9 +31,8 @@ reconcile with.
 
 `lib/content-filter.ts` is the pure half: no React, no storage, so a server
 render and a client render reach the same answer from the same labels.
-`lib/settings.tsx` is the store, and also holds the theme and the "always show
-details" toggle, because quick settings is one popover and all three are device
-state.
+`lib/settings.tsx` is the store for the filters and theme, because quick
+settings is one popover and both are device state.
 
 ## Categories and modes
 
@@ -73,7 +72,6 @@ the page away, because a link to a work is a link somebody followed on purpose.
 
 ## Where the settings are
 
-`QuickSettingsMenu` sits in the masthead, not on the Pager as the old app's
-"always show details" toggle did. The Pager only renders where there are works
-to page through, and a device that had just hidden everything would otherwise
-have had no way back to the setting that hid it.
+`QuickSettingsMenu` sits in the masthead so content filters remain available
+even when they hide every artwork. The Pager only renders where there are works
+to page through.

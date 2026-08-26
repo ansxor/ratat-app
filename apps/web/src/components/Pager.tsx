@@ -8,9 +8,8 @@ import { cn } from "#/lib/utils.ts";
  * Ported from the old app's `src/components/Pager.tsx`: same markup and
  * classes, with `cva` folded into `cn` and Next's `Link` swapped for the
  * router's. The old app's `captureEvent` call is dropped — no observability
- * library here yet. Its settings cog is dropped too: "always show details"
- * moved into the masthead's quick settings, where it is reachable from a page
- * with nothing to page through.
+ * library here yet. Its settings cog is dropped because pager controls belong
+ * with pagination, while content settings live in the masthead.
  */
 
 /**
