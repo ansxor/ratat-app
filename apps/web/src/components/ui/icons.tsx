@@ -3,6 +3,8 @@ export {
   ArrowRight as ArrowRightIcon,
   Check as CheckIcon,
   ChevronRight as ChevronRightIcon,
+  ChevronDown as ChevronDownIcon,
+  ChevronUp as ChevronUpIcon,
   Eye as EyeIcon,
   EyeOff as EyeOffIcon,
   Grid2x2 as BlurIcon,

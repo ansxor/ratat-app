@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Link } from "@tanstack/react-router";
 
+import { ChevronDownIcon, ChevronUpIcon } from "#/components/ui/icons.tsx";
 import { ArtworkVeil } from "#/components/content/ArtworkVeil.tsx";
 import { FollowButton } from "#/components/FollowButton.tsx";
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
@@ -161,9 +162,14 @@ function ProfileBio({ description, bioId }: { description?: string | null; bioId
           type="button"
           aria-expanded={expanded}
           aria-controls={bioId}
-          className="mt-[3px] cursor-pointer border-0 bg-transparent p-0 text-faint text-[12px] font-bold underline hover:text-paper"
+          className="mt-[3px] inline-flex cursor-pointer items-center gap-[2px] border-0 bg-transparent p-0 text-faint text-[12px] font-bold underline hover:text-paper"
           onClick={() => setExpanded((isExpanded) => !isExpanded)}
         >
+          {expanded ? (
+            <ChevronUpIcon className="size-[12px]" aria-hidden="true" />
+          ) : (
+            <ChevronDownIcon className="size-[12px]" aria-hidden="true" />
+          )}
           {expanded ? "Show less" : "Show more"}
         </button>
       )}
