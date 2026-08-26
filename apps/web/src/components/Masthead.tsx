@@ -4,7 +4,6 @@ import { AuthControl } from "#/components/AuthControl.tsx";
 import { BrandMark } from "#/components/BrandMark.tsx";
 import { MastheadNav } from "#/components/MastheadNav.tsx";
 import { QuickSettingsMenu } from "#/components/QuickSettingsMenu.tsx";
-import { MobileSearch } from "#/components/search/MobileSearch.tsx";
 import { SearchBar } from "#/components/search/SearchBar.tsx";
 
 export function Masthead() {
@@ -19,9 +18,8 @@ export function Masthead() {
           <MastheadNav />
         </div>
 
-        <div className="flex items-center gap-[9px] max-[520px]:gap-[8px]">
+        <div className="flex items-center gap-[9px] max-[520px]:gap-[8px] max-[880px]:flex-1 max-[880px]:min-w-0">
           <SearchBar />
-          <MobileSearch />
         </div>
 
         <div className="masthead-actions flex flex-1 basis-0 items-center justify-end gap-[9px] max-[520px]:gap-[8px] max-[880px]:flex-none">

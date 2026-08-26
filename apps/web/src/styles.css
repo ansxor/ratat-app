@@ -331,6 +331,10 @@
       transition: none !important;
       scroll-behavior: auto;
     }
+
+    .allow-width-transition {
+      transition: width 260ms ease-out !important;
+    }
   }
 
   *:focus-visible {
