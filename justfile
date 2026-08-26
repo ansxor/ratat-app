@@ -21,8 +21,8 @@ down-hard:
 
 start-all: up migrate dev
 
-# Start this worktree with its isolated ports and Compose project.
-worktree-start: start-all
+# Start this worktree with its isolated ports and Compose project, then migrate its database.
+worktree-start: up migrate dev
 
 # Restart every local development daemon, including Postgres via pitchfork.
 restart:
