@@ -21,6 +21,15 @@ test("the search combobox disables document scroll padding only while focused", 
   expect(declaration("html:has(header:focus-within)", "scroll-padding-top")).toBeUndefined();
 });
 
+test("the focused mobile search keeps masthead controls in flow for its width transition", () => {
+  expect(styles).toMatch(
+    /\.masthead-leading,[\s\S]*?\.masthead-actions\s*\{[\s\S]*?transition:[\s\S]*?width 320ms cubic-bezier\(0\.34, 1\.45, 0\.64, 1\)/,
+  );
+  expect(styles).not.toMatch(
+    /header:has\(input\[role="combobox"\]:focus\)[\s\S]*?\.masthead-actions\s*\{\s*display:\s*none/,
+  );
+});
+
 test("the mobile gallery feed fills the column instead of shrinking to its cards", () => {
   expect(declaration(".feed", "width")).toBeUndefined();
   expect(styles).toMatch(
