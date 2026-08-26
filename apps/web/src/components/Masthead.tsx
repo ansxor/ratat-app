@@ -10,7 +10,7 @@ import { SearchBar } from "#/components/search/SearchBar.tsx";
 const SEARCH_TRANSITION_MS = 320;
 
 export function Masthead() {
-  const [searchOverlay, setSearchOverlay] = useState<{ left: number; width: number }>();
+  const [searchOverlay, setSearchOverlay] = useState<{ left: number; right: number }>();
   const [searchExpanded, setSearchExpanded] = useState(false);
   const collapseTimer = useRef<number | undefined>(undefined);
 
@@ -30,7 +30,10 @@ export function Masthead() {
 
     const slotBox = slot.getBoundingClientRect();
     const rowBox = row.getBoundingClientRect();
-    setSearchOverlay({ left: slotBox.left - rowBox.left, width: slotBox.width });
+    setSearchOverlay({
+      left: slotBox.left - rowBox.left,
+      right: rowBox.right - slotBox.right,
+    });
     setSearchExpanded(false);
     requestAnimationFrame(() => requestAnimationFrame(() => setSearchExpanded(true)));
   };
@@ -68,7 +71,7 @@ export function Masthead() {
               searchOverlay
                 ? ({
                     "--masthead-search-start": `${searchOverlay.left}px`,
-                    "--masthead-search-width": `${searchOverlay.width}px`,
+                    "--masthead-search-end": `${searchOverlay.right}px`,
                   } as CSSProperties)
                 : undefined
             }

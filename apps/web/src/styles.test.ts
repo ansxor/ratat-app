@@ -23,10 +23,10 @@ test("the search combobox disables document scroll padding only while focused", 
 
 test("the focused mobile search overlays the masthead with a spring transition", () => {
   expect(styles).toMatch(
-    /\.masthead-search--overlay\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?inset-inline-start:\s*var\(--masthead-search-start\);[\s\S]*?width:\s*var\(--masthead-search-width\);[\s\S]*?width 320ms cubic-bezier\(0\.34, 1\.45, 0\.64, 1\)/,
+    /\.masthead-search--overlay\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?inset-inline-start:\s*var\(--masthead-search-start\);[\s\S]*?inset-inline-end:\s*var\(--masthead-search-end\);[\s\S]*?inset-inline-end 320ms cubic-bezier\(0\.34, 1\.45, 0\.64, 1\)/,
   );
   expect(styles).toMatch(
-    /\.masthead-search--overlay\.masthead-search--expanded\s*\{[\s\S]*?width 520ms cubic-bezier\(0\.65, 0, 0\.35, 1\.35\)/,
+    /\.masthead-search--overlay\.masthead-search--expanded\s*\{[\s\S]*?inset-inline-end 520ms cubic-bezier\(0\.65, 0, 0\.35, 1\.35\)/,
   );
 });
 
