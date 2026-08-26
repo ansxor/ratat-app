@@ -73,7 +73,7 @@ const pageLink = (
   variants: { current?: boolean; step?: boolean; disabled?: boolean } = {},
 ): string =>
   cn(
-    "text-[13px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:inline-flex max-[880px]:min-h-[44px] max-[880px]:min-w-[44px] max-[880px]:items-center max-[880px]:justify-center max-[880px]:px-[10px]",
+    "text-[15px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:inline-flex max-[880px]:min-h-[44px] max-[880px]:min-w-[44px] max-[880px]:items-center max-[880px]:justify-center max-[880px]:px-[10px]",
     variants.current &&
       "bg-primary !text-[var(--pager-active-ink)] hover:bg-primary hover:!text-[var(--pager-active-ink)]",
     variants.step && "text-primary hover:!text-[var(--pager-active-ink)] hover:bg-primary",
