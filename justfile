@@ -19,6 +19,10 @@ down-hard:
 
 start-all: up migrate dev
 
+# Restart every local development daemon, including Postgres via pitchfork.
+restart:
+    pitchfork restart -l
+
 migrate:
     bun run migrate
 
