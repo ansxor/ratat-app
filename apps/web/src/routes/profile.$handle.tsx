@@ -1,20 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef } from "react";
 
 import { ArtworkGrid } from "#/components/ArtworkGrid.tsx";
 import { FeedNotice } from "#/components/FeedNotice.tsx";
 import { Footer } from "#/components/Footer.tsx";
 import { Pager } from "#/components/Pager.tsx";
 import { ProfileHeader } from "#/components/ProfileHeader.tsx";
-import {
-  MobileInfinitePagination,
-  pagerLinks,
-  paginationSearch,
-  useInfinitePagination,
-  useMobileInfinitePagination,
-  useScrollToPaginationMode,
-  type PagerPagination,
-} from "#/lib/pagination.tsx";
+import { pagerLinks, paginationSearch, type PagerPagination } from "#/lib/pagination.tsx";
 import {
   getAuthorFeed,
   getProfile,
@@ -92,21 +83,9 @@ function ArtistPage() {
   const { handle } = Route.useParams();
   const search = Route.useSearch();
   const page = search.page ?? 1;
-  const anchorRef = useRef<HTMLDivElement>(null);
-  const infinite = useInfinitePagination({
-    enabled: useMobileInfinitePagination(),
-    resetKey: profile.did,
-    initialPage: portfolio,
-    pageNumber: (result) => result.page ?? 1,
-    getItems: (result) => result.posts,
-    hasNextPage: (result) => result.cursor !== undefined,
-    loadPage: (target) => getAuthorFeed(profile.did, { page: target, limit: PAGE_SIZE }),
-  });
-  const displayPortfolio = infinite.lastPage;
-  const displayPage = displayPortfolio.page ?? page;
-  const posts = infinite.items;
-  const pagination = paginationFor(profile, displayPortfolio, displayPage, handle);
-  useScrollToPaginationMode(anchorRef);
+  const displayPage = portfolio.page ?? page;
+  const posts = portfolio.posts;
+  const pagination = paginationFor(profile, portfolio, displayPage, handle);
 
   return (
     <>
@@ -121,25 +100,10 @@ function ArtistPage() {
                   No artworks to show yet — this artist has posted nothing with media, or Ratat is
                   still reading their work in.
                 </FeedNotice>
-              ) : infinite.enabled ? (
-                <>
-                  <ArtworkGrid
-                    posts={infinite.items}
-                    header="none"
-                    anchorIndex={infinite.lastPageStart}
-                    anchorRef={anchorRef}
-                  />
-                  <MobileInfinitePagination pagination={infinite} />
-                </>
               ) : (
                 <div className="max-[880px]:-mx-[var(--pad)]">
                   <Pager variant="top" pagination={pagination} />
-                  <ArtworkGrid
-                    posts={posts}
-                    header="none"
-                    anchorIndex={infinite.lastPageStart}
-                    anchorRef={anchorRef}
-                  />
+                  <ArtworkGrid posts={posts} header="none" />
                   <Pager variant="bottom" pagination={pagination} />
                 </div>
               )}

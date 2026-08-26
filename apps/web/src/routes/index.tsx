@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ArtworkGrid } from "#/components/ArtworkGrid.tsx";
 import { FeedNotice } from "#/components/FeedNotice.tsx";
@@ -7,15 +7,7 @@ import { Footer } from "#/components/Footer.tsx";
 import { LoginPanel } from "#/components/LoginPanel.tsx";
 import { Pager } from "#/components/Pager.tsx";
 import { useFollows } from "#/lib/follows.tsx";
-import {
-  MobileInfinitePagination,
-  pagerLinks,
-  paginationSearch,
-  useInfinitePagination,
-  useMobileInfinitePagination,
-  useScrollToPaginationMode,
-  type PagerPagination,
-} from "#/lib/pagination.tsx";
+import { pagerLinks, paginationSearch, type PagerPagination } from "#/lib/pagination.tsx";
 import { getTimeline, type Timeline } from "#/lib/ratat.ts";
 import { useSession } from "#/lib/session.tsx";
 
@@ -126,40 +118,18 @@ function HomeFeed({ did, page }: { did: string; page: number }) {
     );
   }
 
-  return <HomeFeedContent did={did} timeline={timeline} />;
+  return <HomeFeedContent timeline={timeline} />;
 }
 
-function HomeFeedContent({ did, timeline }: { did: string; timeline: Timeline }) {
-  const anchorRef = useRef<HTMLDivElement>(null);
-  const infinite = useInfinitePagination({
-    enabled: useMobileInfinitePagination(),
-    resetKey: did,
-    initialPage: timeline,
-    pageNumber: (result) => result.page,
-    getItems: (result) => result.posts,
-    hasNextPage: (result) => result.page * PAGE_SIZE < result.total,
-    loadPage: (target) => getTimeline(did, { page: target, limit: PAGE_SIZE }),
-  });
-  const displayTimeline = infinite.lastPage;
-  const pagination = paginationFor(displayTimeline);
-  const posts = infinite.items;
-  useScrollToPaginationMode(anchorRef);
+function HomeFeedContent({ timeline }: { timeline: Timeline }) {
+  const pagination = paginationFor(timeline);
 
   return (
     <FeedShell>
       <div className="max-[880px]:-mx-[var(--pad)]">
-        {infinite.enabled ? null : <Pager variant="top" pagination={pagination} />}
-        <ArtworkGrid
-          posts={posts}
-          header="pinned"
-          anchorIndex={infinite.lastPageStart}
-          anchorRef={anchorRef}
-        />
-        {infinite.enabled ? (
-          <MobileInfinitePagination pagination={infinite} />
-        ) : (
-          <Pager variant="bottom" pagination={pagination} />
-        )}
+        <Pager variant="top" pagination={pagination} />
+        <ArtworkGrid posts={timeline.posts} header="pinned" />
+        <Pager variant="bottom" pagination={pagination} />
       </div>
     </FeedShell>
   );
