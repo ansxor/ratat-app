@@ -25,28 +25,22 @@ import { DEFAULT_THEME, isThemeChoice, THEME_STORAGE_KEY, type ThemeChoice } fro
  */
 
 const FILTERS_KEY = "ratat:content-filter";
-const DETAILS_KEY = "ratat:gallery-details";
 
 interface SettingsState {
   filters: FilterState;
   theme: ThemeChoice;
-  /** Pins each card's byline and action bar open instead of revealing on hover. */
-  alwaysShowDetails: boolean;
   /** False until the stored values have been read, which cannot happen on the server. */
   hydrated: boolean;
   setFilterMode: (category: FilterCategory, mode: VeilMode) => void;
   setTheme: (theme: ThemeChoice) => void;
-  setAlwaysShowDetails: (enabled: boolean) => void;
 }
 
 const SettingsContext = createContext<SettingsState>({
   filters: DEFAULT_FILTERS,
   theme: DEFAULT_THEME,
-  alwaysShowDetails: false,
   hydrated: false,
   setFilterMode: () => {},
   setTheme: () => {},
-  setAlwaysShowDetails: () => {},
 });
 
 const read = (key: string): unknown => {
@@ -69,14 +63,12 @@ const write = (key: string, value: unknown): void => {
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [theme, setThemeState] = useState<ThemeChoice>(DEFAULT_THEME);
-  const [alwaysShowDetails, setDetailsState] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setFilters(sanitizeFilters(read(FILTERS_KEY)));
     const stored = read(THEME_STORAGE_KEY);
     if (isThemeChoice(stored)) setThemeState(stored);
-    setDetailsState(read(DETAILS_KEY) === true);
     setHydrated(true);
   }, []);
 
@@ -86,11 +78,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     if (theme === "system") delete root.dataset.theme;
     else root.dataset.theme = theme;
   }, [theme, hydrated]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    document.body.classList.toggle("show-details", alwaysShowDetails);
-  }, [alwaysShowDetails, hydrated]);
 
   const setFilterMode = useCallback((category: FilterCategory, mode: VeilMode) => {
     setFilters((current) => {
@@ -106,22 +93,15 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     write(THEME_STORAGE_KEY, next);
   }, []);
 
-  const setAlwaysShowDetails = useCallback((enabled: boolean) => {
-    setDetailsState(enabled);
-    write(DETAILS_KEY, enabled);
-  }, []);
-
   const value = useMemo<SettingsState>(
     () => ({
       filters,
       theme,
-      alwaysShowDetails,
       hydrated,
       setFilterMode,
       setTheme,
-      setAlwaysShowDetails,
     }),
-    [filters, theme, alwaysShowDetails, hydrated, setFilterMode, setTheme, setAlwaysShowDetails],
+    [filters, theme, hydrated, setFilterMode, setTheme],
   );
 
   return <SettingsContext value={value}>{children}</SettingsContext>;

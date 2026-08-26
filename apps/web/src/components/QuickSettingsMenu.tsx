@@ -53,22 +53,11 @@ const THEME_OPTIONS: readonly SegmentedOption<ThemeChoice>[] = THEME_CHOICES.map
 }));
 
 /**
- * Ported from the old app's `QuickSettingsMenu`, with the Pager's "always show
- * details" toggle folded in as the issue asks. It sits in the masthead rather
- * than on the Pager because the Pager only renders where there are works to
- * page through — and a device that has hidden everything would otherwise have
- * no way back to the setting that hid it.
+ * Ported from the old app's `QuickSettingsMenu`. It sits in the masthead so
+ * content filters remain available even when they hide every artwork.
  */
 export function QuickSettingsMenu() {
-  const {
-    filters,
-    theme,
-    alwaysShowDetails,
-    hydrated,
-    setFilterMode,
-    setTheme,
-    setAlwaysShowDetails,
-  } = useSettings();
+  const { filters, theme, hydrated, setFilterMode, setTheme } = useSettings();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -155,20 +144,6 @@ export function QuickSettingsMenu() {
               onValueChange={setTheme}
             />
           </SettingRow>
-
-          <div className="px-[12px] pt-[10px] pb-[11px] border-b border-line-soft">
-            <label className="flex items-center gap-[9px] cursor-pointer text-[12.5px] font-[700] tracking-[0.01em] text-paper">
-              <input
-                type="checkbox"
-                checked={alwaysShowDetails}
-                disabled={!hydrated}
-                className="appearance-none flex-none w-[34px] h-[18px] rounded-full relative cursor-pointer bg-ink-hi border border-line transition-[background,border-color] duration-[150ms] after:content-[''] after:absolute after:top-px after:left-px after:size-[14px] after:rounded-full after:bg-ink-raised after:shadow-[0_1px_2px_var(--shadow)] after:transition-transform after:duration-[150ms] checked:bg-primary checked:border-primary checked:after:translate-x-[16px]"
-                onChange={(event) => setAlwaysShowDetails(event.target.checked)}
-              />
-              <span>Always show details</span>
-            </label>
-          </div>
-
         </div>
       )}
     </div>

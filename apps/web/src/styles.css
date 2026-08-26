@@ -647,29 +647,12 @@
   }
 }
 
-body.show-details .piece__art {
-  border: 1px solid var(--line);
-}
-body.show-details .piece__top,
-body.show-details .piece__bar {
-  position: static;
-  transform: none;
-  opacity: 1;
-  background: var(--ink-raised);
-  backdrop-filter: none;
-}
-
 /* Mobile: the tile border stands in for the removed grid gap, so tiles still
-   read as separate click targets. Unlayered (and last) so it also wins over
-   the `show-details` border above. */
+   read as separate click targets. */
 @media (max-width: 880px) {
   .piece__art {
     border-color: var(--line-2);
   }
-  body.show-details .piece__art {
-    border-color: var(--line-2);
-  }
-
   /* Focused masthead search takes the whole row and dims the page behind it. */
   header:has(input[role="combobox"]:focus) .brand,
   header:has(input[role="combobox"]:focus) .masthead-actions {

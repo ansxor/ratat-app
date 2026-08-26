@@ -27,3 +27,9 @@ test("the mobile gallery feed fills the column instead of shrinking to its cards
     /@media\s*\(max-width:\s*880px\)\s*\{[\s\S]*?\.feed\s*\{\s*width:\s*100%\s*;/,
   );
 });
+
+test("gallery card details are controlled by their page context", () => {
+  expect(styles).not.toContain("body.show-details");
+  expect(styles).toMatch(/\.piece--pinned \.piece__top\s*\{/);
+  expect(styles).toMatch(/\.piece--reveal \.piece__top\s*\{/);
+});
