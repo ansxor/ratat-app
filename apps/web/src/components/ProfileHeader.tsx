@@ -161,7 +161,7 @@ function ProfileBio({ description, bioId }: { description?: string | null; bioId
           type="button"
           aria-expanded={expanded}
           aria-controls={bioId}
-          className="mt-[3px] cursor-pointer border-0 bg-transparent p-0 text-primary font-bold underline"
+          className="mt-[3px] cursor-pointer border-0 bg-transparent p-0 text-faint text-[12px] font-bold underline hover:text-paper"
           onClick={() => setExpanded((isExpanded) => !isExpanded)}
         >
           {expanded ? "Show less" : "Show more"}
