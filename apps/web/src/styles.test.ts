@@ -21,12 +21,12 @@ test("the search combobox disables document scroll padding only while focused", 
   expect(declaration("html:has(header:focus-within)", "scroll-padding-top")).toBeUndefined();
 });
 
-test("the focused mobile search keeps masthead controls in flow for its width transition", () => {
+test("the focused mobile search overlays the masthead with a spring transition", () => {
   expect(styles).toMatch(
-    /\.masthead-leading,[\s\S]*?\.masthead-actions\s*\{[\s\S]*?transition:[\s\S]*?width 320ms cubic-bezier\(0\.34, 1\.45, 0\.64, 1\)/,
+    /\.masthead-search--overlay\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?inset-inline-start:\s*var\(--masthead-search-start\);[\s\S]*?width:\s*var\(--masthead-search-width\);[\s\S]*?width 320ms cubic-bezier\(0\.34, 1\.45, 0\.64, 1\)/,
   );
-  expect(styles).not.toMatch(
-    /header:has\(input\[role="combobox"\]:focus\)[\s\S]*?\.masthead-actions\s*\{\s*display:\s*none/,
+  expect(styles).toMatch(
+    /\.masthead-search--overlay\.masthead-search--expanded\s*\{[\s\S]*?width 440ms cubic-bezier\(0\.22, 0\.9, 0\.3, 1\.25\)/,
   );
 });
 
