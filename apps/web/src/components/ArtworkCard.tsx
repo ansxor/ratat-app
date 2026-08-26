@@ -61,7 +61,7 @@ export function ArtworkCard({
         )}
 
         <div
-          className={cn("relative", veilFrameClass(covered ? veil : null, { animated }))}
+          className={cn("relative overflow-hidden", veilFrameClass(covered ? veil : null, { animated }))}
           style={{ aspectRatio: imgAspect }}
         >
           <Link
