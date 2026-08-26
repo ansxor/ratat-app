@@ -56,7 +56,7 @@ export function SegmentedRadio<T extends string>({
             "h-[27px] inline-flex items-center justify-center cursor-pointer p-0",
             "bg-ink-raised text-mist transition-colors duration-[140ms] hover:bg-ink",
             "[&_svg]:size-[15px]",
-            value === option.value && "bg-invert-bg text-invert-fg",
+            value === option.value && "bg-primary text-primary-foreground",
             disabled && "opacity-[0.6] cursor-default",
           )}
         >
