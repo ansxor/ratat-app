@@ -275,7 +275,7 @@ function ArtworkMeta({
             description={description}
             id="artwork-description"
             className="m-0"
-            collapsedClassName="max-[880px]:line-clamp-4"
+            collapsedClassName="max-[880px]:line-clamp-3"
           />
         </div>
       )}
