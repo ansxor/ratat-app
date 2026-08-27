@@ -70,7 +70,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
   const covered = veil.variant !== null && !veil.peeked;
   const frame = cn(
     veilFrameClass(covered ? veil.variant : null, { animated: veil.animated, strength: "page" }),
-    "max-mobile:!h-auto max-mobile:max-h-[calc(100dvh-var(--header-h))]",
+    "max-mobile:!h-auto max-mobile:min-h-[75dvh] max-mobile:max-h-[calc(100dvh-var(--header-h))]",
   );
 
   const cover = veil.variant && (
