@@ -161,7 +161,7 @@ function ArtistActions({ post }: { post: Post }) {
           <Link
             to="/profile/$handle"
             params={{ handle: post.author.handle }}
-            className="inline-flex items-center gap-[7px] border-b border-line text-paper rounded-[6px] px-[7px] py-[3px] mx-[-7px] my-[-3px] transition-[background] duration-[140ms] hover:bg-ink-hi max-[880px]:border-b-0"
+            className="inline-flex min-w-0 items-center gap-[7px] border-b border-line text-paper rounded-[6px] px-[7px] py-[3px] mx-[-7px] my-[-3px] transition-[background] duration-[140ms] hover:bg-ink-hi max-[880px]:border-b-0"
           >
             {post.author.avatar ? (
               <Image
@@ -174,7 +174,7 @@ function ArtistActions({ post }: { post: Post }) {
             ) : (
               <span className="size-[20px] flex-none rounded-[4px] border border-line-2 bg-mat" />
             )}
-            <span className="max-[880px]:text-[17px] max-[880px]:font-[600]">{artistName}</span>
+            <span className="min-w-0 truncate max-[880px]:text-[17px] max-[880px]:font-[600]">{artistName}</span>
           </Link>
           <FollowButton
             subject={post.author.did}
