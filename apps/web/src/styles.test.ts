@@ -21,13 +21,18 @@ test("the search combobox disables document scroll padding only while focused", 
   expect(declaration("html:has(header:focus-within)", "scroll-padding-top")).toBeUndefined();
 });
 
-test("the focused mobile search overlays the masthead with a spring transition", () => {
+test("mobile masthead is a four-cell action bar fixed to the bottom", () => {
   expect(styles).toMatch(
-    /\.masthead-search--overlay\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?inset-inline-start:\s*var\(--masthead-search-start\);[\s\S]*?inset-inline-end:\s*var\(--masthead-search-end\);[\s\S]*?inset-inline-end 320ms cubic-bezier\(0\.34, 1\.45, 0\.64, 1\)/,
+    /@media\s*\(max-width:\s*880px\)\s*\{[\s\S]*?\.masthead\s*\{[\s\S]*?bottom:\s*0;/,
   );
   expect(styles).toMatch(
-    /\.masthead-search--overlay\.masthead-search--expanded\s*\{[\s\S]*?inset-inline-end 430ms cubic-bezier\(0\.4, 0\.15, 0\.25, 1\.3\)/,
+    /\.masthead-row\s*\{[\s\S]*?display:\s*grid;[\s\S]*?grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);/,
   );
+});
+
+test("mobile masthead reserves space and places search above the action bar", () => {
+  expect(styles).toMatch(/body\s*\{[\s\S]*?padding-bottom:\s*calc\(var\(--mobile-masthead-h\)/);
+  expect(styles).toMatch(/\.masthead-mobile-search-panel\s*\{[\s\S]*?min-height:\s*60px;/);
 });
 
 test("the mobile gallery feed fills the column instead of shrinking to its cards", () => {

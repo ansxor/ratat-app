@@ -21,9 +21,9 @@ const needleOf = (typed: string): string => typed.trim().replace(/^@/, "");
  * should not depend on the typeahead having heard of them.
  *
  * The layout is left to the caller: `SearchBar` gives it a fixed width in the
- * masthead, `MobileSearch` stretches it across the row. `onDismiss` fires when
- * the visitor is done with the field — Escape on a closed dropdown, or a
- * navigation — so the mobile overlay knows to collapse.
+ * desktop masthead, while `MobileSearch` stretches it across its bottom panel.
+ * `onDismiss` fires when the visitor is done with the field — Escape on a
+ * closed dropdown, or a navigation — so the mobile panel knows to collapse.
  */
 export function SearchField({
   className,

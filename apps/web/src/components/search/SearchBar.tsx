@@ -1,9 +1,8 @@
 import { SearchField } from "#/components/search/SearchField.tsx";
 
 /**
- * The inline masthead search. Desktop gives it a fixed width that grows while
- * it is focused; below 880px it fills the space the masthead hands it (it
- * replaced the old button-and-overlay `MobileSearch`).
+ * The inline masthead search used on desktop. Mobile uses `MobileSearch`,
+ * which opens the same field in a panel above the bottom action bar.
  */
 export function SearchBar() {
   return (
