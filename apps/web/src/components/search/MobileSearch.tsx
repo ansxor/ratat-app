@@ -28,7 +28,7 @@ export function MobileSearch() {
         title="Search"
         aria-expanded={open}
         className={BUTTON}
-        onClick={() => setOpen(true)}
+        onClick={() => setOpen((value) => !value)}
       >
         <SearchIcon size={22} strokeWidth={1.9} />
       </button>
@@ -45,17 +45,6 @@ export function MobileSearch() {
             autoFocus
             onDismiss={() => dismiss(true)}
           />
-          <button
-            type="button"
-            aria-label="Close search"
-            className={`${BUTTON} masthead-mobile-search-close`}
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={() => dismiss(true)}
-          >
-            <span aria-hidden="true" className="text-[22px] leading-none">
-              ×
-            </span>
-          </button>
         </div>
       )}
     </div>

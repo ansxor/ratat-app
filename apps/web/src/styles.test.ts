@@ -36,6 +36,15 @@ test("mobile masthead reserves space and places search above the action bar", ()
   expect(styles).toMatch(/\.masthead-mobile-search-panel\s*\{[\s\S]*?min-height:\s*60px;/);
 });
 
+test("mobile quick settings uses a full-width sheet without an arrow", () => {
+  expect(styles).toMatch(
+    /\.masthead-actions > \.relative > \[role="dialog"\]\s*\{[\s\S]*?position:\s*fixed;[\s\S]*?width:\s*100vw;/,
+  );
+  expect(styles).toMatch(
+    /\.masthead-actions > \.relative > \[role="dialog"\] > span\[aria-hidden="true"\]\s*\{[\s\S]*?display:\s*none;/,
+  );
+});
+
 test("the mobile gallery feed fills the column instead of shrinking to its cards", () => {
   expect(declaration(".feed", "width")).toBeUndefined();
   expect(styles).toMatch(
