@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 
-import { paginationSearch, shouldUseMobileInfinitePagination } from "./pagination.tsx";
+import { pageSlots, paginationSearch } from "./pagination.tsx";
 
 test("pagination search preserves an explicit page one", () => {
   expect(paginationSearch({ page: "1" })).toEqual({ page: 1 });
@@ -12,7 +12,7 @@ test("pagination search ignores invalid page values", () => {
   expect(paginationSearch({ page: "not-a-page" })).toEqual({});
 });
 
-test("mobile infinite pagination follows the viewport mode", () => {
-  expect(shouldUseMobileInfinitePagination({ isMobile: true })).toBe(true);
-  expect(shouldUseMobileInfinitePagination({ isMobile: false })).toBe(false);
+test("pagination slots stay compact at either end", () => {
+  expect(pageSlots(1, 20)).toEqual([1, 2, 3, 4, "gap", 20]);
+  expect(pageSlots(20, 20)).toEqual([1, "gap", 17, 18, 19, 20]);
 });

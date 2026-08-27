@@ -1,7 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { type ReactNode } from "react";
 
-import { type PagerPagination, type PagerSlot, usePaginationViewport } from "#/lib/pagination.tsx";
+import {
+  pageSlots,
+  type PagerPagination,
+  type PagerSlot,
+  usePaginationViewport,
+} from "#/lib/pagination.tsx";
 import { cn } from "#/lib/utils.ts";
 
 /**
@@ -20,53 +25,11 @@ import { cn } from "#/lib/utils.ts";
  */
 const ACTIVE_OPTIONS = { exact: true, includeSearch: true } as const;
 
-function useVisibleSlots(slots: Array<PagerSlot | "gap">): {
-  areaRef: RefObject<HTMLDivElement | null>;
-  probeRef: RefObject<HTMLDivElement | null>;
-  visibleCount: number;
-} {
-  const areaRef = useRef<HTMLDivElement>(null);
-  const probeRef = useRef<HTMLDivElement>(null);
-  const [visibleCount, setVisibleCount] = useState(0);
-  const { isMobile: mobile } = usePaginationViewport();
-
-  useLayoutEffect(() => {
-    if (!mobile) {
-      setVisibleCount(slots.length);
-      return;
-    }
-
-    setVisibleCount(0);
-
-    const area = areaRef.current;
-    const probe = probeRef.current;
-    if (!area || !probe) return;
-
-    let disposed = false;
-    const update = () => {
-      if (disposed) return;
-      const available = area.getBoundingClientRect().width;
-      const start = probe.getBoundingClientRect().left;
-      let count = 0;
-      for (const child of probe.children) {
-        if (child.getBoundingClientRect().right - start > available) break;
-        count += 1;
-      }
-      setVisibleCount(count);
-    };
-
-    const observer = new ResizeObserver(update);
-    observer.observe(area);
-    observer.observe(probe);
-    document.fonts?.ready.then(update);
-    update();
-    return () => {
-      disposed = true;
-      observer.disconnect();
-    };
-  }, [mobile, slots]);
-
-  return { areaRef, probeRef, visibleCount };
+function mobileSlots(pagination: PagerPagination): Array<PagerSlot | "gap"> {
+  const wanted = new Set(
+    pageSlots(pagination.current, pagination.totalPages ?? pagination.current, 1, 5),
+  );
+  return pagination.slots.filter((slot) => slot === "gap" || wanted.has(slot.page));
 }
 
 const pageLink = (
@@ -88,7 +51,7 @@ function pageSlot(
 ): ReactNode {
   if (slot === "gap") {
     return (
-      <span key={`gap-${index}`} className="text-faint px-[3px]" aria-hidden="true">
+      <span key={`gap-${index}`} className="text-faint text-[11px] px-0" aria-hidden="true">
         …
       </span>
     );
@@ -114,11 +77,6 @@ function pageSlot(
   );
 }
 
-function slotProbe(slot: PagerSlot | "gap", current: number): ReactNode {
-  if (slot === "gap") return <span className="text-faint px-[3px]">…</span>;
-  return <span className={pageLink({ current: slot.page === current })}>{slot.page}</span>;
-}
-
 export function Pager({
   variant = "top",
   leading,
@@ -130,8 +88,8 @@ export function Pager({
   pagination?: PagerPagination;
   visualOnly?: boolean;
 }) {
-  const slots = pagination?.slots ?? [];
-  const { areaRef, probeRef, visibleCount } = useVisibleSlots(slots);
+  const { isMobile } = usePaginationViewport();
+  const displayedSlots = pagination && isMobile ? mobileSlots(pagination) : pagination?.slots;
 
   return (
     <div
@@ -148,75 +106,61 @@ export function Pager({
       {pagination && (pagination.slots.length > 1 || pagination.nextLink) && (
         <nav
           className={cn(
-            "flex min-w-0 items-center gap-[3px]",
+            "flex min-w-0 items-center gap-[3px] max-[880px]:w-full max-[880px]:justify-between",
             variant !== "standalone" && "ml-auto",
           )}
           aria-label="Pagination"
         >
           {pagination.prevLink &&
             (visualOnly ? (
-              <span className={pageLink({ step: true })}>‹ Prev</span>
+              <span className={pageLink({ step: true })}>
+                ‹ <span className="max-[880px]:hidden">Prev</span>
+              </span>
             ) : (
               <Link
                 className={pageLink({ step: true })}
                 activeOptions={ACTIVE_OPTIONS}
                 {...pagination.prevLink}
               >
-                ‹ Prev
+                ‹ <span className="max-[880px]:hidden">Prev</span>
               </Link>
             ))}
-          <div ref={areaRef} className="min-w-0 flex-1">
-            <div className="flex items-center gap-[3px]">
-              {pagination.slots.map((slot, index) => (
-                <div
-                  key={slot === "gap" ? `gap-${index}` : slot.page}
-                  className={cn("flex-none", index >= visibleCount && "hidden")}
-                >
+          {!pagination.prevLink && (
+            <span
+              className={cn(pageLink({ disabled: true }), "hidden max-[880px]:inline-flex")}
+              aria-disabled="true"
+            >
+              ‹
+            </span>
+          )}
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <div className="flex min-w-0 items-center justify-center gap-[3px]">
+              {displayedSlots?.map((slot, index) => (
+                <div key={slot === "gap" ? `gap-${index}` : slot.page} className="flex-none">
                   {pageSlot(slot, index, pagination.current, visualOnly)}
                 </div>
               ))}
             </div>
           </div>
-          <div ref={probeRef} className="absolute invisible flex w-max items-center gap-[3px]">
-            {pagination.slots.map((slot, index) => (
-              <div
-                key={slot === "gap" ? `probe-gap-${index}` : `probe-${slot.page}`}
-                className="flex-none"
-              >
-                {slotProbe(slot, pagination.current)}
-              </div>
-            ))}
-          </div>
           {pagination.nextLink ? (
             visualOnly ? (
-              <span className={pageLink({ step: true })}>Next ›</span>
+              <span className={pageLink({ step: true })}>
+                <span className="max-[880px]:hidden">Next</span> ›
+              </span>
             ) : (
               <Link
                 className={pageLink({ step: true })}
                 activeOptions={ACTIVE_OPTIONS}
                 {...pagination.nextLink}
               >
-                Next ›
+                <span className="max-[880px]:hidden">Next</span> ›
               </Link>
             )
           ) : (
             <span className={pageLink({ disabled: true })} aria-disabled="true">
-              Next ›
+              <span className="max-[880px]:hidden">Next</span> ›
             </span>
           )}
-          {pagination.lastLink &&
-            (visualOnly ? (
-              <span className={pageLink({ step: true })}>Last »</span>
-            ) : (
-              <Link
-                className={pageLink({ step: true })}
-                activeOptions={ACTIVE_OPTIONS}
-                {...pagination.lastLink}
-                aria-label={`Last page (${pagination.totalPages})`}
-              >
-                Last »
-              </Link>
-            ))}
         </nav>
       )}
     </div>

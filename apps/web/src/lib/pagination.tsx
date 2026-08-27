@@ -14,9 +14,7 @@ interface PaginationViewport {
   isMobile: boolean;
 }
 
-const PaginationViewportContext = createContext<PaginationViewport>({
-  isMobile: false,
-});
+const PaginationViewportContext = createContext(false);
 
 export function PaginationViewportProvider({ children }: { children: ReactNode }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -30,23 +28,18 @@ export function PaginationViewportProvider({ children }: { children: ReactNode }
   }, []);
 
   return (
-    <PaginationViewportContext.Provider value={{ isMobile }}>
+    <PaginationViewportContext.Provider value={isMobile}>
       {children}
     </PaginationViewportContext.Provider>
   );
 }
 
 export function useMobileInfinitePagination(): boolean {
-  const { isMobile } = useContext(PaginationViewportContext);
-  return shouldUseMobileInfinitePagination({ isMobile });
-}
-
-export function shouldUseMobileInfinitePagination(opts: { isMobile: boolean }): boolean {
-  return opts.isMobile;
+  return useContext(PaginationViewportContext);
 }
 
 export function usePaginationViewport(): PaginationViewport {
-  return useContext(PaginationViewportContext);
+  return { isMobile: useContext(PaginationViewportContext) };
 }
 
 export function useScrollToPaginationMode(
@@ -237,7 +230,6 @@ export interface PagerPagination {
   slots: Array<PagerSlot | "gap">;
   prevLink?: LinkProps;
   nextLink?: LinkProps;
-  lastLink?: LinkProps;
 }
 
 export function pageCount(total: number, limit: number): number {
@@ -258,6 +250,12 @@ export function pageSlots(
   if (totalPages <= 1) return [1];
   if (totalPages <= maxSlots) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+  if (current <= 2) {
+    return [...Array.from({ length: Math.min(4, totalPages) }, (_, i) => i + 1), "gap", totalPages];
+  }
+  if (current >= totalPages - 1) {
+    return [1, "gap", ...Array.from({ length: 4 }, (_, i) => totalPages - 3 + i)];
   }
 
   const wanted = new Set<number>([1, totalPages]);
@@ -321,7 +319,6 @@ export function pagerLinks(opts: {
     ),
     ...(current > 1 ? { prevLink: link(current - 1) } : {}),
     ...(current < totalPages ? { nextLink: link(current + 1) } : {}),
-    ...(current < totalPages ? { lastLink: link(totalPages) } : {}),
   };
 }
 
