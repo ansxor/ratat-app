@@ -60,7 +60,7 @@ export function AuthControl() {
   if (!restored) {
     return (
       <span
-        className={`${AVATAR_CLASS} bg-ink-hi cursor-default pointer-events-none animate-pulse-soft`}
+        className={`${AVATAR_CLASS} bg-ink-hi cursor-default pointer-events-none animate-pulse-soft max-[880px]:w-full max-[880px]:h-full max-[880px]:min-h-[52px]`}
         aria-hidden="true"
       />
     );
@@ -68,7 +68,10 @@ export function AuthControl() {
 
   if (!session) {
     return (
-      <Link className="btn btn--accent" to="/login">
+      <Link
+        className="btn btn--accent max-[880px]:w-full max-[880px]:h-full max-[880px]:min-h-[52px] max-[880px]:justify-center"
+        to="/login"
+      >
         <SignInIcon {...GLYPH} />
         Sign In
       </Link>
@@ -77,10 +80,10 @@ export function AuthControl() {
 
   const handle = session.handle ?? session.did;
   return (
-    <div className="relative flex" ref={menuRef}>
+    <div className="relative flex max-[880px]:w-full max-[880px]:h-full" ref={menuRef}>
       <button
         type="button"
-        className={`${AVATAR_CLASS} cursor-pointer p-0`}
+        className={`${AVATAR_CLASS} cursor-pointer p-0 max-[880px]:w-full max-[880px]:h-full max-[880px]:min-h-[52px]`}
         aria-label={`Signed in as ${handle} — open account menu`}
         title={handle}
         aria-haspopup="menu"
@@ -94,7 +97,7 @@ export function AuthControl() {
       />
       {menuOpen && (
         <div
-          className="absolute top-[calc(100%+8px)] right-0 min-w-[150px] bg-ink-raised border border-line shadow-[0_12px_28px_-12px_var(--shadow-drop)] z-60 flex flex-col"
+          className="absolute top-[calc(100%+8px)] right-0 min-w-[150px] max-[880px]:top-auto max-[880px]:bottom-[calc(100%+8px)] bg-ink-raised border border-line shadow-[0_12px_28px_-12px_var(--shadow-drop)] z-60 flex flex-col"
           role="menu"
         >
           {session.handle ? (

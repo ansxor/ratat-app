@@ -46,8 +46,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <SessionProvider>
               <FollowsProvider>
                 <DevLoopbackRedirect />
-                <Masthead />
-                {children}
+                <div className="app-shell flex flex-col h-dvh overflow-hidden">
+                  <Masthead />
+                  <div className="app-content flex-auto min-h-0 overflow-auto overflow-x-hidden max-[880px]:order-1">
+                    {children}
+                  </div>
+                </div>
               </FollowsProvider>
             </SessionProvider>
           </SettingsProvider>

@@ -286,7 +286,6 @@
     background-color: var(--ink);
     background-image: repeating-conic-gradient(var(--dither) 0 25%, transparent 0 50%);
     background-size: 4px 4px;
-    padding-top: var(--header-h);
     color: var(--paper);
     font-family: var(--body);
     font-size: 16px;
@@ -349,11 +348,21 @@
     z-index: 1;
   }
 
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .app-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    overflow-x: hidden;
+  }
+
   .masthead {
-    position: fixed;
-    inset-inline: 0;
-    inset-block-start: 0;
-    z-index: 50;
     box-sizing: border-box;
     max-inline-size: 100vw;
   }
@@ -660,108 +669,15 @@
 /* Mobile: the tile border stands in for the removed grid gap, so tiles still
    read as separate click targets. */
 @media (max-width: 880px) {
-  :root {
-    --mobile-masthead-h: 64px;
-  }
-
-  body {
-    padding-top: 0;
-    padding-bottom: calc(var(--mobile-masthead-h) + env(safe-area-inset-bottom));
-  }
-
-  .masthead {
-    position: fixed;
-    inset-block-start: auto;
-    bottom: 0;
-    width: 100%;
-    border-top: 2px solid var(--header-edge);
-    border-bottom: none;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .masthead-row {
-    position: static;
-    display: grid;
-    box-sizing: border-box;
-    max-inline-size: 100vw;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 4px;
-    height: var(--mobile-masthead-h);
-    padding: 4px 8px;
-  }
-
-  .masthead-leading,
-  .masthead-actions {
-    display: contents;
-  }
-
-  .masthead-action,
-  .masthead-actions > * {
-    min-width: 0;
-    width: 100%;
-    height: 100%;
-    min-height: 52px;
-  }
-
-  .masthead-action {
-    justify-content: center;
-    align-items: center;
-    background: var(--header-tint);
-  }
-
-  .masthead-action:hover {
-    background: var(--header-tint-hi);
-  }
-
-  .masthead-search-slot {
-    min-width: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .masthead-mobile-search {
-    width: 100%;
-    height: 100%;
-  }
-
-  .masthead-mobile-search-panel {
-    min-height: 60px;
-  }
-
   .masthead-mobile-search-field > div:first-child {
     min-height: 44px;
   }
 
   /* Suggestions must grow upward from the bottom search panel, not under the
-     fixed action bar. */
+     mobile action bar. */
   .masthead-mobile-search-field > .absolute {
     top: auto;
     bottom: calc(100% + 6px);
-  }
-
-  .masthead-actions > .relative > button {
-    width: 100%;
-    height: 100%;
-    min-height: 52px;
-  }
-
-  .masthead-actions > .relative > [role="dialog"],
-  .masthead-actions > .relative > [role="menu"] {
-    top: auto;
-    bottom: calc(100% + 8px);
-  }
-
-  /* Quick settings is a full-width bottom sheet on mobile. */
-  .masthead-actions > .relative > [role="dialog"] {
-    position: fixed;
-    inset-inline: 0;
-    bottom: calc(var(--mobile-masthead-h) + env(safe-area-inset-bottom) + 8px);
-    width: 100vw;
-    max-width: 100vw;
-  }
-
-  .masthead-actions > .relative > [role="dialog"] > span[aria-hidden="true"] {
-    display: none;
   }
 
   .gallery--home .piece__top {

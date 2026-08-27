@@ -20,7 +20,7 @@ export function MobileSearch() {
   };
 
   return (
-    <div className="masthead-mobile-search hidden max-[880px]:flex items-center">
+    <div className="masthead-mobile-search hidden max-[880px]:flex w-full h-full items-center">
       <button
         ref={toggleRef}
         type="button"
@@ -35,7 +35,7 @@ export function MobileSearch() {
 
       {open && (
         <div
-          className="masthead-mobile-search-panel absolute bottom-full left-0 right-0 z-10 flex items-center gap-[9px] bg-header px-[12px] py-[8px] shadow-[0_-8px_20px_-16px_var(--shadow-drop)]"
+          className="masthead-mobile-search-panel absolute bottom-full left-0 right-0 z-10 flex min-h-[60px] items-center gap-[9px] bg-header px-[12px] py-[8px] shadow-[0_-8px_20px_-16px_var(--shadow-drop)]"
           onBlur={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) dismiss(false);
           }}

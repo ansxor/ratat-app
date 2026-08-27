@@ -3,6 +3,12 @@ import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
 const styles = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+const masthead = readFileSync(new URL("./components/Masthead.tsx", import.meta.url), "utf8");
+const rootRoute = readFileSync(new URL("./routes/__root.tsx", import.meta.url), "utf8");
+const quickSettings = readFileSync(
+  new URL("./components/QuickSettingsMenu.tsx", import.meta.url),
+  "utf8",
+);
 
 function declaration(selector: string, property: string, css = styles): string | undefined {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -21,29 +27,27 @@ test("the search combobox disables document scroll padding only while focused", 
   expect(declaration("html:has(header:focus-within)", "scroll-padding-top")).toBeUndefined();
 });
 
-test("mobile masthead is a four-cell action bar fixed to the bottom", () => {
+test("mobile masthead is a four-cell sibling below the scrolling content", () => {
   expect(styles).not.toContain("position: sticky");
-  expect(styles).toMatch(
-    /@media\s*\(max-width:\s*880px\)\s*\{[\s\S]*?\.masthead\s*\{[\s\S]*?bottom:\s*0;/,
-  );
-  expect(styles).toMatch(
-    /\.masthead-row\s*\{[\s\S]*?display:\s*grid;[\s\S]*?grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);/,
-  );
-  expect(styles).toMatch(/\.masthead\s*\{[\s\S]*?max-inline-size:\s*100vw;/);
+  expect(rootRoute).toContain("app-shell flex flex-col h-dvh overflow-hidden");
+  expect(rootRoute).toContain("app-content flex-auto min-h-0 overflow-auto overflow-x-hidden");
+  expect(masthead).toMatch(/<MastheadBar \/>[\s\S]*<MastheadBar mobile \/>/);
+  expect(masthead).toContain("grid grid-cols-4");
 });
 
-test("mobile masthead reserves space and places search above the action bar", () => {
-  expect(styles).toMatch(/body\s*\{[\s\S]*?padding-bottom:\s*calc\(var\(--mobile-masthead-h\)/);
-  expect(styles).toMatch(/\.masthead-mobile-search-panel\s*\{[\s\S]*?min-height:\s*60px;/);
+test("mobile masthead places search above the action bar", () => {
+  expect(masthead).toContain("<MobileSearch />");
+  expect(masthead).toContain("order-2 flex-none");
+  expect(styles).toMatch(
+    /\.masthead-mobile-search-field > div:first-child\s*\{[\s\S]*?min-height:\s*44px;/,
+  );
 });
 
 test("mobile quick settings uses a full-width sheet without an arrow", () => {
-  expect(styles).toMatch(
-    /\.masthead-actions > \.relative > \[role="dialog"\]\s*\{[\s\S]*?position:\s*fixed;[\s\S]*?width:\s*100vw;/,
-  );
-  expect(styles).toMatch(
-    /\.masthead-actions > \.relative > \[role="dialog"\] > span\[aria-hidden="true"\]\s*\{[\s\S]*?display:\s*none;/,
-  );
+  expect(quickSettings).toContain("max-[880px]:static");
+  expect(quickSettings).toContain("max-[880px]:w-full");
+  expect(quickSettings).toContain("max-[880px]:hidden");
+  expect(quickSettings).toContain("max-[880px]:bottom-[calc(100%+8px)]");
 });
 
 test("the mobile gallery feed fills the column instead of shrinking to its cards", () => {
