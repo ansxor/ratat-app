@@ -62,10 +62,6 @@ function paginationFor(timeline: Timeline): PagerPagination {
 }
 
 function HomeFeed({ did, page }: { did: string; page: number }) {
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-  }, [did, page]);
-
   const { follows, loaded } = useFollows();
   const [timeline, setTimeline] = useState<Timeline | undefined>(undefined);
   const [failed, setFailed] = useState(false);

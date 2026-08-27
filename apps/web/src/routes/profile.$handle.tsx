@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 import { ArtworkGrid } from "#/components/ArtworkGrid.tsx";
 import { FeedNotice } from "#/components/FeedNotice.tsx";
@@ -80,15 +79,10 @@ function paginationFor(
 }
 
 function ArtistPage() {
+  const { profile, portfolio } = Route.useLoaderData();
   const { handle } = Route.useParams();
   const search = Route.useSearch();
   const page = search.page ?? 1;
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-  }, [handle, page]);
-
-  const { profile, portfolio } = Route.useLoaderData();
   const displayPage = portfolio.page ?? page;
   const posts = portfolio.posts;
   const pagination = paginationFor(profile, portfolio, displayPage, handle);
