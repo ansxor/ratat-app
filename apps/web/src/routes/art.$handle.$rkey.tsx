@@ -191,7 +191,12 @@ function ArtistActions({ post }: { post: Post }) {
 }
 
 function ArtworkPage() {
+  const { handle, rkey } = Route.useParams();
   const { post, moreBy } = Route.useLoaderData();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [handle, rkey]);
   const { hidden, veil, peeked, animated, reveal } = useContentVeil(post.labels);
   const [unhidden, setUnhidden] = useState(false);
   const description = (post.text ?? "").trim() || undefined;
