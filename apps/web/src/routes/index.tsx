@@ -41,7 +41,7 @@ function Home() {
 function FeedShell({ children }: { children?: React.ReactNode }) {
   return (
     <>
-      <main className="gallery max-[880px]:py-0">
+      <main className="gallery gallery--home max-[880px]:py-0">
         <div className="wrap layout">
           <div className="feed">{children}</div>
         </div>

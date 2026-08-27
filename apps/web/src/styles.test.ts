@@ -42,3 +42,9 @@ test("gallery card details are controlled by their page context", () => {
   expect(styles).toMatch(/\.piece--pinned \.piece__top\s*\{/);
   expect(styles).toMatch(/\.piece--reveal \.piece__top\s*\{/);
 });
+
+test("home gallery item headers are hidden on mobile", () => {
+  expect(styles).toMatch(
+    /@media\s*\(max-width:\s*880px\)\s*\{[\s\S]*?\.gallery--home \.piece__top\s*\{\s*display:\s*none;/,
+  );
+});

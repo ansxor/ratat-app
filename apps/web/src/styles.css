@@ -676,6 +676,9 @@
 /* Mobile: the tile border stands in for the removed grid gap, so tiles still
    read as separate click targets. */
 @media (max-width: 880px) {
+  .gallery--home .piece__top {
+    display: none;
+  }
   .piece__art {
     border-color: var(--line-2);
   }
