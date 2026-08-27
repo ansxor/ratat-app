@@ -133,7 +133,7 @@ function MediaCarousel({ media, alt, veil }: { media: Media[]; alt: string; veil
   }, [api]);
 
   return (
-    <Carousel setApi={setApi}>
+    <Carousel setApi={setApi} aria-label={alt}>
       <CarouselContent className="-ml-[0.4rem]">
         {media.map((item, index) => (
           <CarouselItem key={index} className="pl-[0.4rem]">
@@ -141,8 +141,8 @@ function MediaCarousel({ media, alt, veil }: { media: Media[]; alt: string; veil
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
+      <CarouselPrevious className="!left-2" />
+      <CarouselNext className="!right-2" />
       {count > 1 && (
         <div
           className="absolute bottom-[10px] right-[10px] z-[5] bg-scrim-chip px-[7px] py-[3px] font-[700] text-[11px] leading-[1.4] text-accent-ink tabular-nums"
