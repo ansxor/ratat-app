@@ -670,9 +670,8 @@
   }
 
   .masthead {
-    position: fixed !important;
-    inset-block-start: auto !important;
-    inset-block-end: 0 !important;
+    position: fixed;
+    inset-block-start: auto;
     bottom: 0;
     width: 100%;
     border-top: 2px solid var(--header-edge);

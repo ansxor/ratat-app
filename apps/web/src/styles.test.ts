@@ -22,6 +22,7 @@ test("the search combobox disables document scroll padding only while focused", 
 });
 
 test("mobile masthead is a four-cell action bar fixed to the bottom", () => {
+  expect(styles).not.toContain("position: sticky");
   expect(styles).toMatch(
     /@media\s*\(max-width:\s*880px\)\s*\{[\s\S]*?\.masthead\s*\{[\s\S]*?bottom:\s*0;/,
   );
