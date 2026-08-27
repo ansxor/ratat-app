@@ -28,6 +28,7 @@ test("mobile masthead is a four-cell action bar fixed to the bottom", () => {
   expect(styles).toMatch(
     /\.masthead-row\s*\{[\s\S]*?display:\s*grid;[\s\S]*?grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\);/,
   );
+  expect(styles).toMatch(/\.masthead\s*\{[\s\S]*?max-inline-size:\s*100vw;/);
 });
 
 test("mobile masthead reserves space and places search above the action bar", () => {

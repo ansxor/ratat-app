@@ -348,6 +348,13 @@
     z-index: 1;
   }
 
+  .masthead {
+    position: sticky;
+    top: 0;
+    box-sizing: border-box;
+    max-inline-size: 100vw;
+  }
+
   .brand {
     display: flex;
     align-items: baseline;
@@ -659,8 +666,9 @@
   }
 
   .masthead {
-    position: fixed;
-    top: auto;
+    position: fixed !important;
+    inset-block-start: auto !important;
+    inset-block-end: 0 !important;
     bottom: 0;
     width: 100%;
     border-top: 2px solid var(--header-edge);
@@ -671,6 +679,8 @@
   .masthead-row {
     position: static;
     display: grid;
+    box-sizing: border-box;
+    max-inline-size: 100vw;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 4px;
     height: var(--mobile-masthead-h);
