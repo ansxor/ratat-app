@@ -99,7 +99,7 @@ export function AuthControl() {
         >
           {session.handle ? (
             <Link
-              className="block w-full text-left bg-none border-none border-b border-b-line-soft font-body text-[13px] font-[600] text-paper px-[12px] py-[8px] cursor-pointer last:border-b-0 hover:bg-ink-hi hover:text-paper"
+              className="block w-full text-left bg-none border-none border-b border-b-line-soft font-body text-[13px] font-[600] text-paper px-[12px] py-[8px] cursor-pointer last:border-b-0 hover:bg-ink-hi hover:text-paper max-[880px]:inline-flex max-[880px]:items-center max-[880px]:min-h-[44px] max-[880px]:py-[10px] max-[880px]:text-[15px]"
               to="/profile/$handle"
               params={{ handle: session.handle }}
               role="menuitem"
@@ -110,7 +110,7 @@ export function AuthControl() {
           ) : null}
           <button
             type="button"
-            className="block w-full text-left bg-none border-none border-b border-b-line-soft font-body text-[13px] font-[600] text-paper px-[12px] py-[8px] cursor-pointer last:border-b-0 hover:bg-ink-hi hover:text-paper"
+            className="block w-full text-left bg-none border-none border-b border-b-line-soft font-body text-[13px] font-[600] text-paper px-[12px] py-[8px] cursor-pointer last:border-b-0 hover:bg-ink-hi hover:text-paper max-[880px]:inline-flex max-[880px]:items-center max-[880px]:min-h-[44px] max-[880px]:py-[10px] max-[880px]:text-[15px]"
             role="menuitem"
             onClick={handleSignOut}
           >
