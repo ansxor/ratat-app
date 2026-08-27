@@ -8,7 +8,7 @@ import { QuickSettingsMenu } from "#/components/QuickSettingsMenu.tsx";
 
 export function Masthead() {
   return (
-    <header className="masthead z-50 bg-header border-b-2 border-header-edge">
+    <header className="masthead z-50 bg-header border-b-2 border-header-edge max-[880px]:fixed max-[880px]:inset-x-0 max-[880px]:top-auto max-[880px]:bottom-0">
       <div className="masthead-row wrap flex items-center gap-[18px] h-[42px] max-[880px]:px-[12px] max-[880px]:gap-[8px]">
         <div className="masthead-leading flex flex-1 basis-0 items-center gap-[18px] min-w-0 max-[880px]:flex-none">
           <Link className="brand masthead-action" to="/" aria-label="Ratat home">
