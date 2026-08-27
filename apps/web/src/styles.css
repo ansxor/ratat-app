@@ -286,6 +286,7 @@
     background-color: var(--ink);
     background-image: repeating-conic-gradient(var(--dither) 0 25%, transparent 0 50%);
     background-size: 4px 4px;
+    padding-top: var(--header-h);
     color: var(--paper);
     font-family: var(--body);
     font-size: 16px;
@@ -349,8 +350,10 @@
   }
 
   .masthead {
-    position: sticky;
-    top: 0;
+    position: fixed;
+    inset-inline: 0;
+    inset-block-start: 0;
+    z-index: 50;
     box-sizing: border-box;
     max-inline-size: 100vw;
   }
@@ -662,6 +665,7 @@
   }
 
   body {
+    padding-top: 0;
     padding-bottom: calc(var(--mobile-masthead-h) + env(safe-area-inset-bottom));
   }
 
