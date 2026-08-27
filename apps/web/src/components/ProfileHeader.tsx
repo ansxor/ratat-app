@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { Link } from "@tanstack/react-router";
 
-import { ChevronDownIcon, ChevronUpIcon } from "#/components/ui/icons.tsx";
+import { ExpandableText } from "#/components/ExpandableText.tsx";
 import { ArtworkVeil } from "#/components/content/ArtworkVeil.tsx";
 import { FollowButton } from "#/components/FollowButton.tsx";
 import { PLACEHOLDER_GRADIENT } from "#/lib/avatar.ts";
@@ -120,26 +120,6 @@ function ProfileStats({
  */
 
 function ProfileBio({ description, bioId }: { description?: string | null; bioId: string }) {
-  const bioRef = useRef<HTMLParagraphElement>(null);
-  const [expanded, setExpanded] = useState(false);
-  const [canExpand, setCanExpand] = useState(false);
-
-  useEffect(() => {
-    setExpanded(false);
-    setCanExpand(false);
-  }, [description]);
-
-  useEffect(() => {
-    const bio = bioRef.current;
-    if (!bio || expanded) return;
-
-    const checkOverflow = () => setCanExpand(bio.scrollHeight > bio.clientHeight + 1);
-    checkOverflow();
-    const observer = new ResizeObserver(checkOverflow);
-    observer.observe(bio);
-    return () => observer.disconnect();
-  }, [description, expanded]);
-
   if (!description)
     return (
       <div className="flex-1 min-w-[280px] max-[880px]:order-3 max-[880px]:basis-full max-[880px]:min-w-0" />
@@ -147,32 +127,12 @@ function ProfileBio({ description, bioId }: { description?: string | null; bioId
 
   return (
     <div className="flex-1 min-w-[280px] max-[880px]:order-3 max-[880px]:basis-full max-[880px]:min-w-0">
-      <p
-        ref={bioRef}
+      <ExpandableText
+        description={description}
         id={bioId}
-        className={cn(
-          "m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words max-[880px]:text-[13px]",
-          !expanded && "line-clamp-4",
-        )}
-      >
-        {description}
-      </p>
-      {canExpand && (
-        <button
-          type="button"
-          aria-expanded={expanded}
-          aria-controls={bioId}
-          className="mt-[3px] inline-flex cursor-pointer items-center gap-[2px] border-0 bg-transparent p-0 text-faint text-[12px] font-bold underline hover:text-paper"
-          onClick={() => setExpanded((isExpanded) => !isExpanded)}
-        >
-          {expanded ? (
-            <ChevronUpIcon className="size-[12px]" aria-hidden="true" />
-          ) : (
-            <ChevronDownIcon className="size-[12px]" aria-hidden="true" />
-          )}
-          {expanded ? "Show less" : "Show more"}
-        </button>
-      )}
+        className="m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words max-[880px]:text-[13px]"
+        collapsedClassName="line-clamp-4"
+      />
     </div>
   );
 }

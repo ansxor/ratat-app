@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { ArtworkGate } from "#/components/content/ArtworkGate.tsx";
+import { ExpandableText } from "#/components/ExpandableText.tsx";
 import { ArtworkVeil, veilFrameClass } from "#/components/content/ArtworkVeil.tsx";
 import { EngagementButton } from "#/components/EngagementButton.tsx";
 import { FeedNotice } from "#/components/FeedNotice.tsx";
@@ -270,7 +271,12 @@ function ArtworkMeta({
             whiteSpace: "pre-wrap",
           }}
         >
-          {description}
+          <ExpandableText
+            description={description}
+            id="artwork-description"
+            className="m-0"
+            collapsedClassName="max-[880px]:line-clamp-4"
+          />
         </div>
       )}
       {actions && (
