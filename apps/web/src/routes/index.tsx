@@ -41,7 +41,7 @@ function Home() {
 function FeedShell({ children }: { children?: React.ReactNode }) {
   return (
     <>
-      <main className="gallery gallery--home max-[880px]:py-0">
+      <main className="gallery gallery--home max-mobile:py-0">
         <div className="wrap layout">
           <div className="feed">{children}</div>
         </div>
@@ -126,7 +126,7 @@ function HomeFeedContent({ timeline }: { timeline: Timeline }) {
 
   return (
     <FeedShell>
-      <div className="max-[880px]:-mx-[var(--pad)]">
+      <div className="max-mobile:-mx-[var(--pad)]">
         <Pager variant="top" pagination={pagination} />
         <ArtworkGrid posts={timeline.posts} header="pinned" />
         <Pager variant="bottom" pagination={pagination} />

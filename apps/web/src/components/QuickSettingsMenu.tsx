@@ -81,7 +81,7 @@ export function QuickSettingsMenu() {
   return (
     <div
       ref={rootRef}
-      className="quick-settings-root relative inline-flex max-[880px]:static max-[880px]:w-full max-[880px]:h-full max-[880px]:min-w-0"
+      className="quick-settings-root relative inline-flex max-mobile:static max-mobile:w-full max-mobile:h-full max-mobile:min-w-0"
     >
       <button
         type="button"
@@ -94,7 +94,7 @@ export function QuickSettingsMenu() {
           setOpen((value) => !value);
         }}
         className={cn(
-          "size-[28px] flex-none inline-flex items-center justify-center cursor-pointer p-0 max-[880px]:size-full max-[880px]:min-h-[52px]",
+          "size-[28px] flex-none inline-flex items-center justify-center cursor-pointer p-0 max-mobile:size-full max-mobile:min-h-[52px]",
           "border-none bg-header-tint text-header-fg",
           "transition-colors duration-[140ms] hover:bg-header-tint-hi",
           open && "bg-ink text-paper",
@@ -109,14 +109,14 @@ export function QuickSettingsMenu() {
           aria-label="Quick settings"
           className={cn(
             "absolute top-[calc(100%+8px)] right-0 z-50 w-[292px]",
-            "max-[880px]:top-auto max-[880px]:right-auto max-[880px]:bottom-[calc(100%+8px)] max-[880px]:left-0 max-[880px]:w-full max-[880px]:max-w-[100vw]",
+            "max-mobile:top-auto max-mobile:right-auto max-mobile:bottom-[calc(100%+8px)] max-mobile:left-0 max-mobile:w-full max-mobile:max-w-[100vw]",
             "bg-ink-raised border border-paper text-left",
             "shadow-[0_22px_40px_-20px_var(--shadow-drop)]",
           )}
         >
           <span
             aria-hidden="true"
-            className="absolute -top-[5px] right-[10px] size-[8px] rotate-45 bg-ink border-l border-t border-paper max-[880px]:hidden"
+            className="absolute -top-[5px] right-[10px] size-[8px] rotate-45 bg-ink border-l border-t border-paper max-mobile:hidden"
           />
           {FILTER_CATEGORIES.map((category) => (
             <SettingRow

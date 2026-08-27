@@ -14,11 +14,11 @@ import { cn } from "#/lib/utils.ts";
 // Desktop: the old app's stacked stat (number over label). Mobile: a compact
 // inline "0 Followers" so the three read as one dot-separated row.
 const STAT_LINK =
-  "flex flex-col gap-[2px] items-start no-underline max-[880px]:inline max-[880px]:font-bold max-[880px]:text-[14px]";
+  "flex flex-col gap-[2px] items-start no-underline max-mobile:inline max-mobile:font-bold max-mobile:text-[14px]";
 const STAT_VALUE =
-  "font-display text-[22px] font-[500] leading-none max-[880px]:font-bold max-[880px]:text-[14px]";
+  "font-display text-[22px] font-[500] leading-none max-mobile:font-bold max-mobile:text-[14px]";
 const STAT_LABEL =
-  "font-mono text-[10.5px] tracking-[0.16em] uppercase text-faint max-[880px]:text-[12px] max-[880px]:normal-case max-[880px]:tracking-normal";
+  "font-mono text-[10.5px] tracking-[0.16em] uppercase text-faint max-mobile:text-[12px] max-mobile:normal-case max-mobile:tracking-normal";
 
 const BSKY_FAVICON = "https://www.google.com/s2/favicons?domain=bsky.app&sz=64";
 // theme-invariant: Bluesky's brand colour, from the old app's connections palette.
@@ -78,7 +78,7 @@ function ProfileStats({
   artCount: number;
 }) {
   return (
-    <div className="flex gap-[26px] py-[6px] max-[880px]:order-1 max-[880px]:flex-1 max-[880px]:flex-wrap max-[880px]:items-baseline max-[880px]:gap-x-[10px] max-[880px]:gap-y-[6px]">
+    <div className="flex gap-[26px] py-[6px] max-mobile:order-1 max-mobile:flex-1 max-mobile:flex-wrap max-mobile:items-baseline max-mobile:gap-x-[10px] max-mobile:gap-y-[6px]">
       <Link
         to="/profile/$handle/followers"
         params={{ handle: profile.handle }}
@@ -87,7 +87,7 @@ function ProfileStats({
         <b className={STAT_VALUE}>{profile.followersCount ?? 0}</b>{" "}
         <span className={STAT_LABEL}>Followers</span>
       </Link>
-      <span className="hidden max-[880px]:inline text-[13px] text-faint" aria-hidden="true">
+      <span className="hidden max-mobile:inline text-[13px] text-faint" aria-hidden="true">
         ·
       </span>
       <Link
@@ -98,7 +98,7 @@ function ProfileStats({
         <b className={STAT_VALUE}>{profile.followsCount ?? 0}</b>{" "}
         <span className={STAT_LABEL}>Following</span>
       </Link>
-      <span className="hidden max-[880px]:inline text-[13px] text-faint" aria-hidden="true">
+      <span className="hidden max-mobile:inline text-[13px] text-faint" aria-hidden="true">
         ·
       </span>
       <Link
@@ -122,15 +122,15 @@ function ProfileStats({
 function ProfileBio({ description, bioId }: { description?: string | null; bioId: string }) {
   if (!description)
     return (
-      <div className="flex-1 min-w-[280px] max-[880px]:order-3 max-[880px]:basis-full max-[880px]:min-w-0" />
+      <div className="flex-1 min-w-[280px] max-mobile:order-3 max-mobile:basis-full max-mobile:min-w-0" />
     );
 
   return (
-    <div className="flex-1 min-w-[280px] max-[880px]:order-3 max-[880px]:basis-full max-[880px]:min-w-0">
+    <div className="flex-1 min-w-[280px] max-mobile:order-3 max-mobile:basis-full max-mobile:min-w-0">
       <ExpandableText
         description={description}
         id={bioId}
-        className="m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words max-[880px]:text-[13px]"
+        className="m-0 text-[15.5px] text-paper whitespace-pre-wrap break-words max-mobile:text-[13px]"
         collapsedClassName="line-clamp-4"
       />
     </div>
@@ -164,7 +164,7 @@ export function ProfileHeader({
           // Mobile full-bleed: the header escapes `.wrap`'s inline padding to
           // reach the window edges, matching the gallery below it. Desktop keeps
           // the wrap padding.
-          "max-[880px]:-mx-[var(--pad)]",
+          "max-mobile:-mx-[var(--pad)]",
           "shadow-[0_24px_48px_-36px_var(--shadow-drop)]",
           "before:content-[''] before:absolute before:inset-0 before:pointer-events-none",
           // theme-invariant: contrast over arbitrary user artwork.
@@ -177,7 +177,7 @@ export function ProfileHeader({
           className="absolute inset-0 z-[-1] bg-cover bg-center"
           style={{ ...bannerStyle, ...(blur ? { filter: blur } : {}) }}
         />
-        <div className="absolute inset-0 flex flex-col items-start justify-center gap-[12px] py-[20px] px-[24px] max-[880px]:px-[16px]">
+        <div className="absolute inset-0 flex flex-col items-start justify-center gap-[12px] py-[20px] px-[24px] max-mobile:px-[16px]">
           <div
             className="w-[clamp(96px,14vw,160px)] h-[clamp(96px,14vw,160px)] flex-none bg-cover bg-center border border-line shadow-[inset_0_0_0_3px_var(--color-ink-raised),0_18px_36px_-24px_var(--shadow-drop)]"
             style={{ ...avatarStyle, ...(blur ? { filter: blur } : {}) }}
@@ -207,7 +207,7 @@ export function ProfileHeader({
 
       {/* Desktop: description | stats | follow in one row (the old layout).
           Mobile: stats+follow first, description below. */}
-      <div className="flex items-start flex-wrap gap-[24px] mt-[14px] max-[880px]:items-center max-[880px]:gap-[10px] max-[880px]:-mx-[12px] max-[880px]:mt-[8px]">
+      <div className="flex items-start flex-wrap gap-[24px] mt-[14px] max-mobile:items-center max-mobile:gap-[10px] max-mobile:-mx-[12px] max-mobile:mt-[8px]">
         <ProfileBio
           description={profile.description}
           bioId={`profile-bio-${profile.did.replace(/[^a-zA-Z0-9_-]/g, "-")}`}
@@ -215,7 +215,7 @@ export function ProfileHeader({
 
         <ProfileStats profile={profile} section={section} artCount={artCount} />
 
-        <div className="flex items-center gap-[8px] py-[6px] max-[880px]:order-2 max-[880px]:py-0">
+        <div className="flex items-center gap-[8px] py-[6px] max-mobile:order-2 max-mobile:py-0">
           <FollowButton subject={profile.did} />
         </div>
       </div>

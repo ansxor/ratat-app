@@ -10,13 +10,13 @@ import { QuickSettingsMenu } from "#/components/QuickSettingsMenu.tsx";
 const HEADER = "z-50 bg-header border-header-edge box-border max-w-[100vw]";
 const DESKTOP_ROW = "masthead-row wrap flex items-center gap-[18px] h-[42px]";
 const MOBILE_ROW =
-  "masthead-row wrap grid grid-cols-4 gap-1 h-[64px] p-[4px_8px] max-[880px]:static";
+  "masthead-row wrap grid grid-cols-4 gap-1 h-[64px] p-[4px_8px] max-mobile:static";
 
 function MastheadBar({ mobile = false }: { mobile?: boolean }) {
   const row = mobile ? MOBILE_ROW : DESKTOP_ROW;
   const header = mobile
-    ? "masthead masthead--mobile hidden max-[880px]:block relative order-2 flex-none w-full border-t-2"
-    : "masthead masthead--desktop sticky top-0 border-b-2 max-[880px]:hidden";
+    ? "masthead masthead--mobile hidden max-mobile:block relative order-2 flex-none w-full border-t-2"
+    : "masthead masthead--desktop sticky top-0 border-b-2 max-mobile:hidden";
 
   return (
     <header className={`${header} ${HEADER}`} aria-label={mobile ? "Mobile navigation" : undefined}>

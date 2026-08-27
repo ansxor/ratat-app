@@ -70,7 +70,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
   const covered = veil.variant !== null && !veil.peeked;
   const frame = cn(
     veilFrameClass(covered ? veil.variant : null, { animated: veil.animated, strength: "page" }),
-    "max-[880px]:!h-auto max-[880px]:max-h-[calc(100dvh-var(--header-h))]",
+    "max-mobile:!h-auto max-mobile:max-h-[calc(100dvh-var(--header-h))]",
   );
 
   const cover = veil.variant && (
@@ -87,7 +87,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
 
   if (isVideo(media)) {
     return (
-      <div style={style} className={cn(frame, "p-[16px] max-[880px]:p-0")}>
+      <div style={style} className={cn(frame, "p-[16px] max-mobile:p-0")}>
         <video
           controls
           playsInline
@@ -105,7 +105,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
   }
 
   return (
-    <div style={style} className={cn(frame, "p-[16px] max-[880px]:p-0")}>
+    <div style={style} className={cn(frame, "p-[16px] max-mobile:p-0")}>
       <Image
         src={media.fullsize}
         alt={covered ? "" : (media.alt ?? alt)}
@@ -164,7 +164,7 @@ function ArtistActions({ post }: { post: Post }) {
           <Link
             to="/profile/$handle"
             params={{ handle: post.author.handle }}
-            className="inline-flex min-w-0 items-center gap-[7px] border-b border-line text-paper rounded-[6px] px-[7px] py-[3px] mx-[-7px] my-[-3px] transition-[background] duration-[140ms] hover:bg-ink-hi max-[880px]:border-b-0"
+            className="inline-flex min-w-0 items-center gap-[7px] border-b border-line text-paper rounded-[6px] px-[7px] py-[3px] mx-[-7px] my-[-3px] transition-[background] duration-[140ms] hover:bg-ink-hi max-mobile:border-b-0"
           >
             {post.author.avatar ? (
               <Image
@@ -177,12 +177,14 @@ function ArtistActions({ post }: { post: Post }) {
             ) : (
               <span className="size-[20px] flex-none rounded-[4px] border border-line-2 bg-mat" />
             )}
-            <span className="min-w-0 truncate max-[880px]:text-[17px] max-[880px]:font-[600]">{artistName}</span>
+            <span className="min-w-0 truncate max-mobile:text-[17px] max-mobile:font-[600]">
+              {artistName}
+            </span>
           </Link>
           <FollowButton
             subject={post.author.did}
             variant="compact"
-            className="max-[880px]:h-[34px] max-[880px]:px-[12px] max-[880px]:text-[14px] max-[880px]:[&_svg]:size-[15px]"
+            className="max-mobile:h-[34px] max-mobile:px-[12px] max-mobile:text-[14px] max-mobile:[&_svg]:size-[15px]"
           />
         </div>
       </div>
@@ -214,10 +216,10 @@ function ArtworkPage() {
 
   return (
     <>
-      <main className="gallery max-[880px]:pt-0">
+      <main className="gallery max-mobile:pt-0">
         <div className="wrap layout">
           <div className="feed">
-            <div className="max-[880px]:-mx-[var(--pad)]">
+            <div className="max-mobile:-mx-[var(--pad)]">
               {post.media.length > 1 ? (
                 <MediaCarousel media={post.media} alt={mediaAlt} veil={frameVeil} />
               ) : (
@@ -227,7 +229,7 @@ function ArtworkPage() {
               )}
             </div>
 
-            <div className="mt-[24px] flex items-start gap-[16px] max-[880px]:hidden">
+            <div className="mt-[24px] flex items-start gap-[16px] max-mobile:hidden">
               <ArtistActions post={post} />
             </div>
 
@@ -257,7 +259,7 @@ function ArtworkMeta({
 }) {
   return (
     <div
-      className="mt-[16px] max-[880px]:mt-0 max-[880px]:-mx-[var(--pad)] rounded-[4px] max-[880px]:rounded-none"
+      className="mt-[16px] max-mobile:mt-0 max-mobile:-mx-[var(--pad)] rounded-[4px] max-mobile:rounded-none"
       style={{
         background: "var(--ink-raised)",
         border: "1px solid var(--line-2)",
@@ -266,7 +268,7 @@ function ArtworkMeta({
     >
       {description && (
         <div
-          className="text-[15px] max-[880px]:text-[13px]"
+          className="text-[15px] max-mobile:text-[13px]"
           style={{
             padding: "16px",
             lineHeight: 1.6,
@@ -278,13 +280,13 @@ function ArtworkMeta({
             description={description}
             id="artwork-description"
             className="m-0"
-            collapsedClassName="max-[880px]:line-clamp-3"
+            collapsedClassName="max-mobile:line-clamp-3"
           />
         </div>
       )}
       {actions && (
         <div
-          className="hidden max-[880px]:flex items-center gap-[12px]"
+          className="hidden max-mobile:flex items-center gap-[12px]"
           style={{
             padding: "9px 16px",
             borderTop: description ? "1px solid var(--line)" : "none",

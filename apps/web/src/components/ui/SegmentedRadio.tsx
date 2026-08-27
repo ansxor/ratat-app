@@ -53,7 +53,7 @@ export function SegmentedRadio<T extends string>({
           key={option.value}
           title={option.hint ? `${option.label} · ${option.hint}` : option.label}
           className={cn(
-            "h-[27px] max-[880px]:h-[44px] inline-flex items-center justify-center cursor-pointer p-0",
+            "h-[27px] max-mobile:h-[44px] inline-flex items-center justify-center cursor-pointer p-0",
             "bg-ink-raised text-mist transition-colors duration-[140ms] hover:bg-ink",
             "[&_svg]:size-[15px]",
             value === option.value &&

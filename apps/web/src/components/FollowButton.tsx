@@ -73,7 +73,7 @@ export function FollowButton({
       disabled={pending}
     >
       <CheckIcon />
-      <span className="max-[880px]:hidden">Following</span>
+      <span className="max-mobile:hidden">Following</span>
     </button>
   ) : (
     <button
@@ -84,7 +84,7 @@ export function FollowButton({
       disabled={pending}
     >
       <PlusIcon />
-      <span className="max-[880px]:hidden">Follow</span>
+      <span className="max-mobile:hidden">Follow</span>
     </button>
   );
 }

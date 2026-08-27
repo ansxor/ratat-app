@@ -12,7 +12,7 @@ export function MastheadNav() {
   const home = pathname === "/";
 
   return (
-    <nav className="flex gap-4 ml-[8px] items-center max-[880px]:hidden" aria-label="Primary">
+    <nav className="flex gap-4 ml-[8px] items-center max-mobile:hidden" aria-label="Primary">
       <Link
         className={cn("flex gap-2", NAV_LINK, home && NAV_LINK_ACTIVE)}
         to="/"

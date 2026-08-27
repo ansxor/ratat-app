@@ -20,7 +20,10 @@ export function PaginationViewportProvider({ children }: { children: ReactNode }
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const query = window.matchMedia("(max-width: 880px)");
+    const breakpoint = getComputedStyle(document.documentElement)
+      .getPropertyValue("--breakpoint-mobile")
+      .trim();
+    const query = window.matchMedia(`(max-width: ${breakpoint})`);
     const update = () => setIsMobile(query.matches);
     query.addEventListener("change", update);
     update();

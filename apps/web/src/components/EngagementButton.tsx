@@ -12,7 +12,7 @@ import { useSession } from "#/lib/session.tsx";
 import { cn } from "#/lib/utils.ts";
 
 const DETAIL_CLASS =
-  "inline-flex items-center gap-[6px] text-[13px] font-[700] px-[12px] py-[7px] bg-ink-raised border text-paper transition-[background,border-color] duration-[140ms] hover:bg-ink-hi [&_svg]:size-[15px] [&_svg]:text-gold hover:border-gold disabled:cursor-default disabled:opacity-60 disabled:hover:bg-ink-raised disabled:hover:border-line max-[880px]:gap-[8px] max-[880px]:text-[16px] max-[880px]:px-[16px] max-[880px]:py-[8px] max-[880px]:[&_svg]:size-[19px]";
+  "inline-flex items-center gap-[6px] text-[13px] font-[700] px-[12px] py-[7px] bg-ink-raised border text-paper transition-[background,border-color] duration-[140ms] hover:bg-ink-hi [&_svg]:size-[15px] [&_svg]:text-gold hover:border-gold disabled:cursor-default disabled:opacity-60 disabled:hover:bg-ink-raised disabled:hover:border-line max-mobile:gap-[8px] max-mobile:text-[16px] max-mobile:px-[16px] max-mobile:py-[8px] max-mobile:[&_svg]:size-[19px]";
 
 /**
  * The old app's favourite control. Ratat writes a real `app.bsky.feed.like`, so

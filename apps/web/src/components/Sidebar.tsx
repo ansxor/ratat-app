@@ -19,10 +19,10 @@ export function Sidebar({ moreBy }: { moreBy: Post[] }) {
   const visible = useVisible(moreBy);
   if (visible.length === 0) return null;
   return (
-    <aside className="w-[326px] flex-none max-[880px]:-mx-[var(--pad)] max-[880px]:w-[calc(100%+var(--pad)*2)] [&_section+section]:mt-[18px]">
+    <aside className="w-[326px] flex-none max-mobile:-mx-[var(--pad)] max-mobile:w-[calc(100%+var(--pad)*2)] [&_section+section]:mt-[18px]">
       <section>
         <RailHeading>More by @{visible[0]?.author.handle}</RailHeading>
-        <div className="grid grid-cols-2 gap-[0.4rem] max-[880px]:gap-0">
+        <div className="grid grid-cols-2 gap-[0.4rem] max-mobile:gap-0">
           {visible.map((post) => (
             <ArtworkCard key={post.uri} post={post} aspect="1/1" header="none" />
           ))}

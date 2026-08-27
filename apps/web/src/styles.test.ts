@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 const styles = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const masthead = readFileSync(new URL("./components/Masthead.tsx", import.meta.url), "utf8");
+const brandMark = readFileSync(new URL("./components/BrandMark.tsx", import.meta.url), "utf8");
 const rootRoute = readFileSync(new URL("./routes/__root.tsx", import.meta.url), "utf8");
 const quickSettings = readFileSync(
   new URL("./components/QuickSettingsMenu.tsx", import.meta.url),
@@ -19,6 +20,13 @@ function declaration(selector: string, property: string, css = styles): string |
 test("censored gallery cards keep their artist header above the veil", () => {
   // ArtworkVeil uses z-[3]; the artist header must remain above it.
   expect(Number(declaration(".piece__top", "z-index"))).toBeGreaterThan(3);
+});
+
+test("mobile behavior uses one Tailwind breakpoint token", () => {
+  expect(styles).toContain("--breakpoint-mobile: 880px;");
+  expect(styles).toContain("@media (max-width: theme(--breakpoint-mobile))");
+  expect(masthead).toContain("max-mobile:");
+  expect(brandMark).toContain('compact && "max-mobile:hidden"');
 });
 
 test("the search combobox disables document scroll padding only while focused", () => {
@@ -44,16 +52,16 @@ test("mobile masthead places search above the action bar", () => {
 });
 
 test("mobile quick settings uses a full-width sheet without an arrow", () => {
-  expect(quickSettings).toContain("max-[880px]:static");
-  expect(quickSettings).toContain("max-[880px]:w-full");
-  expect(quickSettings).toContain("max-[880px]:hidden");
-  expect(quickSettings).toContain("max-[880px]:bottom-[calc(100%+8px)]");
+  expect(quickSettings).toContain("max-mobile:static");
+  expect(quickSettings).toContain("max-mobile:w-full");
+  expect(quickSettings).toContain("max-mobile:hidden");
+  expect(quickSettings).toContain("max-mobile:bottom-[calc(100%+8px)]");
 });
 
 test("the mobile gallery feed fills the column instead of shrinking to its cards", () => {
   expect(declaration(".feed", "width")).toBeUndefined();
   expect(styles).toMatch(
-    /@media\s*\(max-width:\s*880px\)\s*\{[\s\S]*?\.feed\s*\{\s*width:\s*100%\s*;/,
+    /@media\s*\(max-width:\s*theme\(--breakpoint-mobile\)\)\s*\{[\s\S]*?\.feed\s*\{\s*width:\s*100%\s*;/,
   );
 });
 
@@ -65,6 +73,6 @@ test("gallery card details are controlled by their page context", () => {
 
 test("home gallery item headers are hidden on mobile", () => {
   expect(styles).toMatch(
-    /@media\s*\(max-width:\s*880px\)\s*\{[\s\S]*?\.gallery--home \.piece__top\s*\{\s*display:\s*none;/,
+    /@media\s*\(max-width:\s*theme\(--breakpoint-mobile\)\)\s*\{[\s\S]*?\.gallery--home \.piece__top\s*\{\s*display:\s*none;/,
   );
 });

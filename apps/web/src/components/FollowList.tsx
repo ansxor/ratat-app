@@ -21,7 +21,7 @@ import { Fragment, type RefObject } from "react";
 export function FollowRow({ account }: { account: FollowActor }) {
   const name = account.displayName?.trim() || account.handle || account.subject;
   return (
-    <div className="flex items-center gap-[10px] px-[14px] py-[9px] max-[880px]:py-[14px] border-b border-line-soft last:border-b-0">
+    <div className="flex items-center gap-[10px] px-[14px] py-[9px] max-mobile:py-[14px] border-b border-line-soft last:border-b-0">
       <Link
         to="/profile/$handle"
         params={{ handle: account.handle ?? account.subject }}
@@ -43,7 +43,7 @@ export function FollowRow({ account }: { account: FollowActor }) {
       <FollowButton
         subject={account.subject}
         variant="compact"
-        className="max-[880px]:h-[36px] max-[880px]:px-[12px] max-[880px]:text-[13px] max-[880px]:[&_svg]:size-[15px]"
+        className="max-mobile:h-[36px] max-mobile:px-[12px] max-mobile:text-[13px] max-mobile:[&_svg]:size-[15px]"
       />
     </div>
   );
@@ -76,7 +76,7 @@ export function FollowList({
   }
   return (
     <>
-      <div className="border border-line bg-ink-raised max-[880px]:-mx-[var(--pad)]">
+      <div className="border border-line bg-ink-raised max-mobile:-mx-[var(--pad)]">
         {actors.map((account, index) => (
           <Fragment key={account.uri}>
             {anchorIndex === index && anchorRef ? (

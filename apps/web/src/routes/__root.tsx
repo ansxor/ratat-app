@@ -48,7 +48,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <DevLoopbackRedirect />
                 <div className="app-shell flex flex-col h-dvh overflow-hidden">
                   <Masthead />
-                  <div className="app-content flex-auto min-h-0 overflow-auto overflow-x-hidden max-[880px]:order-1">
+                  <div className="app-content flex-auto min-h-0 overflow-auto overflow-x-hidden max-mobile:order-1">
                     {children}
                   </div>
                 </div>

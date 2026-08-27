@@ -20,7 +20,7 @@ export function MobileSearch() {
   };
 
   return (
-    <div className="masthead-mobile-search hidden max-[880px]:flex w-full h-full items-center">
+    <div className="masthead-mobile-search hidden max-mobile:flex w-full h-full items-center">
       <button
         ref={toggleRef}
         type="button"

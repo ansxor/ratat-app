@@ -60,7 +60,7 @@ export function AuthControl() {
   if (!restored) {
     return (
       <span
-        className={`${AVATAR_CLASS} bg-ink-hi cursor-default pointer-events-none animate-pulse-soft max-[880px]:w-full max-[880px]:h-full max-[880px]:min-h-[52px]`}
+        className={`${AVATAR_CLASS} bg-ink-hi cursor-default pointer-events-none animate-pulse-soft max-mobile:w-full max-mobile:h-full max-mobile:min-h-[52px]`}
         aria-hidden="true"
       />
     );
@@ -69,7 +69,7 @@ export function AuthControl() {
   if (!session) {
     return (
       <Link
-        className="btn btn--accent max-[880px]:w-full max-[880px]:h-full max-[880px]:min-h-[52px] max-[880px]:justify-center"
+        className="btn btn--accent max-mobile:w-full max-mobile:h-full max-mobile:min-h-[52px] max-mobile:justify-center"
         to="/login"
       >
         <SignInIcon {...GLYPH} />
@@ -80,10 +80,10 @@ export function AuthControl() {
 
   const handle = session.handle ?? session.did;
   return (
-    <div className="relative flex max-[880px]:w-full max-[880px]:h-full" ref={menuRef}>
+    <div className="relative flex max-mobile:w-full max-mobile:h-full" ref={menuRef}>
       <button
         type="button"
-        className={`${AVATAR_CLASS} cursor-pointer p-0 max-[880px]:w-full max-[880px]:h-full max-[880px]:min-h-[52px]`}
+        className={`${AVATAR_CLASS} cursor-pointer p-0 max-mobile:w-full max-mobile:h-full max-mobile:min-h-[52px]`}
         aria-label={`Signed in as ${handle} — open account menu`}
         title={handle}
         aria-haspopup="menu"
@@ -97,12 +97,12 @@ export function AuthControl() {
       />
       {menuOpen && (
         <div
-          className="absolute top-[calc(100%+8px)] right-0 min-w-[150px] max-[880px]:top-auto max-[880px]:bottom-[calc(100%+8px)] bg-ink-raised border border-line shadow-[0_12px_28px_-12px_var(--shadow-drop)] z-60 flex flex-col"
+          className="absolute top-[calc(100%+8px)] right-0 min-w-[150px] max-mobile:top-auto max-mobile:bottom-[calc(100%+8px)] bg-ink-raised border border-line shadow-[0_12px_28px_-12px_var(--shadow-drop)] z-60 flex flex-col"
           role="menu"
         >
           {session.handle ? (
             <Link
-              className="block w-full text-left bg-none border-none border-b border-b-line-soft font-body text-[13px] font-[600] text-paper px-[12px] py-[8px] cursor-pointer last:border-b-0 hover:bg-ink-hi hover:text-paper max-[880px]:inline-flex max-[880px]:items-center max-[880px]:min-h-[44px] max-[880px]:py-[10px] max-[880px]:text-[15px]"
+              className="block w-full text-left bg-none border-none border-b border-b-line-soft font-body text-[13px] font-[600] text-paper px-[12px] py-[8px] cursor-pointer last:border-b-0 hover:bg-ink-hi hover:text-paper max-mobile:inline-flex max-mobile:items-center max-mobile:min-h-[44px] max-mobile:py-[10px] max-mobile:text-[15px]"
               to="/profile/$handle"
               params={{ handle: session.handle }}
               role="menuitem"
@@ -113,7 +113,7 @@ export function AuthControl() {
           ) : null}
           <button
             type="button"
-            className="block w-full text-left bg-none border-none border-b border-b-line-soft font-body text-[13px] font-[600] text-paper px-[12px] py-[8px] cursor-pointer last:border-b-0 hover:bg-ink-hi hover:text-paper max-[880px]:inline-flex max-[880px]:items-center max-[880px]:min-h-[44px] max-[880px]:py-[10px] max-[880px]:text-[15px]"
+            className="block w-full text-left bg-none border-none border-b border-b-line-soft font-body text-[13px] font-[600] text-paper px-[12px] py-[8px] cursor-pointer last:border-b-0 hover:bg-ink-hi hover:text-paper max-mobile:inline-flex max-mobile:items-center max-mobile:min-h-[44px] max-mobile:py-[10px] max-mobile:text-[15px]"
             role="menuitem"
             onClick={handleSignOut}
           >

@@ -89,19 +89,19 @@ function ArtistPage() {
 
   return (
     <>
-      <main className="gallery max-[880px]:pt-0">
+      <main className="gallery max-mobile:pt-0">
         <div className="wrap layout">
           <div className="feed">
             <ProfileHeader profile={profile} artCount={pagination.total ?? posts.length} />
 
-            <div className="pt-[18px] pb-[40px] max-[880px]:pt-[8px]">
+            <div className="pt-[18px] pb-[40px] max-mobile:pt-[8px]">
               {posts.length === 0 ? (
                 <FeedNotice>
                   No artworks to show yet — this artist has posted nothing with media, or Ratat is
                   still reading their work in.
                 </FeedNotice>
               ) : (
-                <div className="max-[880px]:-mx-[var(--pad)]">
+                <div className="max-mobile:-mx-[var(--pad)]">
                   <Pager variant="top" pagination={pagination} />
                   <ArtworkGrid posts={posts} header="none" />
                   <Pager variant="bottom" pagination={pagination} />

@@ -117,6 +117,8 @@
 }
 
 @theme inline {
+  --breakpoint-mobile: 880px;
+
   --color-ink: var(--ink);
   --color-ink-raised: var(--ink-raised);
   --color-ink-hi: var(--ink-hi);
@@ -462,7 +464,7 @@
       column-width: 150px;
     }
   }
-  @media (max-width: 880px) {
+  @media (max-width: theme(--breakpoint-mobile)) {
     .layout {
       flex-direction: column;
     }
@@ -668,7 +670,7 @@
 
 /* Mobile: the tile border stands in for the removed grid gap, so tiles still
    read as separate click targets. */
-@media (max-width: 880px) {
+@media (max-width: theme(--breakpoint-mobile)) {
   .masthead-mobile-search-field > div:first-child {
     min-height: 44px;
   }

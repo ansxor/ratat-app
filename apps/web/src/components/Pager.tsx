@@ -36,7 +36,7 @@ const pageLink = (
   variants: { current?: boolean; step?: boolean; disabled?: boolean } = {},
 ): string =>
   cn(
-    "text-[15px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-[880px]:inline-flex max-[880px]:min-h-[44px] max-[880px]:min-w-[44px] max-[880px]:items-center max-[880px]:justify-center max-[880px]:px-[10px]",
+    "text-[15px] font-[600] text-mist px-[8px] py-[3px] whitespace-nowrap transition-[color,background] duration-[140ms] hover:text-paper hover:bg-ink-hi max-mobile:inline-flex max-mobile:min-h-[44px] max-mobile:min-w-[44px] max-mobile:items-center max-mobile:justify-center max-mobile:px-[10px]",
     variants.current &&
       "bg-primary !text-[var(--pager-active-ink)] hover:bg-primary hover:!text-[var(--pager-active-ink)]",
     variants.step && "text-primary hover:!text-[var(--pager-active-ink)] hover:bg-primary",
@@ -96,9 +96,9 @@ export function Pager({
       className={cn(
         "flex items-center gap-[8px]",
         variant !== "standalone" &&
-          "bg-[color-mix(in_srgb,var(--color-ink-raised)_92%,transparent)] border border-line px-[10px] py-[4px] mb-[0.4rem] max-[880px]:mb-0",
-        variant === "top" && "max-[880px]:hidden",
-        variant === "bottom" && "mt-[0.4rem] mb-0 max-[880px]:mt-0",
+          "bg-[color-mix(in_srgb,var(--color-ink-raised)_92%,transparent)] border border-line px-[10px] py-[4px] mb-[0.4rem] max-mobile:mb-0",
+        variant === "top" && "max-mobile:hidden",
+        variant === "bottom" && "mt-[0.4rem] mb-0 max-mobile:mt-0",
         variant === "standalone" && "justify-center mt-[1.5rem]",
       )}
     >
@@ -106,7 +106,7 @@ export function Pager({
       {pagination && (pagination.slots.length > 1 || pagination.nextLink) && (
         <nav
           className={cn(
-            "flex min-w-0 items-center gap-[3px] max-[880px]:w-full max-[880px]:justify-between",
+            "flex min-w-0 items-center gap-[3px] max-mobile:w-full max-mobile:justify-between",
             variant !== "standalone" && "ml-auto",
           )}
           aria-label="Pagination"
@@ -114,7 +114,7 @@ export function Pager({
           {pagination.prevLink &&
             (visualOnly ? (
               <span className={pageLink({ step: true })}>
-                ‹ <span className="max-[880px]:hidden">Prev</span>
+                ‹ <span className="max-mobile:hidden">Prev</span>
               </span>
             ) : (
               <Link
@@ -122,12 +122,12 @@ export function Pager({
                 activeOptions={ACTIVE_OPTIONS}
                 {...pagination.prevLink}
               >
-                ‹ <span className="max-[880px]:hidden">Prev</span>
+                ‹ <span className="max-mobile:hidden">Prev</span>
               </Link>
             ))}
           {!pagination.prevLink && (
             <span
-              className={cn(pageLink({ disabled: true }), "hidden max-[880px]:inline-flex")}
+              className={cn(pageLink({ disabled: true }), "hidden max-mobile:inline-flex")}
               aria-disabled="true"
             >
               ‹
@@ -145,7 +145,7 @@ export function Pager({
           {pagination.nextLink ? (
             visualOnly ? (
               <span className={pageLink({ step: true })}>
-                <span className="max-[880px]:hidden">Next</span> ›
+                <span className="max-mobile:hidden">Next</span> ›
               </span>
             ) : (
               <Link
@@ -153,12 +153,12 @@ export function Pager({
                 activeOptions={ACTIVE_OPTIONS}
                 {...pagination.nextLink}
               >
-                <span className="max-[880px]:hidden">Next</span> ›
+                <span className="max-mobile:hidden">Next</span> ›
               </Link>
             )
           ) : (
             <span className={pageLink({ disabled: true })} aria-disabled="true">
-              <span className="max-[880px]:hidden">Next</span> ›
+              <span className="max-mobile:hidden">Next</span> ›
             </span>
           )}
         </nav>
