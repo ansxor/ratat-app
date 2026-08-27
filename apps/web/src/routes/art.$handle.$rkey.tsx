@@ -61,6 +61,8 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
     position: "relative" as const,
     overflow: "hidden",
     height: "calc(100vh - 260px)",
+    width: "100%",
+    aspectRatio: aspectRatio(media),
     background: "var(--ink-raised)",
     border: "1px solid var(--line)",
   };
@@ -68,6 +70,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
   const covered = veil.variant !== null && !veil.peeked;
   const frame = cn(
     veilFrameClass(covered ? veil.variant : null, { animated: veil.animated, strength: "page" }),
+    "max-[880px]:!h-auto max-[880px]:max-h-[calc(100dvh-var(--header-h))]",
   );
 
   const cover = veil.variant && (
