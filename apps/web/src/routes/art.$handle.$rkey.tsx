@@ -330,7 +330,7 @@ function ArtworkMeta({
             flex: "none",
             marginLeft: "auto",
             padding: "3px 8px",
-            borderRadius: "999px",
+            borderRadius: "0",
             border: "1px solid var(--bsky-line)",
             background: "var(--bsky-tint)",
             fontSize: "11.5px",
