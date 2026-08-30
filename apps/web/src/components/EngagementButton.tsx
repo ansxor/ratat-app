@@ -63,8 +63,6 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
     }
   };
 
-  const press = () => void toggle();
-
   const active = optimisticActive ?? Boolean(likeUri);
   const title = !session ? "Sign in to favourite" : active ? "Remove favourite" : "Favourite";
 
@@ -79,7 +77,7 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
         }
         title={title}
         disabled={pending || !session}
-        onClick={press}
+        onClick={() => void toggle()}
       >
         <StarIcon key={animationKey} className={`star-${starAnimation}`} />
         <span>{count}</span>
