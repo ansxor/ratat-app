@@ -2,10 +2,8 @@ import { useEffect, useState } from "react";
 
 import { StarIcon } from "#/components/ui/icons.tsx";
 import {
-  acknowledgeFirstLike,
   createLike,
   deleteLike,
-  hasAcknowledgedFirstLike,
 } from "#/lib/likes.ts";
 import type { Post } from "#/lib/ratat.ts";
 import { useSession } from "#/lib/session.tsx";
@@ -15,15 +13,13 @@ const DETAIL_CLASS =
   "inline-flex items-center gap-[6px] text-[13px] font-[700] px-[12px] py-[7px] bg-ink-raised border text-paper transition-[background,border-color] duration-[140ms] hover:bg-ink-hi [&_svg]:size-[15px] [&_svg]:text-gold hover:border-gold disabled:cursor-default disabled:opacity-60 disabled:hover:bg-ink-raised disabled:hover:border-line max-mobile:gap-[8px] max-mobile:text-[16px] max-mobile:px-[16px] max-mobile:py-[8px] max-mobile:[&_svg]:size-[19px]";
 
 /**
- * The old app's favourite control. Ratat writes a real `app.bsky.feed.like`, so
- * the first press asks for consent before the record is created.
+ * The old app's favourite control. Ratat writes a real `app.bsky.feed.like`.
  */
 export function EngagementButton({ post, variant }: { post: Post; variant: "card" | "detail" }) {
   const { session } = useSession();
   const [count, setCount] = useState(post.likeCount ?? 0);
   const [likeUri, setLikeUri] = useState<string | undefined>(post.viewerLike);
   const [pending, setPending] = useState(false);
-  const [notice, setNotice] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [optimisticActive, setOptimisticActive] = useState<boolean | undefined>();
   const [animationKey, setAnimationKey] = useState(0);
@@ -67,19 +63,7 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
     }
   };
 
-  const press = () => {
-    if (!likeUri && !hasAcknowledgedFirstLike()) {
-      setNotice(true);
-      return;
-    }
-    void toggle();
-  };
-
-  const confirmNotice = () => {
-    acknowledgeFirstLike();
-    setNotice(false);
-    void toggle();
-  };
+  const press = () => void toggle();
 
   const active = optimisticActive ?? Boolean(likeUri);
   const title = !session ? "Sign in to favourite" : active ? "Remove favourite" : "Favourite";
@@ -100,30 +84,6 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
         <StarIcon key={animationKey} className={`star-${starAnimation}`} />
         <span>{count}</span>
       </button>
-
-      {notice && (
-        // Cards clip their overflow, so the card notice opens upward over the artwork.
-        <div
-          className={cn(
-            "absolute z-30 bg-ink-raised border border-line shadow-[0_12px_28px_-12px_var(--shadow-drop)] p-[12px]",
-            variant === "detail"
-              ? "top-[calc(100%+8px)] left-0 w-[266px]"
-              : "bottom-[calc(100%+6px)] left-0 w-[230px]",
-          )}
-        >
-          <p className="m-0 text-[13px] leading-[1.5] text-paper">
-            Favouriting here writes a real like to your Bluesky account, visible on Bluesky.
-          </p>
-          <div className="mt-[10px] flex gap-[8px]">
-            <button type="button" className="btn btn--accent" onClick={confirmNotice}>
-              Got it — favourite it
-            </button>
-            <button type="button" className="btn btn--ghost" onClick={() => setNotice(false)}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
 
       {error && (
         <p

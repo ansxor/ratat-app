@@ -48,21 +48,3 @@ export async function deleteLike(agent: OAuthUserAgent, likeUri: string): Promis
   });
   if (!res.ok) fail("deleteRecord", res.data.error);
 }
-
-const FIRST_LIKE_KEY = "ratat:first-like-acknowledged";
-
-export function hasAcknowledgedFirstLike(): boolean {
-  try {
-    return window.localStorage.getItem(FIRST_LIKE_KEY) === "1";
-  } catch {
-    return true;
-  }
-}
-
-export function acknowledgeFirstLike(): void {
-  try {
-    window.localStorage.setItem(FIRST_LIKE_KEY, "1");
-  } catch {
-    /* a browser that refuses storage simply shows the notice again */
-  }
-}
