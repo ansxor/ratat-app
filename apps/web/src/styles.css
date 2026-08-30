@@ -582,17 +582,15 @@
 
   .piece__bar {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    right: 8px;
+    bottom: 8px;
+    z-index: 5;
     display: flex;
-    align-items: center;
-    gap: 0;
-    padding: 1px 4px;
+    padding: 0;
     background: color-mix(in srgb, var(--ink-raised) 92%, transparent);
     backdrop-filter: blur(8px);
-    border-top: 1px solid var(--line);
-    transform: translateY(101%);
+    border: 1px solid var(--line);
+    transform: translateY(14px);
     opacity: 0;
     transition:
       transform 0.22s cubic-bezier(0.2, 0.7, 0.2, 1),
@@ -600,7 +598,7 @@
   }
   .piece:hover .piece__bar,
   .piece:focus-within .piece__bar {
-    transform: none;
+    transform: translateY(0);
     opacity: 1;
   }
 
@@ -623,7 +621,14 @@
     width: 13px;
     height: 13px;
   }
-  .act--star svg {
+  .piece__bar .act--star {
+    gap: 6px;
+    padding: 7px 9px;
+    font-size: 13px;
+  }
+  .piece__bar .act--star svg {
+    width: 17px;
+    height: 17px;
     color: var(--gold);
   }
   @keyframes star-bounce {

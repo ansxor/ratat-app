@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 
 import { ArtworkVeil, veilFrameClass } from "#/components/content/ArtworkVeil.tsx";
 import { EngagementButton } from "#/components/EngagementButton.tsx";
-import { BoostIcon, ChatIcon } from "#/components/ui/icons.tsx";
 import { artworkParams } from "#/lib/artwork-href.ts";
 import { Image } from "#/lib/image.tsx";
 import { aspectRatio, isVideo, type Post } from "#/lib/ratat.ts";
@@ -90,14 +89,6 @@ export function ArtworkCard({
 
         <div className="piece__bar">
           <EngagementButton post={post} variant="card" />
-          <span className="act act--boost">
-            <BoostIcon />
-            <span>{post.repostCount ?? 0}</span>
-          </span>
-          <span className="act act--cm">
-            <ChatIcon />
-            <span>{post.replyCount ?? 0}</span>
-          </span>
         </div>
       </div>
     </article>
