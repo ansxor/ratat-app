@@ -25,12 +25,16 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [optimisticActive, setOptimisticActive] = useState<boolean | undefined>();
+  const [animationKey, setAnimationKey] = useState(0);
+  const [starAnimation, setStarAnimation] = useState<"bounce" | "shrink">("bounce");
 
   const agent = session?.agent;
 
   useEffect(() => {
     setCount(post.likeCount ?? 0);
     setLikeUri(post.viewerLike);
+    setOptimisticActive(undefined);
     setError(null);
   }, [post.uri, post.likeCount, post.viewerLike]);
 
@@ -38,17 +42,25 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
     if (!agent || pending) return;
     setPending(true);
     setError(null);
+    const wasActive = Boolean(likeUri);
+    const previousCount = count;
+    setOptimisticActive(!wasActive);
+    setCount((value) => wasActive ? Math.max(0, value - 1) : value + 1);
+    setStarAnimation(wasActive ? "shrink" : "bounce");
+    setAnimationKey((value) => value + 1);
     try {
       if (likeUri) {
         await deleteLike(agent, likeUri);
         setLikeUri(undefined);
-        setCount((value) => Math.max(0, value - 1));
       } else {
         const uri = await createLike(agent, { uri: post.uri, cid: post.cid });
         setLikeUri(uri);
-        setCount((value) => value + 1);
       }
+      setOptimisticActive(undefined);
     } catch (cause) {
+      setLikeUri(likeUri);
+      setOptimisticActive(undefined);
+      setCount(previousCount);
       setError(cause instanceof Error ? cause.message : "That didn't work.");
     } finally {
       setPending(false);
@@ -69,7 +81,7 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
     void toggle();
   };
 
-  const active = Boolean(likeUri);
+  const active = optimisticActive ?? Boolean(likeUri);
   const title = !session ? "Sign in to favourite" : active ? "Remove favourite" : "Favourite";
 
   return (
@@ -85,7 +97,7 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
         disabled={pending || !session}
         onClick={press}
       >
-        <StarIcon />
+        <StarIcon key={animationKey} className={`star-${starAnimation}`} />
         <span>{count}</span>
       </button>
 
@@ -115,12 +127,10 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
 
       {error && (
         <p
-          className={cn(
-            "absolute z-30 m-0 bg-ink-raised border border-line px-[10px] py-[6px] text-[12.5px] text-[var(--danger)]",
-            variant === "detail" ? "top-[calc(100%+8px)] left-0" : "bottom-[calc(100%+6px)] left-0",
-          )}
+          role="alert"
+          className="fixed bottom-[20px] right-[20px] z-50 m-0 max-w-[min(360px,calc(100vw-40px))] border border-[var(--danger)] bg-ink-raised px-[12px] py-[9px] text-[13px] text-[var(--danger)] shadow-[0_12px_28px_-12px_var(--shadow-drop)]"
         >
-          {error}
+          Favourite failed: {error}
         </p>
       )}
     </div>
