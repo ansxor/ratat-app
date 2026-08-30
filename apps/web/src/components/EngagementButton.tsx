@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { StarIcon } from "#/components/ui/icons.tsx";
-import {
-  createLike,
-  deleteLike,
-} from "#/lib/likes.ts";
+import { createLike, deleteLike } from "#/lib/likes.ts";
 import type { Post } from "#/lib/ratat.ts";
 import { useSession } from "#/lib/session.tsx";
 import { cn } from "#/lib/utils.ts";
@@ -20,7 +18,6 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
   const [count, setCount] = useState(post.likeCount ?? 0);
   const [likeUri, setLikeUri] = useState<string | undefined>(post.viewerLike);
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [optimisticActive, setOptimisticActive] = useState<boolean | undefined>();
   const [animationKey, setAnimationKey] = useState(0);
   const [starAnimation, setStarAnimation] = useState<"bounce" | "shrink">("bounce");
@@ -31,17 +28,15 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
     setCount(post.likeCount ?? 0);
     setLikeUri(post.viewerLike);
     setOptimisticActive(undefined);
-    setError(null);
   }, [post.uri, post.likeCount, post.viewerLike]);
 
   const toggle = async () => {
     if (!agent || pending) return;
     setPending(true);
-    setError(null);
     const wasActive = Boolean(likeUri);
     const previousCount = count;
     setOptimisticActive(!wasActive);
-    setCount((value) => wasActive ? Math.max(0, value - 1) : value + 1);
+    setCount((value) => (wasActive ? Math.max(0, value - 1) : value + 1));
     setStarAnimation(wasActive ? "shrink" : "bounce");
     setAnimationKey((value) => value + 1);
     try {
@@ -57,7 +52,9 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
       setLikeUri(likeUri);
       setOptimisticActive(undefined);
       setCount(previousCount);
-      setError(cause instanceof Error ? cause.message : "That didn't work.");
+      toast.error(
+        `Favourite failed: ${cause instanceof Error ? cause.message : "That didn't work."}`,
+      );
     } finally {
       setPending(false);
     }
@@ -82,15 +79,6 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
         <StarIcon key={animationKey} className={`star-${starAnimation}`} />
         <span>{count}</span>
       </button>
-
-      {error && (
-        <p
-          role="alert"
-          className="fixed bottom-[20px] right-[20px] z-50 m-0 max-w-[min(360px,calc(100vw-40px))] border border-[var(--danger)] bg-ink-raised px-[12px] py-[9px] text-[13px] text-[var(--danger)] shadow-[0_12px_28px_-12px_var(--shadow-drop)]"
-        >
-          Favourite failed: {error}
-        </p>
-      )}
     </div>
   );
 }

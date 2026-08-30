@@ -1,4 +1,5 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
+import { Toaster } from "sonner";
 
 import { DevLoopbackRedirect } from "#/components/DevLoopbackRedirect.tsx";
 import { Masthead } from "#/components/Masthead.tsx";
@@ -57,6 +58,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           </SettingsProvider>
         </PaginationViewportProvider>
 
+        <Toaster position="bottom-right" />
         <Scripts />
       </body>
     </html>
