@@ -237,7 +237,7 @@ function ArtworkPage() {
               <div className="mt-[24px] flex items-start gap-[16px] max-mobile:hidden">
                 <ArtistActions post={post} />
               </div>
-              <div className="hidden max-mobile:-mx-[var(--pad)] max-mobile:flex max-mobile:items-center max-mobile:gap-[12px] max-mobile:border max-mobile:border-line-2 max-mobile:bg-ink-raised max-mobile:px-[16px] max-mobile:py-[9px]">
+              <div className="hidden max-mobile:-mx-[var(--pad)] max-mobile:flex max-mobile:items-center max-mobile:gap-[12px] max-mobile:border max-mobile:border-b-2 max-mobile:border-line-2 max-mobile:bg-ink-raised max-mobile:px-[16px] max-mobile:py-[9px]">
                 <ArtistActions post={post} />
               </div>
             </div>
