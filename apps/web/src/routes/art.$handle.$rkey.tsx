@@ -223,7 +223,7 @@ function ArtworkPage() {
       <main className="gallery max-mobile:pt-0">
         <div className="wrap layout">
           <div className="feed">
-            <div className="max-mobile:flex max-mobile:h-[calc(100dvh-64px)] max-mobile:flex-col">
+            <div className="max-mobile:flex max-mobile:h-[calc(100dvh-66px)] max-mobile:flex-col">
               <div className="max-mobile:-mx-[var(--pad)] max-mobile:min-h-0 max-mobile:flex-1">
                 {post.media.length > 1 ? (
                   <MediaCarousel media={post.media} alt={mediaAlt} veil={frameVeil} />
@@ -237,7 +237,7 @@ function ArtworkPage() {
               <div className="mt-[24px] flex items-start gap-[16px] max-mobile:hidden">
                 <ArtistActions post={post} />
               </div>
-              <div className="hidden max-mobile:-mx-[var(--pad)] max-mobile:flex max-mobile:items-center max-mobile:gap-[12px] max-mobile:mb-px max-mobile:border max-mobile:border-line-2 max-mobile:bg-ink-raised max-mobile:px-[16px] max-mobile:py-[9px]">
+              <div className="hidden max-mobile:-mx-[var(--pad)] max-mobile:flex max-mobile:items-center max-mobile:gap-[12px] max-mobile:border max-mobile:border-line-2 max-mobile:bg-ink-raised max-mobile:px-[16px] max-mobile:py-[9px]">
                 <ArtistActions post={post} />
               </div>
             </div>
