@@ -70,7 +70,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
   const covered = veil.variant !== null && !veil.peeked;
   const frame = cn(
     veilFrameClass(covered ? veil.variant : null, { animated: veil.animated, strength: "page" }),
-    "max-mobile:!h-[calc(100dvh-118px)] max-mobile:min-h-0 max-mobile:max-h-none",
+    "max-mobile:!h-full max-mobile:min-h-0 max-mobile:max-h-none",
   );
 
   const cover = veil.variant && (
@@ -133,7 +133,11 @@ function MediaCarousel({ media, alt, veil }: { media: Media[]; alt: string; veil
   }, [api]);
 
   return (
-    <Carousel setApi={setApi} aria-label={alt}>
+    <Carousel
+      setApi={setApi}
+      aria-label={alt}
+      className="max-mobile:h-full max-mobile:[&_[data-slot=carousel-content]]:h-full max-mobile:[&_[data-slot=carousel-item]]:h-full"
+    >
       <CarouselContent className="-ml-[0.4rem]">
         {media.map((item, index) => (
           <CarouselItem key={index} className="pl-[0.4rem]">
@@ -219,25 +223,26 @@ function ArtworkPage() {
       <main className="gallery max-mobile:pt-0">
         <div className="wrap layout">
           <div className="feed">
-            <div className="max-mobile:-mx-[var(--pad)]">
-              {post.media.length > 1 ? (
-                <MediaCarousel media={post.media} alt={mediaAlt} veil={frameVeil} />
-              ) : (
-                post.media[0] && (
-                  <MediaFrame media={post.media[0]} alt={mediaAlt} veil={frameVeil} />
-                )
-              )}
+            <div className="max-mobile:flex max-mobile:h-[calc(100dvh-64px)] max-mobile:flex-col">
+              <div className="max-mobile:-mx-[var(--pad)] max-mobile:min-h-0 max-mobile:flex-1">
+                {post.media.length > 1 ? (
+                  <MediaCarousel media={post.media} alt={mediaAlt} veil={frameVeil} />
+                ) : (
+                  post.media[0] && (
+                    <MediaFrame media={post.media[0]} alt={mediaAlt} veil={frameVeil} />
+                  )
+                )}
+              </div>
+
+              <div className="mt-[24px] flex items-start gap-[16px] max-mobile:hidden">
+                <ArtistActions post={post} />
+              </div>
+              <div className="hidden max-mobile:-mx-[var(--pad)] max-mobile:flex max-mobile:items-center max-mobile:gap-[12px] max-mobile:border max-mobile:border-line-2 max-mobile:bg-ink-raised max-mobile:px-[16px] max-mobile:py-[9px]">
+                <ArtistActions post={post} />
+              </div>
             </div>
 
-            <div className="mt-[24px] flex items-start gap-[16px] max-mobile:hidden">
-              <ArtistActions post={post} />
-            </div>
-
-            <ArtworkMeta
-              post={post}
-              description={description}
-              actions={<ArtistActions post={post} />}
-            />
+            <ArtworkMeta post={post} description={description} />
           </div>
 
           <Sidebar moreBy={moreBy} />
@@ -248,15 +253,7 @@ function ArtworkPage() {
   );
 }
 
-function ArtworkMeta({
-  post,
-  description,
-  actions,
-}: {
-  post: Post;
-  description: string | undefined;
-  actions?: React.ReactNode;
-}) {
+function ArtworkMeta({ post, description }: { post: Post; description: string | undefined }) {
   return (
     <div
       className="mt-[16px] max-mobile:mt-0 max-mobile:-mx-[var(--pad)] rounded-[4px] max-mobile:rounded-none"
@@ -266,17 +263,6 @@ function ArtworkMeta({
         boxShadow: "0 2px 0 var(--shadow)",
       }}
     >
-      {actions && (
-        <div
-          className="hidden max-mobile:flex items-center gap-[12px]"
-          style={{
-            padding: "9px 16px",
-            borderBottom: description ? "1px solid var(--line)" : "none",
-          }}
-        >
-          {actions}
-        </div>
-      )}
       {description && (
         <div
           className="text-[15px] max-mobile:text-[13px]"
