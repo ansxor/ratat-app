@@ -20,7 +20,7 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
   const [pending, setPending] = useState(false);
   const [optimisticActive, setOptimisticActive] = useState<boolean | undefined>();
   const [animationKey, setAnimationKey] = useState(0);
-  const [starAnimation, setStarAnimation] = useState<"bounce" | "shrink">("bounce");
+  const [starAnimation, setStarAnimation] = useState<"bounce" | "shrink">();
 
   const agent = session?.agent;
 
@@ -28,6 +28,7 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
     setCount(post.likeCount ?? 0);
     setLikeUri(post.viewerLike);
     setOptimisticActive(undefined);
+    setStarAnimation(undefined);
   }, [post.uri, post.likeCount, post.viewerLike]);
 
   const toggle = async () => {
@@ -76,7 +77,10 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
         disabled={pending || !session}
         onClick={() => void toggle()}
       >
-        <StarIcon key={animationKey} className={`star-${starAnimation}`} />
+        <StarIcon
+          key={animationKey}
+          className={starAnimation ? `star-${starAnimation}` : undefined}
+        />
         <span>{count}</span>
       </button>
     </div>
