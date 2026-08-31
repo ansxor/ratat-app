@@ -621,6 +621,12 @@
     width: 13px;
     height: 13px;
   }
+  @media (max-width: theme(--breakpoint-mobile)) {
+    .piece__bar {
+      display: none;
+    }
+  }
+
   .piece__bar .act--star {
     gap: 6px;
     padding: 7px 9px;
