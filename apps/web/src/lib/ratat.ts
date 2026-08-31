@@ -215,10 +215,18 @@ export async function getRatatFollows(
   return { follows, indexed };
 }
 
-export async function getPost(actor: string, rkey: string, signal?: AbortSignal): Promise<Post> {
+export async function getPost(
+  actor: string,
+  rkey: string,
+  options: { viewer?: string; signal?: AbortSignal } = {},
+): Promise<Post> {
   const res = await client.get("net.ratat.feed.getPost", {
-    params: { actor: actor as Profile["did"], rkey },
-    ...(signal ? { signal } : {}),
+    params: {
+      actor: actor as Profile["did"],
+      rkey,
+      ...(options.viewer ? { viewer: options.viewer as Profile["did"] } : {}),
+    },
+    ...(options.signal ? { signal: options.signal } : {}),
   });
   if (!res.ok) throw new AppviewError(res.data.error, res.data.message);
   return res.data.post;

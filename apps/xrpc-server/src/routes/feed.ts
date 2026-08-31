@@ -24,6 +24,7 @@ import {
   indexedFeedSample,
   indexedPost,
   timelinePage,
+  viewerLikeForPost,
 } from "../store.ts";
 import { artworkView, postView, rowPostView } from "../views.ts";
 import { resolveViewer } from "../viewer.ts";
@@ -308,11 +309,18 @@ export const feedGetPost = (
     const known = yield* indexedActor(actor);
     const did = yield* resolveDid(actor, known, ctx.signal);
     const uri = `at://${did}/app.bsky.feed.post/${rkey}` as AtUri;
+    const viewer = ctx.params.viewer
+      ? yield* resolveViewer(ctx.params.viewer, ctx.signal)
+      : undefined;
+    const indexedViewerLike = viewer
+      ? yield* viewerLikeForPost(viewer.did, uri).pipe(Effect.orElseSucceed(() => undefined))
+      : undefined;
+    const viewerLike = indexedViewerLike as NetRatatFeedDefs.PostView["viewerLike"];
 
     const author = known?.did === did ? known : yield* indexedActor(did);
     if (author) {
       const row = yield* indexedPost(uri).pipe(Effect.orElseSucceed(() => undefined));
-      const view = row ? rowPostView(row, author) : undefined;
+      const view = row ? rowPostView(row, author, viewerLike) : undefined;
       if (view) {
         yield* Effect.logDebug(`getPost ${uri} served from index`);
         const indexedOutput: NetRatatFeedGetPost.$output = { post: view };
@@ -337,6 +345,8 @@ export const feedGetPost = (
 
     yield* noteInterestInBackground(post.author);
 
-    const output: NetRatatFeedGetPost.$output = { post };
+    const output: NetRatatFeedGetPost.$output = {
+      post: viewerLike ? { ...post, viewerLike } : post,
+    };
     return json(output);
   });

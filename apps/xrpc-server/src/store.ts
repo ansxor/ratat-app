@@ -415,6 +415,22 @@ export const graphCounts = (
     };
   });
 
+export const viewerLikeForPost = (
+  viewer: string,
+  subjectUri: string,
+): Effect.Effect<string | undefined, DbError, Database> =>
+  Effect.gen(function* () {
+    const database = yield* Database;
+    const rows = yield* database.run("viewerLikeForPost", (db) =>
+      db
+        .select({ uri: postLike.uri })
+        .from(postLike)
+        .where(and(eq(postLike.did, viewer), eq(postLike.subjectUri, subjectUri)))
+        .limit(1),
+    );
+    return rows[0]?.uri;
+  });
+
 // --------------------------------------------------------------- the timeline
 
 export interface TimelineItem {

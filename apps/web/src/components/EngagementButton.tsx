@@ -7,9 +7,6 @@ import type { Post } from "#/lib/ratat.ts";
 import { useSession } from "#/lib/session.tsx";
 import { cn } from "#/lib/utils.ts";
 
-// Detail reads omit viewer state, so retain what viewer-aware feeds already told us.
-const viewerLikes = new Map<string, string | null>();
-
 const DETAIL_CLASS =
   "inline-flex items-center gap-[6px] text-[13px] font-[700] px-[12px] py-[7px] bg-ink-raised border text-paper transition-[background,border-color] duration-[140ms] hover:bg-ink-hi [&_svg]:size-[15px] [&_svg]:text-gold hover:border-gold disabled:cursor-default disabled:opacity-60 disabled:hover:bg-ink-raised disabled:hover:border-line max-mobile:gap-[8px] max-mobile:text-[16px] max-mobile:px-[16px] max-mobile:py-[8px] max-mobile:[&_svg]:size-[19px]";
 
@@ -19,11 +16,7 @@ const DETAIL_CLASS =
 export function EngagementButton({ post, variant }: { post: Post; variant: "card" | "detail" }) {
   const { session } = useSession();
   const [count, setCount] = useState(post.likeCount ?? 0);
-  const likeKey = session ? `${session.did}:${post.uri}` : undefined;
-  const cachedLike = likeKey ? viewerLikes.get(likeKey) : undefined;
-  const [likeUri, setLikeUri] = useState<string | undefined>(
-    cachedLike === null ? undefined : (cachedLike ?? post.viewerLike),
-  );
+  const [likeUri, setLikeUri] = useState<string | undefined>(post.viewerLike);
   const [pending, setPending] = useState(false);
   const [optimisticActive, setOptimisticActive] = useState<boolean | undefined>();
   const [animationKey, setAnimationKey] = useState(0);
@@ -33,15 +26,10 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
 
   useEffect(() => {
     setCount(post.likeCount ?? 0);
-    const cached = likeKey ? viewerLikes.get(likeKey) : undefined;
-    const next = post.viewerLike ?? (cached === null ? undefined : cached);
-    setLikeUri(next);
-    if (likeKey && (post.viewerLike || cached === undefined)) {
-      viewerLikes.set(likeKey, post.viewerLike ?? null);
-    }
+    setLikeUri(post.viewerLike);
     setOptimisticActive(undefined);
     setStarAnimation(undefined);
-  }, [likeKey, post.likeCount, post.viewerLike]);
+  }, [post.uri, post.likeCount, post.viewerLike]);
 
   const toggle = async () => {
     if (!agent || pending) return;
@@ -56,11 +44,9 @@ export function EngagementButton({ post, variant }: { post: Post; variant: "card
       if (likeUri) {
         await deleteLike(agent, likeUri);
         setLikeUri(undefined);
-        if (likeKey) viewerLikes.set(likeKey, null);
       } else {
         const uri = await createLike(agent, { uri: post.uri, cid: post.cid });
         setLikeUri(uri);
-        if (likeKey) viewerLikes.set(likeKey, uri);
       }
       setOptimisticActive(undefined);
     } catch (cause) {

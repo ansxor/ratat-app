@@ -19,6 +19,7 @@ import {
 } from "#/components/ui/Carousel.tsx";
 import { BlueskyIcon } from "#/components/ui/icons.tsx";
 import { rkeyOf } from "#/lib/artwork-href.ts";
+import { restoreAgent } from "#/lib/oauth.ts";
 import { formatDate } from "#/lib/date.ts";
 import { Image, BLACKOUT_IMAGES } from "#/lib/image.tsx";
 import {
@@ -35,7 +36,8 @@ import { cn } from "#/lib/utils.ts";
 
 export const Route = createFileRoute("/art/$handle/$rkey")({
   loader: async ({ params }) => {
-    const post = await getPost(params.handle, params.rkey).catch((cause: unknown) => {
+    const viewer = (await restoreAgent())?.sub;
+    const post = await getPost(params.handle, params.rkey, { viewer }).catch((cause: unknown) => {
       throw new Error(readFailureMessage(cause, "That artwork isn't on Ratat."));
     });
     const feed = await getAuthorFeed(post.author.did, { sample: true, limit: 9 }).catch(

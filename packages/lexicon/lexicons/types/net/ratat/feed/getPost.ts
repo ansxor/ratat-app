@@ -16,6 +16,10 @@ const _mainSchema = /*#__PURE__*/ v.query(
 				 * Record key of the app.bsky.feed.post.
 				 */
 				"rkey": /*#__PURE__*/ v.string(),
+				/**
+				 * DID or handle whose like state should be included.
+				 */
+				"viewer": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.actorIdentifierString()),
 			}
 		),
 		"output": {

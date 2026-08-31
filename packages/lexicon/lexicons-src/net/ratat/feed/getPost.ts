@@ -18,6 +18,10 @@ export default document({
         properties: {
           actor: required(string({ description: "DID or handle.", format: "at-identifier" })),
           rkey: required(string({ description: "Record key of the app.bsky.feed.post." })),
+          viewer: string({
+            description: "DID or handle whose like state should be included.",
+            format: "at-identifier",
+          }),
         },
       }),
       output: {
