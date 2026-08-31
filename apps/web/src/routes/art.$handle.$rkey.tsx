@@ -70,7 +70,7 @@ function MediaFrame({ media, alt, veil }: { media: Media; alt: string; veil: Vei
   const covered = veil.variant !== null && !veil.peeked;
   const frame = cn(
     veilFrameClass(covered ? veil.variant : null, { animated: veil.animated, strength: "page" }),
-    "max-mobile:!h-auto max-mobile:min-h-[75dvh] max-mobile:max-h-[calc(100dvh-var(--header-h))]",
+    "max-mobile:!h-[calc(100dvh-118px)] max-mobile:min-h-0 max-mobile:max-h-none",
   );
 
   const cover = veil.variant && (
@@ -266,6 +266,17 @@ function ArtworkMeta({
         boxShadow: "0 2px 0 var(--shadow)",
       }}
     >
+      {actions && (
+        <div
+          className="hidden max-mobile:flex items-center gap-[12px]"
+          style={{
+            padding: "9px 16px",
+            borderBottom: description ? "1px solid var(--line)" : "none",
+          }}
+        >
+          {actions}
+        </div>
+      )}
       {description && (
         <div
           className="text-[15px] max-mobile:text-[13px]"
@@ -282,17 +293,6 @@ function ArtworkMeta({
             className="m-0"
             collapsedClassName="max-mobile:line-clamp-3"
           />
-        </div>
-      )}
-      {actions && (
-        <div
-          className="hidden max-mobile:flex items-center gap-[12px]"
-          style={{
-            padding: "9px 16px",
-            borderTop: description ? "1px solid var(--line)" : "none",
-          }}
-        >
-          {actions}
         </div>
       )}
       <div
