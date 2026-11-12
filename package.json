@@ -31,13 +31,6 @@
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0"
   },
-  "devEngines": {
-    "packageManager": {
-      "name": "npm",
-      "version": "12.2.2",
-      "onFail": "download"
-    }
-  },
   "allowScripts": {
     "better-sqlite3@12.11.1": true
   }

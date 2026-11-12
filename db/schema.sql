@@ -282,3 +282,13 @@ CREATE TABLE "net.ratat.graph.follow" (
   subject TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
+
+CREATE TABLE ratat_counted_like (
+  uri TEXT PRIMARY KEY,
+  subject_uri TEXT NOT NULL
+);
+
+CREATE TABLE ratat_like_count (
+  uri TEXT PRIMARY KEY,
+  count INTEGER NOT NULL DEFAULT 0
+);
