@@ -1,227 +1,202 @@
 # Indexing: the interested set, backfill, and the live tail
 
-Ratat is a gallery over Bluesky. It stores no content of its own: an artwork is
-an `app.bsky.feed.post` in somebody's repo, and the images are on Bluesky's CDN.
-What the local Postgres index answers is one narrow question — **which posts and
-actors do we know about** — so that a page view does not turn into a walk over
-the public appview.
+Ratat is a gallery over Bluesky built on Hatk. It stores no blobs of its own:
+an artwork is an `app.bsky.feed.post` in somebody's repo, and images live on
+Bluesky's CDN (or via Hatk's `/blob/{did}/{cid}` proxy when running against a
+local dev PDS). What the local SQLite index (`data/hatk.db` locally,
+`/data/hatk.db` in production) answers is one narrow question — **which posts
+and actors do we know about** — so that a page view does not turn into a walk
+over the public appview.
 
-Everything here is on-demand. Ratat does not classify the firehose, does not
-mirror Bluesky, and stores no blobs.
+Hatk manages schema creation by convention from `lexicons/`: `"app.bsky.feed.post"`,
+`"app.bsky.actor.profile"`, `"app.bsky.feed.like"`, and `"net.ratat.graph.follow"`
+are created automatically alongside Hatk's internal metadata tables (`_repos`,
+`_cursor`, `_labels`). Auxiliary like-counter tables are created by
+`server/setup/01-tables.ts`.
 
-## The interested set
+Everything here is on-demand. Ratat does not backfill the whole network and
+stores no blobs.
 
-An `actor` row with a non-null `interested_at` is _interested_. That is the only
-membership test; nothing else gates ingest.
+## The interested set (`_repos`)
 
-A DID becomes interested when:
+A DID with a row in Hatk's `_repos` table is tracked (`pending` while waiting
+for backfill, `active` once imported). Nothing else gates ingest.
 
-| Trigger                                                   | Where                                                                     |
-| --------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Somebody opens their profile                              | `net.ratat.actor.getProfile`                                              |
-| Somebody reads their feed, even before we know the handle | `net.ratat.feed.getAuthorFeed`, from the byline of the first post fetched |
-| Somebody opens one of their artworks                      | `net.ratat.feed.getPost`                                                  |
-| A user logs in                                            | falls out of the above — the masthead reads its own profile               |
-| Somebody Ratat-follows them                               | `net.ratat.graph.follow` ingest — see _The Ratat graph_                   |
+A DID enters `_repos` when:
 
-Marking is a background write on the read path (`noteInterestInBackground`). It
-cannot fail a request: if Postgres is unreachable, the page still renders live
-and the DID simply becomes interested the next time someone looks.
+| Trigger                                                   | Where                                                                                   |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Somebody opens their profile                              | `server/xrpc/getProfile.ts` via `noteInterest(did)` (`POST /repos/add`)                 |
+| Somebody reads their feed, even before we know the handle | `server/xrpc/getAuthorFeed.ts` via `noteInterest(did)` (`POST /repos/add`)              |
+| Somebody opens one of their artworks                      | `server/xrpc/getPost.ts` via `noteInterest(did)` (`POST /repos/add`)                    |
+| A user logs in via OAuth                                  | `server/on-login.ts` (`defineHook('on-login', ...)` calling `ctx.ensureRepo(ctx.did)`)  |
+| Somebody Ratat-follows them                               | `hatk.config.ts` `backfill.references` on `net.ratat.graph.follow` (`field: 'subject'`) |
 
-The same write refreshes the profile snapshot the index keeps — handle, display
-name, avatar, banner, description. Optional fields `coalesce` over what is
-already stored, so a byline-shaped snapshot (did/handle/avatar, all a feed read
-knows) never erases the fuller one a profile visit wrote.
+Read-path marking (`noteInterest` in `server/_interest.ts`) fires an
+asynchronous `POST http://127.0.0.1:${PORT}/repos/add` request to the Hatk
+server itself. **Invariant:** read-path interest marking must never fail a
+request — network or server errors are swallowed so the page still renders from
+the live fallback and the DID is queued on a later visit.
 
 The set only grows. That is fine at v1 scale and is the first thing to revisit:
 see _Limits_ below.
 
-## Backfill
+## Backfill via Hatk
 
-`apps/ingester` runs a worker that looks for the oldest interested DID with no
-`backfilled_at`, and walks its whole Bluesky feed into the index:
-
-```
-getAuthorFeed(actor, filter=posts_with_media, includePins=false)
-  → drop reposts and anything whose embed carries no media
-  → upsert post rows, seeding like/reply/repost counts from the appview
-  → next cursor, after a polite delay
-  → when the cursor runs out, stamp backfilled_at
-```
+Once a DID enters `_repos` in `pending` state, Hatk's built-in backfill worker
+fetches the repository CAR archive directly from the actor's PDS via
+`com.atproto.sync.getRepo` (locating the PDS through the DID document at
+`DID_PLC_URL`), indexes records matching the configured collections, and marks
+the repo `active`.
 
 Choices worth knowing:
 
-- **One DID at a time.** Parallel walks would multiply our load on a shared
-  public appview to shave seconds off a wait nobody is watching.
-- **`backfill_attempted_at` is stamped before the walk, not after.** A crash
-  mid-backfill leaves the DID backed off by `BACKFILL_RETRY_MINUTES` instead of
-  retried immediately on the next boot; a failure also records
-  `backfill_error`.
-- **No page cap by default.** `BACKFILL_MAX_PAGES` exists as a guard against a
-  pathological account; when it fires, it logs that the rest of the portfolio is
-  not indexed rather than quietly stopping.
-- **Media is stored in view shape.** The `media` JSONB column holds exactly the
-  `net.ratat.feed.defs#imageView` / `#videoView` objects the lexicon returns, so
-  a read is a row fetch, not a re-render of blob refs.
+- **Signal scoping.** `hatk.config.ts` sets `backfill.signalCollections:
+  ['net.ratat.graph.follow']` and `backfill.fullNetwork: false`. Listing
+  `app.bsky.feed.post` as a signal collection would trigger full-network
+  auto-backfills for every account on Bluesky; scoping to `net.ratat.graph.follow`
+  keeps indexing limited to Ratat-followed artists and explicitly added DIDs.
+- **Bounded concurrency.** `backfill.parallelism` (default `3`),
+  `backfill.fetchTimeout`, and `backfill.maxRetries` control PDS load and
+  back-off on failed repo imports.
+- **Media extraction on read/view.** `server/_media.ts` extracts image and
+  video metadata (`app.bsky.embed.images`, `app.bsky.embed.video`, and
+  `app.bsky.embed.recordWithMedia`) into `net.ratat.feed.defs#imageView` and
+  `#videoView` shapes, routing local dev blobs through `/blob/{did}/{cid}` when
+  `isLocalRelay()` is true and Bluesky CDN URLs otherwise.
 
 ## The Ratat graph
 
-`net.ratat.graph.follow` is the one record Ratat writes, and it lives in the
-follower's repo. The index mirrors it into `ratat_follow` because the home feed
-is a join over it, and because being followed is what makes an artist worth
-indexing at all.
+`net.ratat.graph.follow` is the one custom record Ratat writes, and it lives in
+the follower's repo. Hatk indexes it into `"net.ratat.graph.follow"` because
+the home timeline is a SQL join over it, and because being followed is what
+makes an artist worth indexing.
 
-Two ways a follow arrives:
-
-- **The tail** (below) sees everything written from now on.
-- **A one-off graph walk** covers what was written before. A repo is walked when
-  somebody asks what it follows — `net.ratat.graph.getFollows` stamps
-  `follows_wanted_at`, which is the queue the worker reads, and stamps
-  `follows_backfilled_at` when done. The appview does not carry the collection,
-  so the walk reads `com.atproto.repo.listRecords` from the actor's own PDS,
-  found through their DID document.
-
-Either way, indexing a follow marks its **subject** interested. The record
-carries only a DID, so the first sighting of a subject fetches their profile
-from the appview — an actor row needs a handle to render a byline.
-
-`getFollows` reports `indexed: false` until the walk has happened. That is what
-lets the web app fall back to reading the viewer's own repo, which is also the
-only correct answer in the second after a follow is written.
+- **Real-time writes.** Hatk's stream consumer picks up `net.ratat.graph.follow`
+  creates and deletes from the relay/PDS stream.
+- **Reference backfill.** Because `hatk.config.ts` configures
+  `backfill.references: [{ collection: 'net.ratat.graph.follow', field: 'subject' }]`,
+  indexing a follow automatically enqueues the followed artist's repo into
+  `_repos` so their artworks and profile are backfilled.
+- **Followers and following queries.** `server/xrpc/getFollows.ts` and
+  `server/xrpc/getFollowers.ts` query `"net.ratat.graph.follow"` joined with
+  `_repos` and `"app.bsky.actor.profile"`, reporting `indexed: true` once the
+  target repo is `active` in `_repos` (so the frontend knows when to fall back
+  to the viewer's own PDS via `net.ratat.graph.listBskyFollows`).
 
 Duplicate follows of the same subject are tolerated rather than constrained: a
 repo may hold several, and the timeline join collapses them.
 
-## The live tail
+## Live sync and the like-count mirror
 
-Three jetstream subscriptions, for three different reasons.
+Hatk's built-in firehose consumer subscribes to the configured relay
+(`ws://localhost:2583` in dev, `wss://bsky.network` in production) and keeps
+indexed repos up to date as `app.bsky.feed.post`, `app.bsky.actor.profile`,
+`app.bsky.feed.like`, and `net.ratat.graph.follow` commits arrive.
 
-**`jetstream:posts`** is scoped by DID. Posts and profile edits live in the
-author's own repo, so jetstream filters to the interested set for us
-(`wantedDids`, re-read every `JETSTREAM_DID_REFRESH_SECONDS`). It handles:
+**The like-count mirror (`server/_like-tail.ts`):** a like (`app.bsky.feed.like`)
+lives in the _liker's_ repo, not the artwork author's repo, so a repo-scoped
+index of tracked artists would miss likes from arbitrary Bluesky accounts.
 
-- `app.bsky.feed.post` create/update → index if the record carries media;
-  **delete the row if an edit stripped the media**, since a post without media
-  is not an artwork.
-- `app.bsky.feed.post` delete → drop the row. Takedowns matter here: we cache
-  media _metadata_, and the images themselves stay on Bluesky's CDN, so a
-  takedown there propagates on its own.
-- `app.bsky.actor.profile` → refresh the byline snapshot. Records carry blob
-  refs, not URLs, so the CDN URLs are rebuilt the way the appview builds them
-  (`packages/common/src/blob.ts`) — a post indexed from the firehose and the
-  same post indexed from a backfill agree.
-- identity events → update the stored handle.
+To maintain live like counts in production without indexing the entire network:
 
-**`jetstream:likes`** cannot be scoped that way, and this is the expensive part
-of the design. A like lives in the _liker's_ repo, and we do not know who will
-like an artwork before they do — so this subscription is the whole
-`app.bsky.feed.like` firehose. Filtering happens here:
+1. `server/setup/01-tables.ts` creates two auxiliary SQLite tables:
+   `ratat_like_count (uri TEXT PRIMARY KEY, count INTEGER NOT NULL DEFAULT 0)`
+   and `ratat_counted_like (uri TEXT PRIMARY KEY, subject_uri TEXT NOT NULL)`.
+2. When `JETSTREAM_LIKE_TAIL !== 'false'` and `JETSTREAM_URL` is configured,
+   `01-tables.ts` starts `server/_like-tail.ts`, which connects to Jetstream for
+   `app.bsky.feed.like` events.
+3. On a like create whose subject post belongs to a tracked DID in `_repos`,
+   `_like-tail.ts` records the like URI in `ratat_counted_like` and increments
+   `ratat_like_count` once.
+4. Like **deletes** arrive with no record payload and therefore no subject URI.
+   `_like-tail.ts` looks up the deleted like's URI in `ratat_counted_like`,
+   removes it, and decrements `ratat_like_count`.
 
-1. The like's subject at-uri names the author. One string parse plus a set
-   lookup against the interested DIDs drops nearly every event, without
-   touching Postgres.
-2. What survives goes to `applyLike`, which increments `post.like_count` only
-   if we actually index that post, and only once.
+Set `JETSTREAM_LIKE_TAIL=false` (or leave `JETSTREAM_URL` unset in local dev) to
+disable the global like tail; handlers also read `"app.bsky.feed.like"` counts
+directly for locally indexed likes.
 
-Like **deletes** arrive with no record, and so no subject. That is why the
-`post_like` table exists: it maps a like URI back to the post it was counted
-against, for likes on our posts only. It is never read for display, and it is
-loaded into memory at boot so a delete can be recognised without a query.
+## Reads, live fallback, and cursors
 
-Set `JETSTREAM_LIKE_TAIL=false` to turn this half off; counts then stay at their
-backfilled values.
+Handlers read from SQLite once an actor's repo is `active` in `_repos`, and fall
+back to the public Bluesky appview (`BSKY_APPVIEW_URL`, default
+`https://public.api.bsky.app`) via `server/_bsky.ts` when an actor or post is
+not yet indexed:
 
-**`jetstream:follows`** is unscoped for the same reason as the like tail — a
-follow lives in the follower's repo — but costs nothing, because only Ratat
-writes `net.ratat.graph.follow` and jetstream filters the collection upstream.
-A create writes the row and marks the subject interested; a delete carries no
-record, but the DID and rkey in the event name the row on their own.
+- **`net.ratat.actor.getProfile`** (`server/xrpc/getProfile.ts`): fetches the
+  live Bluesky profile for fresh Bluesky follower/following counts, falling back
+  to `"app.bsky.actor.profile"` + `_repos` when offline or querying local-only
+  seeded accounts; overlays Ratat graph counts from `"net.ratat.graph.follow"`
+  and media `postsCount` when active; triggers `noteInterest` asynchronously.
+- **`net.ratat.feed.getAuthorFeed`** (`server/xrpc/getAuthorFeed.ts`): checks
+  `isRepoActive(db, actorDid)`. If `active`, queries `"app.bsky.feed.post"`
+  filtered to media embeds, supporting `sample: true`, 1-based `page` offsets
+  with `total`, and keyset `cursor` (an active account with 0 media posts returns
+  an empty page rather than falling back to live). If untracked or `pending`,
+  falls back to live `app.bsky.feed.getAuthorFeed` and calls `noteInterest`.
+- **`net.ratat.feed.getPost`** (`server/xrpc/getPost.ts`): looks up the post in
+  `"app.bsky.feed.post"` first; if absent, fetches live via `app.bsky.feed.getPosts`
+  and calls `noteInterest`.
+- **`net.ratat.actor.searchActorsTypeahead`** (`server/xrpc/searchActorsTypeahead.ts`):
+  queries local `_repos` / `"app.bsky.actor.profile"` rows and merges live
+  results from `app.bsky.actor.searchActorsTypeahead`, deduplicating by DID so
+  both seeded local accounts and live Bluesky artists appear.
 
-Each subscription checkpoints its jetstream cursor to `ingestion_cursor` every
-`JETSTREAM_CHECKPOINT_EVERY` events, and resumes from it on reconnect.
+**Cursors (`server/_cursor.ts`):**
 
-## Reads
+- The indexed path mints base64url keyset cursors (`createdAtMillis|uri` via
+  `encodeFeedCursor` / `decodeFeedCursor`).
+- The live fallback path receives opaque upstream cursors from the public
+  appview and caches page-to-cursor mappings in memory (`rememberCursor` /
+  `nearestCursor`) so multi-page walks do not lose position.
+- **Invariant:** the indexed path checks cursor format and refuses foreign
+  (upstream/opaque) cursors rather than paging from nonsense.
 
-`apps/xrpc-server` serves an actor from the index once `backfilled_at` is set,
-and live from the public appview otherwise. The fallback is not only for the
-first visit — **any** database failure falls back to live, including a server
-started with no `DATABASE_URL` at all, which logs a warning and behaves exactly
-as it did before this index existed.
-
-What that buys, measured on `bsky.app` (168 indexed artworks, `limit=30`) against
-a second server pointed at an unreachable database:
-
-| Read   | Indexed | Live   |
-| ------ | ------- | ------ |
-| page 1 | 5.9 ms  | 351 ms |
-| page 4 | 5.4 ms  | 560 ms |
-| page 6 | 4.2 ms  | 240 ms |
-
-The live column flatters itself: those requests ran in order against one process,
-so pages 4 and 6 walked from a cursor page 1 had already cached. A cold jump to
-page 4 pays one upstream request per page on the way.
-
-Page numbers are offsets over `post_author_feed_idx (did, created_at desc, uri
-desc)`, so a jump to page 40 costs the same as page 2. The cursor-walking path
-and its memo (`cursor-cache.ts`) survive only for actors the index does not hold
-yet.
-
-Cursors handed out by the indexed path are a base64url keyset
-(`createdAtMillis|uri`); one minted by the live path is upstream's opaque string.
-The indexed path recognises the difference and refuses a cursor it did not mint,
-falling back to live rather than paging from nonsense.
-
-The home feed (`net.ratat.feed.getTimeline`) is the one read with **no live
-fallback**: it is a join over a graph only we hold, so an unreachable index is
-an error rather than a slower answer. It is paged the same way — offsets over
-`post_timeline_idx (created_at desc, uri desc)` — and returns the total, so the
-pager knows how many pages exist. An artist who is followed but not yet
-backfilled contributes nothing until the worker reaches them.
+**Timeline (`net.ratat.feed.getTimeline`, `server/xrpc/getTimeline.ts`):**
+**No live fallback.** The home feed is a SQL join between `"app.bsky.feed.post"`
+and `"net.ratat.graph.follow"` for the viewer's DID, paged by 1-based `page`
+offset with `total`. Because the Ratat follow graph exists only in Ratat's
+index, an unreachable index cannot fall back to Bluesky's appview. A followed
+artist contributes posts as soon as Hatk finishes importing their repo.
 
 ### What is not indexed
 
-- **Profiles.** `getProfile` is always live: followers, follows and post counts
-  are Bluesky's numbers and would be stale the moment we stored them. The
-  snapshot in `actor` exists only to render a byline next to an indexed post.
-- **Viewer state.** Whether _you_ liked something is read through your own PDS
-  (`apps/web/src/lib/likes.ts`), which proxies to an appview that knows.
-- **Reply and repost counts.** Snapshots taken when the post was indexed. They
-  are not maintained: replies and reposts would each need their own global
-  firehose tail, which is not worth what those two numbers are worth.
+- **Bluesky profile stats.** Bluesky follower, following, and post counts in
+  `getProfile` come live from `BSKY_APPVIEW_URL` (falling back to local tables
+  only when offline or for local dev accounts) so they do not go stale.
+- **Viewer state.** Whether _you_ liked a post (`viewerLike`) is resolved from
+  indexed `"app.bsky.feed.like"` records or the authenticated viewer's PDS/OAuth
+  session rather than precomputed per viewer.
+- **Maintained reply and repost counts.** Replies and reposts would each require
+  their own global firehose tail and are not mirrored.
 
 ## Limits, and what to watch
 
-- **The interested set only grows**, and jetstream refuses to scope a
-  subscription to more than 10,000 DIDs. Past that the tail logs an error and
-  drops the overflow. An eviction or re-backfill policy is needed before then.
-- **`post_like` grows with every like on an indexed post**, and the whole table
-  is held in memory by the like tail so deletes can be attributed. Both are
-  bounded by our own index rather than by Bluesky, but neither is bounded by
-  anything else.
-- **The like firehose is real bandwidth** — every like on the network, decoded
-  and discarded. That is the price of a mirrored counter; `JETSTREAM_LIKE_TAIL`
-  is the switch.
-- **A backfill is a point-in-time walk.** Nothing re-walks an actor later, so a
-  post that existed before the backfill but was missed (an appview hiccup mid
-  walk) stays missing until somebody re-triggers it by hand.
-- **The backfill queue is first-come, first-served.** A newly Ratat-followed
-  artist waits behind everyone already in it, and one prolific account can hold
-  the queue for minutes — a 26,000-artwork walk was measured at over two. A
-  home feed that stays empty after an import is usually this.
+- **`_repos` only grows.** Without an eviction policy, tracked repos accumulate
+  over time; if scaling to >10,000 tracked DIDs with Jetstream pinning,
+  Jetstream's 10,000-DID filter cap applies.
+- **`ratat_counted_like` grows with every counted like** so deletes can be
+  attributed back to `ratat_like_count`.
+- **The global like tail consumes real bandwidth** — every `app.bsky.feed.like`
+  on Bluesky is decoded and filtered against `_repos`. `JETSTREAM_LIKE_TAIL=false`
+  disables it.
+- **Backfill is a point-in-time CAR import.** A repo that finished importing
+  gets subsequent updates from the stream, while large accounts wait in Hatk's
+  `backfill.parallelism` queue behind earlier entries.
 
 ## Configuration
 
-| Variable                        | Default                                 | What it does                                                    |
-| ------------------------------- | --------------------------------------- | --------------------------------------------------------------- |
-| `DATABASE_URL`                  | —                                       | Postgres. Absent in `xrpc-server` means live-only reads.        |
-| `BSKY_APPVIEW_URL`              | `https://public.api.bsky.app`           | Where backfill and live reads go.                               |
-| `JETSTREAM_URL`                 | `wss://jetstream1.us-east.bsky.network` | Jetstream instance. jetstream1, not jetstream2 (see config.ts). |
-| `PLC_DIRECTORY_URL`             | `https://plc.directory`                 | DID documents, which is how a repo's PDS is found.              |
-| `JETSTREAM_LIKE_TAIL`           | `true`                                  | Tail the global like firehose.                                  |
-| `JETSTREAM_DID_REFRESH_SECONDS` | `30`                                    | How often the tail re-scopes to the interested set.             |
-| `JETSTREAM_CHECKPOINT_EVERY`    | `50`                                    | Events between cursor writes.                                   |
-| `BACKFILL_POLL_SECONDS`         | `5`                                     | Idle wait when the backfill queue is empty.                     |
-| `BACKFILL_PAGE_SIZE`            | `100`                                   | Posts per upstream page.                                        |
-| `BACKFILL_PAGE_DELAY_MS`        | `250`                                   | Politeness delay between pages.                                 |
-| `BACKFILL_MAX_PAGES`            | `0` (no cap)                            | Guard against a pathological account.                           |
-| `BACKFILL_RETRY_MINUTES`        | `30`                                    | Back-off after a failed backfill.                               |
+| Variable                 | Default                                                   | What it does                                                       |
+| ------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------ |
+| `PORT`                   | `3000`                                                    | HTTP port for the Hatk backend and SvelteKit frontend.             |
+| `DATABASE`               | `data/hatk.db`                                            | SQLite database path (`/data/hatk.db` in production).              |
+| `RELAY`                  | `ws://localhost:2583` (`wss://bsky.network` in prod)      | Firehose relay WebSocket URL consumed by Hatk.                     |
+| `DID_PLC_URL`            | `http://localhost:2582` (`https://plc.directory` in prod) | PLC directory URL for DID and PDS resolution.                      |
+| `BSKY_APPVIEW_URL`       | `https://public.api.bsky.app`                             | Public Bluesky AppView for live fallback reads and search.         |
+| `JETSTREAM_URL`          | `wss://jetstream1.us-east.bsky.network`                   | Jetstream endpoint used by `server/_like-tail.ts`.                 |
+| `JETSTREAM_LIKE_TAIL`    | `true`                                                    | Mirror global `app.bsky.feed.like` events into `ratat_like_count`. |
+| `BACKFILL_PARALLELISM`   | `3`                                                       | Concurrent repo CAR backfills in Hatk.                             |
+| `BACKFILL_FETCH_TIMEOUT` | `300`                                                     | Per-repo CAR fetch timeout in seconds.                             |
+| `BACKFILL_MAX_RETRIES`   | `5`                                                       | Max retries for failed repo backfills.                             |
+| `OAUTH_ISSUER`           | `http://127.0.0.1:{port}`                                 | Public OAuth issuer URL in production.                             |

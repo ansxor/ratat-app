@@ -3,6 +3,7 @@
 This file provides instructions and context for AI coding agents working on this project.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:7510c1e2 -->
+
 ## Beads Issue Tracker
 
 This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
@@ -12,7 +13,7 @@ This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full 
 ```bash
 bd ready              # Find available work
 bd show <id>          # View issue details
-bd update <id> --claim  # Claim work
+bd update <id> --claim  # Claim work atomically
 bd close <id>         # Complete work
 ```
 
@@ -49,46 +50,25 @@ bd close <id>         # Complete work
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
+
 <!-- END BEADS INTEGRATION -->
 
+## Project
 
-## Build & Test
+Ratat is a single-package [Hatk](https://hatk.dev) application serving a
+SvelteKit 2 / Svelte 5 art gallery frontend (`app/`), file-based XRPC handlers
+and hooks (`server/`), ATProto lexicons (`lexicons/net/ratat/*`,
+`lexicons/app/bsky/*`), seeds (`seeds/`), and convention-driven SQLite storage
+(`data/hatk.db`) on a single port (`http://127.0.0.1:3000`).
 
-Bun workspace. `just` wraps the root scripts.
+Source the Vite+ environment before running toolchain commands:
 
 ```bash
-bun install
-just up          # Postgres via docker compose
-just migrate     # apply packages/db migrations
-just dev         # all workspace dev servers
-just check       # lint + lint-colors + format-check + typecheck
+. ~/.config/vite-plus/env
+
+npx hatk generate types   # Regenerate server & client types from lexicons
+npx hatk seed             # Seed local dev PDS with test accounts and artworks
+vp dev                    # Start local PDS/PLC + Hatk server + SvelteKit dev
+vp check                  # Run linting, formatting, and type checks
+vp test                   # Run unit, integration, and browser tests
 ```
-
-## Architecture Overview
-
-Ratat is a read-mostly art appview over `app.bsky.*` data. See
-`.hermes/plans/2026-08-05_ratat-lens-migration.md` for the full plan.
-
-```
-apps/web           TanStack Start (React) — XRPC client + OAuth. No Effect.
-apps/xrpc-server   Effect — read API serving net.ratat.* query lexicons.
-apps/ingester      Effect — jetstream tail + lazy per-DID backfill.
-packages/db        Drizzle + Postgres schema and migration runner.
-packages/lexicon   net.ratat.graph.follow record + net.ratat.* query lexicons.
-packages/common    Shared ATProto helpers.
-```
-
-## Conventions & Patterns
-
-- Backend services use Effect. The frontend does not.
-- Lint/format via oxlint + oxfmt from the repo root; per-package `typecheck`
-  scripts run `tsc --noEmit` against `tsconfig.base.json`.
-- Page and component designs are PORTED from the old app at
-  `/home/answer/Workspace/ratat/apps/frontend` — copy its layout, JSX structure,
-  classes, and CSS one-for-one; never invent a new design. Buttons, inputs, and
-  dialogs are square-cornered like the old app. When no old-app equivalent
-  exists, stay consistent with its visual language.
-- Colours in `apps/web` come from the `light-dark()` tokens in
-  `apps/web/src/styles.css`. `bun run lint:colors` rejects hex, `rgb()`/`hsl()`,
-  and Tailwind palette classes anywhere in `apps/web/src`; a colour that must
-  not flip needs a `theme-invariant` comment on or above the line.

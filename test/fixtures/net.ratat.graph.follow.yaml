@@ -1,0 +1,19 @@
+- did: did:plc:carol
+  rkey: alice
+  subject: did:plc:alice
+  createdAt: $now(-5m)
+
+- did: did:plc:carol
+  rkey: bob
+  subject: did:plc:bob
+  createdAt: $now(-10m)
+
+- did: did:plc:alice
+  rkey: bob
+  subject: did:plc:bob
+  createdAt: $now(-15m)
+
+- did: did:plc:bob
+  rkey: alice
+  subject: did:plc:alice
+  createdAt: $now(-20m)

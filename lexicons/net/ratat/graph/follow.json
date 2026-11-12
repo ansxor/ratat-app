@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "net.ratat.graph.follow",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A Ratat follow. Immutable; delete = unfollow. Kept separate from app.bsky.graph.follow so that following an artist here never mutates the viewer's Bluesky graph, and so a Ratat feed stays art-only.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["subject", "createdAt"],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "format": "did"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

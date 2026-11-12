@@ -1,32 +1,44 @@
 {
   "name": "ratat-app",
-  "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "type": "module",
   "scripts": {
-    "dev": "bun --filter '*' dev",
-    "dev:web": "bun --filter '@ratat/web' dev",
-    "dev:server": "bun --filter '@ratat/xrpc-server' dev",
-    "dev:ingester": "bun --filter '@ratat/ingester' dev",
-    "build": "bun --filter '@ratat/web' build",
-    "migrate": "bun --filter '@ratat/db' migrate",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "lint:colors": "bun --filter '@ratat/web' lint:colors",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check",
-    "typecheck": "bun --filter '*' typecheck && tsc --noEmit",
-    "test": "bun --filter '*' test",
-    "smoke": "bun scripts/smoke.ts"
+    "start": "hatk start",
+    "dev": "vp dev",
+    "build": "vp build",
+    "check": "vp check && svelte-check",
+    "format": "vp format",
+    "test": "vp test",
+    "prepare": "svelte-kit sync"
+  },
+  "dependencies": {
+    "@hatk/hatk": "^0.0.1-alpha.63",
+    "@sveltejs/adapter-node": "^5.5.4",
+    "@sveltejs/kit": "^2.55.0",
+    "embla-carousel-svelte": "^8.6.0"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "oxfmt": "0.58.0",
-    "oxlint": "1.73.0",
-    "railway": "^3.8.1",
-    "typescript": "^5.9.3"
+    "@playwright/test": "^1.65.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/node": "^26.1.1",
+    "@voidzero-dev/vite-plus-core": "^0.2.5",
+    "svelte": "^5",
+    "svelte-check": "^4",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5",
+    "vite-plus": "1.6.0"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": "12.2.2",
+      "onFail": "download"
+    }
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true
   }
 }

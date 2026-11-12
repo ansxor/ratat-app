@@ -1,0 +1,93 @@
+{
+  "lexicon": 1,
+  "id": "net.ratat.actor.defs",
+  "defs": {
+    "profileViewBasic": {
+      "type": "object",
+      "description": "The byline shape: enough to render an artist next to their work.",
+      "required": ["did", "handle"],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 800,
+          "maxGraphemes": 80
+        },
+        "avatar": {
+          "type": "string",
+          "description": "CDN URL, not a blob ref.",
+          "format": "uri"
+        }
+      }
+    },
+    "profileView": {
+      "type": "object",
+      "description": "An artist's profile, hydrated from their Bluesky profile record. The graph counts are Ratat's own: how many net.ratat.graph.follow records this actor holds and how many point at them, counted from the local index.",
+      "required": ["did", "handle", "bskyUrl"],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 800,
+          "maxGraphemes": 80
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 20000,
+          "maxGraphemes": 2000
+        },
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "banner": {
+          "type": "string",
+          "format": "uri"
+        },
+        "followersCount": {
+          "type": "integer",
+          "description": "How many accounts Ratat-follow this one, counted from the local index. Follows written before the ingester watched a follower's repo may be missing."
+        },
+        "followsCount": {
+          "type": "integer",
+          "description": "How many accounts this one Ratat-follows, counted from the local index. Zero until the index has walked this actor's follow records."
+        },
+        "postsCount": {
+          "type": "integer",
+          "description": "Posts of every kind in the actor's repo, as Bluesky counts them — not the size of this actor's Ratat portfolio, which holds only posts with media."
+        },
+        "labels": {
+          "type": "array",
+          "description": "Moderation label values on the account, from its self-labels and from the labelers the Bluesky appview applies. Negations are already resolved away.",
+          "items": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "bskyUrl": {
+          "type": "string",
+          "description": "Permalink to the Bluesky profile.",
+          "format": "uri"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    }
+  }
+}

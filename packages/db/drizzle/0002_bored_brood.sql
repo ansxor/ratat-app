@@ -1,1 +1,0 @@
-ALTER TABLE "post" ADD COLUMN "labels" text[] DEFAULT '{}' NOT NULL;

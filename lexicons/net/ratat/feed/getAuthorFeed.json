@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "net.ratat.feed.getAuthorFeed",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "An artist's portfolio, newest first: their own posts carrying media, hydrated live from the public Bluesky appview. Reposts and text-only posts are excluded. [public]",
+      "parameters": {
+        "type": "params",
+        "required": ["actor"],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "DID or handle.",
+            "format": "at-identifier"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 30
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from a previous page; omit for the first page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "1-based page number, for numbered pagination. The upstream feed is cursor-based, so the server walks cursors to reach the page; a page past the end of the feed yields the last page. Ignored when `cursor` is given.",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 1
+          },
+          "sample": {
+            "type": "boolean",
+            "description": "When true, the feed is a random sample of the artist's works rather than a page: `limit` posts drawn without order, no `cursor` or `page` in the response. `cursor` and `page` are ignored.",
+            "default": false
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["feed"],
+          "properties": {
+            "feed": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "net.ratat.feed.defs#postView"
+              }
+            },
+            "cursor": {
+              "type": "string",
+              "description": "Absent when the upstream feed is exhausted. A page may hold fewer than `limit` posts — or none — while a cursor remains, because posts that carry no media are dropped after paging; never infer the end from the array's length."
+            },
+            "page": {
+              "type": "integer",
+              "description": "The page this response holds. Lower than the requested `page` when the feed ended first. Absent when the request named a `cursor` instead, since a cursor does not say where it sits."
+            },
+            "total": {
+              "type": "integer",
+              "description": "The artist's exact media-post count, present when the response is served from the local index — which is the number a numbered pager should show. Absent when the feed is hydrated live from Bluesky (there is no count short of walking the whole feed) or when the request continued by `cursor`."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "ProfileNotFound"
+        }
+      ]
+    }
+  }
+}

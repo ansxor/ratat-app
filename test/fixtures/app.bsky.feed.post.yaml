@@ -1,0 +1,809 @@
+- did: did:plc:alice
+  rkey: art-01
+  text: Warm horizon landscape study
+  createdAt: $now(-2m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Warm horizon landscape
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa01
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:alice
+  rkey: text-01
+  text: Text-only studio note without media
+  createdAt: $now(-3m)
+
+- did: did:plc:alice
+  rkey: art-02
+  text: Four-panel color progression
+  createdAt: $now(-12m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Panel 1
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa02
+          mimeType: image/png
+          size: 1539
+      - alt: Panel 2
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa03
+          mimeType: image/png
+          size: 1343
+      - alt: Panel 3
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa04
+          mimeType: image/png
+          size: 1330
+      - alt: Panel 4
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa05
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:alice
+  rkey: art-03
+  text: Figure study (adult rated)
+  createdAt: $now(-22m)
+  labels:
+    $type: com.atproto.label.defs#selfLabels
+    values:
+      - val: porn
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Adult figure study
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa06
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:alice
+  rkey: art-04
+  text: Graphic anatomy study
+  createdAt: $now(-32m)
+  labels:
+    $type: com.atproto.label.defs#selfLabels
+    values:
+      - val: graphic-media
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Graphic anatomy sketch
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa07
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:alice
+  rkey: art-05
+  text: Early afternoon horizon sketch
+  createdAt: $now(-42m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Afternoon horizon sketch
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa08
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-35
+  text: "Bob series #35 four-image carousel"
+  createdAt: $now(-1m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Carousel frame 1
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb35
+          mimeType: image/png
+          size: 1539
+      - alt: Carousel frame 2
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc35
+          mimeType: image/png
+          size: 1343
+      - alt: Carousel frame 3
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbd35
+          mimeType: image/png
+          size: 1330
+      - alt: Carousel frame 4
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbe35
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: text-01
+  text: Bob text-only update without media
+  createdAt: $now(-1m)
+
+- did: did:plc:bob
+  rkey: post-34
+  text: "Bob study #34 (porn)"
+  createdAt: $now(-2m)
+  labels:
+    $type: com.atproto.label.defs#selfLabels
+    values:
+      - val: porn
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 34
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb34
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-33
+  text: "Bob study #33 (graphic-media)"
+  createdAt: $now(-3m)
+  labels:
+    $type: com.atproto.label.defs#selfLabels
+    values:
+      - val: graphic-media
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 33
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb33
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-32
+  text: "Bob study #32 (sexual)"
+  createdAt: $now(-4m)
+  labels:
+    $type: com.atproto.label.defs#selfLabels
+    values:
+      - val: sexual
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 32
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb32
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-31
+  text: "Bob study #31"
+  createdAt: $now(-5m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 31
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb31
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-30
+  text: "Bob study #30"
+  createdAt: $now(-6m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 30
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-29
+  text: "Bob study #29"
+  createdAt: $now(-7m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 29
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb29
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-28
+  text: "Bob study #28"
+  createdAt: $now(-8m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 28
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb28
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-27
+  text: "Bob study #27"
+  createdAt: $now(-9m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 27
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb27
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-26
+  text: "Bob study #26"
+  createdAt: $now(-10m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 26
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb26
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-25
+  text: "Bob study #25"
+  createdAt: $now(-11m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 25
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb25
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-24
+  text: "Bob study #24"
+  createdAt: $now(-12m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 24
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb24
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-23
+  text: "Bob study #23"
+  createdAt: $now(-13m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 23
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb23
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-22
+  text: "Bob study #22"
+  createdAt: $now(-14m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 22
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb22
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-21
+  text: "Bob study #21"
+  createdAt: $now(-15m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 21
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb21
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-20
+  text: "Bob study #20"
+  createdAt: $now(-16m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 20
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb20
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-19
+  text: "Bob study #19"
+  createdAt: $now(-17m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 19
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb19
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-18
+  text: "Bob study #18"
+  createdAt: $now(-18m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 18
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb18
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-17
+  text: "Bob study #17"
+  createdAt: $now(-19m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 17
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb17
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-16
+  text: "Bob study #16"
+  createdAt: $now(-20m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 16
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb16
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-15
+  text: "Bob study #15"
+  createdAt: $now(-21m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 15
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb15
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-14
+  text: "Bob study #14"
+  createdAt: $now(-22m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 14
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb14
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-13
+  text: "Bob study #13"
+  createdAt: $now(-23m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 13
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb13
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-12
+  text: "Bob study #12"
+  createdAt: $now(-24m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 12
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb12
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-11
+  text: "Bob study #11"
+  createdAt: $now(-25m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 11
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb11
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-10
+  text: "Bob study #10"
+  createdAt: $now(-26m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 10
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-09
+  text: "Bob study #09"
+  createdAt: $now(-27m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 09
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb09
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-08
+  text: "Bob study #08"
+  createdAt: $now(-28m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 08
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb08
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-07
+  text: "Bob study #07"
+  createdAt: $now(-29m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 07
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb07
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-06
+  text: "Bob study #06"
+  createdAt: $now(-30m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 06
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb06
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-05
+  text: "Bob study #05"
+  createdAt: $now(-31m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 05
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb05
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-04
+  text: "Bob study #04"
+  createdAt: $now(-32m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 04
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb04
+          mimeType: image/png
+          size: 1343
+
+- did: did:plc:bob
+  rkey: post-03
+  text: "Bob study #03"
+  createdAt: $now(-33m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 03
+        aspectRatio:
+          width: 200
+          height: 200
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb03
+          mimeType: image/png
+          size: 1330
+
+- did: did:plc:bob
+  rkey: post-02
+  text: "Bob study #02"
+  createdAt: $now(-34m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 02
+        aspectRatio:
+          width: 256
+          height: 192
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb02
+          mimeType: image/png
+          size: 1539
+
+- did: did:plc:bob
+  rkey: post-01
+  text: "Bob study #01"
+  createdAt: $now(-35m)
+  embed:
+    $type: app.bsky.embed.images
+    images:
+      - alt: Nocturnal study 01
+        aspectRatio:
+          width: 192
+          height: 256
+        image:
+          $type: blob
+          ref:
+            $link: bafkreibbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb01
+          mimeType: image/png
+          size: 1343

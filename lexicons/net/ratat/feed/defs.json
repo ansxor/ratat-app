@@ -1,0 +1,121 @@
+{
+  "lexicon": 1,
+  "id": "net.ratat.feed.defs",
+  "defs": {
+    "imageView": {
+      "type": "object",
+      "description": "CDN URLs served by Bluesky; dimensions are the appview's, not the record's.",
+      "required": ["thumb", "fullsize"],
+      "properties": {
+        "thumb": {
+          "type": "string",
+          "format": "uri"
+        },
+        "fullsize": {
+          "type": "string",
+          "format": "uri"
+        },
+        "alt": {
+          "type": "string",
+          "maxLength": 10000,
+          "maxGraphemes": 1000
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "app.bsky.embed.defs#aspectRatio"
+        }
+      }
+    },
+    "videoView": {
+      "type": "object",
+      "required": ["playlist"],
+      "properties": {
+        "playlist": {
+          "type": "string",
+          "description": "HLS manifest URL.",
+          "format": "uri"
+        },
+        "thumbnail": {
+          "type": "string",
+          "format": "uri"
+        },
+        "alt": {
+          "type": "string",
+          "maxLength": 10000,
+          "maxGraphemes": 1000
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "app.bsky.embed.defs#aspectRatio"
+        }
+      }
+    },
+    "postView": {
+      "type": "object",
+      "description": "One artwork: an app.bsky.feed.post carrying media. Text-only posts are never returned.",
+      "required": ["uri", "cid", "author", "media", "bskyUrl", "createdAt"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "author": {
+          "type": "ref",
+          "ref": "net.ratat.actor.defs#profileViewBasic"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 3000,
+          "maxGraphemes": 300
+        },
+        "media": {
+          "type": "array",
+          "minLength": 1,
+          "items": {
+            "type": "union",
+            "refs": ["#imageView", "#videoView"]
+          }
+        },
+        "labels": {
+          "type": "array",
+          "description": "Moderation label values on this post, from the poster's self-labels and from the labelers the Bluesky appview applies. Negations are already resolved away. Clients filter on these device-side.",
+          "items": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "viewerLike": {
+          "type": "string",
+          "description": "The requesting viewer's indexed app.bsky.feed.like record URI, when they have liked this artwork.",
+          "format": "at-uri"
+        },
+        "likeCount": {
+          "type": "integer"
+        },
+        "replyCount": {
+          "type": "integer"
+        },
+        "repostCount": {
+          "type": "integer"
+        },
+        "bskyUrl": {
+          "type": "string",
+          "description": "Permalink to the Bluesky post.",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    }
+  }
+}

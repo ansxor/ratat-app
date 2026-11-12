@@ -1,3 +1,0 @@
-#:schema https://mise.jdx.dev/schema/mise.json
-[env]
-PORT = "{{ env.RATAT_API_PORT }}"

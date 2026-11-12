@@ -1,0 +1,37 @@
+- did: did:plc:alice
+  rkey: self
+  displayName: Alice
+  description: Digital illustrator exploring warm color palettes and landscapes.
+  avatar:
+    $type: blob
+    ref:
+      $link: bafkreialiceavatar0000000000000000000000000000000000000000001
+    mimeType: image/png
+    size: 512
+  banner:
+    $type: blob
+    ref:
+      $link: bafkreialicebanner0000000000000000000000000000000000000000001
+    mimeType: image/png
+    size: 1024
+
+- did: did:plc:bob
+  rkey: self
+  displayName: Bob
+  description: Character designer and nocturnal sketch artist.
+  avatar:
+    $type: blob
+    ref:
+      $link: bafkreibobavatar000000000000000000000000000000000000000000001
+    mimeType: image/png
+    size: 512
+
+- did: did:plc:carol
+  rkey: self
+  displayName: Carol
+  description: Art collector and curator.
+
+- did: did:plc:dave
+  rkey: self
+  displayName: Dave
+  description: Quiet observer with no follows or posts yet.

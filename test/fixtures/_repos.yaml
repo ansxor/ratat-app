@@ -1,0 +1,12 @@
+- did: did:plc:alice
+  handle: alice.test
+  status: active
+- did: did:plc:bob
+  handle: bob.test
+  status: active
+- did: did:plc:carol
+  handle: carol.test
+  status: active
+- did: did:plc:dave
+  handle: dave.test
+  status: active

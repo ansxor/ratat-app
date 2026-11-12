@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "net.ratat.feed.getTimeline",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "The home gallery: every indexed artwork by an actor the viewer Ratat-follows, newest first. Served from the local index alone, so an artist who is followed but not yet backfilled contributes nothing until they are. [public]",
+      "parameters": {
+        "type": "params",
+        "required": ["viewer"],
+        "properties": {
+          "viewer": {
+            "type": "string",
+            "description": "DID or handle whose net.ratat.graph.follow records build the timeline.",
+            "format": "at-identifier"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 30
+          },
+          "page": {
+            "type": "integer",
+            "description": "1-based page number. The index is ordered, so a page is an offset; a page past the end of the timeline yields the last page.",
+            "minimum": 1,
+            "default": 1
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["feed", "page", "total"],
+          "properties": {
+            "feed": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "net.ratat.feed.defs#postView"
+              }
+            },
+            "page": {
+              "type": "integer",
+              "description": "The page this response holds. Lower than the requested `page` when the timeline ended first."
+            },
+            "total": {
+              "type": "integer",
+              "description": "Artworks in the whole timeline, which is what sizes the pager."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "ProfileNotFound"
+        }
+      ]
+    }
+  }
+}

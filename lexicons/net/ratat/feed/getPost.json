@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "net.ratat.feed.getPost",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "One artwork addressed the way the web app links to it — by the artist's identifier and the post's record key — hydrated live from the public Bluesky appview. [public]",
+      "parameters": {
+        "type": "params",
+        "required": ["actor", "rkey"],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "DID or handle.",
+            "format": "at-identifier"
+          },
+          "rkey": {
+            "type": "string",
+            "description": "Record key of the app.bsky.feed.post."
+          },
+          "viewer": {
+            "type": "string",
+            "description": "DID or handle whose like state should be included.",
+            "format": "at-identifier"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["post"],
+          "properties": {
+            "post": {
+              "type": "ref",
+              "ref": "net.ratat.feed.defs#postView"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "ProfileNotFound"
+        },
+        {
+          "name": "PostNotFound",
+          "description": "No such post, or the post carries no media and is not an artwork."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "lexicon": 1,
+  "id": "net.ratat.graph.getFollowers",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "The net.ratat.graph.follow records pointing at an actor, newest first, read from the local index. [public]",
+      "parameters": {
+        "type": "params",
+        "required": ["actor"],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "DID or handle.",
+            "format": "at-identifier"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 100
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number for numbered paging, which is what the web's follower list uses. Give page or cursor, not both."
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from a previous page; omit for the first page."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["followers"],
+          "properties": {
+            "followers": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#followView"
+              }
+            },
+            "cursor": {
+              "type": "string",
+              "description": "Absent when the last page has been served."
+            },
+            "page": {
+              "type": "integer",
+              "description": "The page actually served, which is the last one when paging ran out first."
+            },
+            "total": {
+              "type": "integer",
+              "description": "How many followers the index holds for this actor. Present when paged, since numbered paging is what needs a total."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "ProfileNotFound"
+        }
+      ]
+    },
+    "followView": {
+      "type": "object",
+      "required": ["uri", "subject", "createdAt"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "The follow record's at-uri.",
+          "format": "at-uri"
+        },
+        "subject": {
+          "type": "string",
+          "description": "The following account's DID.",
+          "format": "did"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "handle": {
+          "type": "string",
+          "description": "The following account's handle from the index snapshot; absent when the index has not resolved one yet, in which case callers fall back to the DID.",
+          "format": "handle"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 800,
+          "maxGraphemes": 80
+        },
+        "avatar": {
+          "type": "string",
+          "description": "CDN URL, not a blob ref.",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

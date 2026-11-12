@@ -6,21 +6,16 @@ account, and ends at a preference held on one device.
 
 ## Where labels come from
 
-The appview hydrates a post through `app.bsky.feed.getPosts` or
-`getAuthorFeed`, and the labels on that view are the poster's self-labels plus
-whatever the labelers the Bluesky appview applies have added. `labelValues()`
-in `@ratat/common/labels` flattens them to bare strings and applies negations,
-because value is the only part the web app reads — the labeler DID, the
-signature and the timestamps would otherwise travel through the index and the
-lexicon for nobody.
+Posts carry self-labels in `app.bsky.feed.post` records and, when fetched via
+Bluesky's appview (`app.bsky.feed.getPosts` or `getAuthorFeed`), hydrated labels
+from Bluesky's configured labelers. `labelValues()` and `selfLabelValues()` in
+`server/_media.ts` flatten label objects to bare strings and apply negations
+(`neg: true`), because the label value is the only part the web app reads — the
+labeler DID, signature, and timestamps would otherwise travel through the index
+and the lexicon for nobody.
 
 `net.ratat.feed.defs#postView` and `net.ratat.actor.defs#profileView` both
 carry a `labels: string[]`.
-
-The index stores them on the post row. A **hydrated** write — the backfill,
-built from an appview view — owns that column; a post arriving on jetstream
-carries only the author's self-labels and must not erase what a labeler added,
-which is the same rule the mirrored like count follows.
 
 ## Device preference, not identity
 
@@ -29,10 +24,13 @@ write to the user's repo. It lives in `localStorage` and applies whether or not
 anyone is signed in. There is deliberately no account-level setting to
 reconcile with.
 
-`lib/content-filter.ts` is the pure half: no React, no storage, so a server
-render and a client render reach the same answer from the same labels.
-`lib/settings.tsx` is the store for the filters and theme, because quick
-settings is one popover and both are device state.
+- `app/lib/content-filter.ts` is the pure half: no Svelte runtime, no browser
+  storage (`DEFAULT_FILTERS`, `categoriesOf`, `veilMode`, `isHidden`,
+  `filterLabelled`, `sanitizeFilters`). Both SSR and the browser reach the same
+  answer from the same labels and filter state.
+- `app/lib/settings.svelte.ts` is the Svelte 5 runes store (`$state` / `$effect`)
+  persisting both content filters and theme (`system` | `light` | `dark`) in
+  `localStorage`, and exposing `useContentVeil(labels)`.
 
 ## Categories and modes
 
@@ -50,28 +48,37 @@ Two label values are not settings. `!hide` from the Bluesky moderation service
 hides the work whatever this device asked for, and `!warn` covers it at least
 as far as `blur`.
 
-## Hydration, and why the default is blur
+## SSR, hydration, and why the default is blur
 
-The server has no storage, so the stored value can only be read after mount.
-Until that effect runs every reader sees `DEFAULT_FILTERS`. That makes the
-pre-hydration render the one nobody chose, so it has to be the covered one —
-which is why the adult default is `blur` and not `show`.
+SvelteKit SSR has no access to `localStorage`, so server-rendered HTML and the
+initial pre-hydration pass always evaluate against `DEFAULT_FILTERS`
+(`adult: 'blur'`, `graphic: 'blur'`). `settings.svelte.ts` reads the stored
+device preference only after mount in the browser.
 
-It is `blur` rather than `hide` because Ratat is a gallery for artists whose
-work is routinely rated: hiding by default would empty half the site for
-somebody who never opened the settings.
+That makes the pre-hydration render the one nobody chose, so it has to be the
+covered one — which is why the defaults are `blur` rather than `show`. It is
+`blur` rather than `hide` because Ratat is a gallery for artists whose work is
+routinely rated: hiding by default would empty half the site for somebody who
+never opened the settings.
 
 ## Reveal is not a setting
 
-Uncovering a card is a peek. It lives in `useContentVeil` and is forgotten the
-moment the mode behind it changes, so it is never written anywhere.
+Uncovering a card is a peek. `useContentVeil(labels)` in
+`app/lib/settings.svelte.ts` tracks `peeked` in component-local reactive state
+and forgets it the moment the underlying filter mode changes or the user
+navigates, so it is never written to `localStorage`.
 
-The artwork page is the exception worth naming: a `hide` there does not take
-the page away, because a link to a work is a link somebody followed on purpose.
-`ArtworkGate` says what covered it and offers the reveal instead.
+- `app/lib/components/ArtworkVeil.svelte` overlays the `blur` or `black` cover
+  on gallery cards and detail media frames with an uncensor button.
+- `app/lib/components/ArtworkGate.svelte` handles `hide` on the artwork detail
+  route (`app/routes/art/[handle]/[rkey]/+page.svelte`): unlike feed grids, a
+  `hide` there does not take the page away, because a direct link to a work is
+  a link somebody followed on purpose. `ArtworkGate` names the category that
+  covered it and offers a `Reveal` button instead.
 
 ## Where the settings are
 
-`QuickSettingsMenu` sits in the masthead so content filters remain available
-even when they hide every artwork. The Pager only renders where there are works
-to page through.
+`app/lib/components/QuickSettingsMenu.svelte` sits in `Masthead.svelte` so
+content filters remain available from any route, even when `hide` removes every
+artwork from a grid. `Pager.svelte` only renders where there are works to page
+through.
