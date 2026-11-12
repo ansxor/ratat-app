@@ -29,10 +29,11 @@ and hooks (`server/`), ATProto lexicons (`lexicons/net/ratat/*`,
 `lexicons/app/bsky/*`), seeds (`seeds/`), and convention-driven SQLite storage
 (`data/hatk.db`) on a single port (`http://127.0.0.1:3000`).
 
-Source the Vite+ environment before running toolchain commands:
+Source the development environment via direnv (`direnv allow`), `nix develop`, or by sourcing Vite+:
 
 ```bash
-. ~/.config/vite-plus/env
+direnv allow   # or: nix develop
+# or manually: . ~/.config/vite-plus/env
 
 npx hatk generate types   # Regenerate server & client types from lexicons
 npx hatk seed             # Seed local dev PDS with test accounts and artworks
